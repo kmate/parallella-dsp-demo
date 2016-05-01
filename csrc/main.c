@@ -1,3 +1,4 @@
+#include "dsp.h"
 #include "mongoose.h"
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +14,8 @@ static void signal_handler(int sig_num) {
 }
 
 #define BUFFER_SIZE 1024
-float buffer[BUFFER_SIZE];
+float input[BUFFER_SIZE];
+float output[BUFFER_SIZE];
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
   switch (ev) {
@@ -26,10 +28,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
     }
     case MG_EV_WEBSOCKET_FRAME: {
       struct websocket_message *wm = (struct websocket_message *)ev_data;
-      memcpy(buffer, wm->data, wm->size);
-      // printf("%f, %f, %f\n", buffer[0], buffer[1], buffer[2]);
-      // TODO: process buffer
-      mg_send_websocket_frame(nc, WEBSOCKET_OP_BINARY, buffer, BUFFER_SIZE * sizeof(float));
+      memcpy(input, wm->data, wm->size);
+      process_samples(input, output, BUFFER_SIZE);
+      mg_send_websocket_frame(nc, WEBSOCKET_OP_BINARY, output, BUFFER_SIZE * sizeof(float));
       break;
     }
   }
