@@ -17,12 +17,12 @@ function startClicked() {
 }
 
 function captureSuccess(stream) {
-    var context = new AudioContext();    
+    var context = new AudioContext();
     input = context.createMediaStreamSource(stream);
     recorder = context.createScriptProcessor(chunkSize, 1, 1);
     bufferNext = bufferSize;
     input.connect(recorder);
-    
+
     socket = new WebSocket("ws://localhost:8000/ws");
     socket.binaryType = "arraybuffer";
     socket.onopen = function(event) {
@@ -43,14 +43,14 @@ function captureSuccess(stream) {
             bufferNext = 0;
             buffer = context.createBuffer(1, bufferSize, context.sampleRate);
         }
-        
+
         var received = new Float32Array(event.data);
         var target = buffer.getChannelData(0);
         for (var i = 0; i < chunkSize; i++) {
             target[bufferNext + i] = received[i];
         }
         bufferNext += chunkSize;
-        
+
         if (bufferNext == bufferSize) {
             var output = context.createBufferSource();
             output.buffer = buffer;
