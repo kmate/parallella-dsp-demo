@@ -27,7 +27,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
     case MG_EV_WEBSOCKET_FRAME: {
       struct websocket_message *wm = (struct websocket_message *)ev_data;
       memcpy(buffer, wm->data, wm->size);
-      printf("%f, %f, %f\n", buffer[0], buffer[1], buffer[2]);
+      // printf("%f, %f, %f\n", buffer[0], buffer[1], buffer[2]);
+      // TODO: process buffer
+      mg_send_websocket_frame(nc, WEBSOCKET_OP_BINARY, buffer, BUFFER_SIZE * sizeof(float));
       break;
     }
   }
