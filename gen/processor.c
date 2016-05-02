@@ -114,7 +114,7 @@ void *thread_t19(void *unused)
         for (v28 = 0; v28 < v24; v28++) {
             a27[v28] = a25[v28];
         }
-        v29 = emit_samples(a27, v24);
+        v29 = emit_samples(a27);
         if (!v29) {
             chan_close(chan1);
             pthread_cancel(t19);
@@ -143,7 +143,7 @@ int main()
         bool v37;
         bool v38;
         
-        v31 = receive_samples(a30, 1024);
+        v31 = receive_samples(a30);
         if (!v31) {
             break;
         }

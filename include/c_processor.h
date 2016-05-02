@@ -86,7 +86,7 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign) {
 #define IN_LATENCY   ((FFT_SIZE) - (STEP_SIZE))
 #define EXPCT_DIFF   (2.0 * (M_PI) * (double)(STEP_SIZE) / (double)(FFT_SIZE))
 
-void pitchShiftBody(float pitchShift, float *input, float *output) {
+void smbPitchShift(float pitchShift, float *input, float *output) {
 	/* do windowing and re,im interleave */
 	float gFFTworksp[2*FFT_SIZE];
 	for (int k = 0; k < FFT_SIZE;k++) {

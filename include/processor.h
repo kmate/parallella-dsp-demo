@@ -11,7 +11,7 @@
 FILE *dsp_in;
 FILE *dsp_out;
 
-#define DEBUG(x) // printf(x)
+#define DEBUG(...) // printf(__VA_ARGS__)
 
 #define BUFFER_SIZE 1024
 #define FFT_SIZE    1024
@@ -49,32 +49,39 @@ void teardown_queues() {
   fclose(dsp_out);
 }
 
-bool receive_samples(void *input, size_t length) {
-  if (length != fread(input, sizeof(float), length, dsp_in)) {
-    printf("[Processor] Terminated (fread).\n");
-    return false;
+bool receive_samples(float *input) {
+  static float inFrame[BUFFER_SIZE];
+  static int cursor = IN_LATENCY;
+  static int sample = BUFFER_SIZE;
+
+  if (BUFFER_SIZE <= sample) {
+    if (BUFFER_SIZE != fread(inFrame, sizeof(float), BUFFER_SIZE, dsp_in)) {
+      printf("[Processor] Terminated (fread).\n");
+      return false;
+    }
+    DEBUG("[Processor] Samples received.\n");
+
+    cursor = IN_LATENCY;
+    sample = 0;
   }
-  DEBUG("[Processor] Samples received.\n");
+
+  for (; sample < BUFFER_SIZE; ++sample) {
+    in_queue[cursor++] = inFrame[sample];
+    if (FFT_SIZE <= cursor) {
+      cursor = IN_LATENCY;
+      memcpy(input, in_queue, FFT_SIZE * sizeof(float));
+      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
+      break;
+    }
+  }
   return true;
 }
 
-bool emit_samples(void *output, size_t length) {
-  if (length != fwrite(output, sizeof(float), length, dsp_out)) {
-    printf("[Processor] Terminated (fwrite).\n");
-    return false;
-  }
-  fflush(dsp_out);
-  DEBUG("[Processor] Samples sent.\n");
-  return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void finish_loop(float *output, float *outdata) {
+bool emit_samples(float *output) {
   static int last_done = 0;
   static float outFrame[BUFFER_SIZE];
 
-  for(int k=0; k < FFT_SIZE; k++) {
+  for (int k = 0; k < FFT_SIZE; ++k) {
     accumulator[k] += output[k];
   }
   memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
@@ -82,31 +89,17 @@ void finish_loop(float *output, float *outdata) {
   memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
   last_done += STEP_SIZE;
 
-  if (BUFFER_SIZE == last_done) {
+  if (BUFFER_SIZE < last_done) {
     last_done = 0;
-    memcpy(outdata, outFrame, BUFFER_SIZE * sizeof(float));
-  }
-}
 
-void smbPitchShift(float pitchShift, float *indata, float *outdata) {
-  int gRover = IN_LATENCY;
-
-	for (int i = 0; i < BUFFER_SIZE; i++) {
-		in_queue[gRover] = indata[i];
-		gRover++;
-
-		if (gRover >= FFT_SIZE) {
-      gRover = IN_LATENCY;
-
-      float buffer[FFT_SIZE];
-      memcpy(buffer, in_queue, FFT_SIZE * sizeof(float));
-      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
-
-      pitchShiftBody(pitchShift, buffer, buffer);
-
-      finish_loop(buffer, outdata);
+    if (BUFFER_SIZE != fwrite(outFrame, sizeof(float), BUFFER_SIZE, dsp_out)) {
+      printf("[Processor] Terminated (fwrite).\n");
+      return false;
     }
+    fflush(dsp_out);
+    DEBUG("[Processor] Samples sent.\n");
   }
+  return true;
 }
 
 #endif // PROCESSOR_H_

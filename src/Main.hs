@@ -132,14 +132,14 @@ mainProgram = do
   let chanSize = 10 `ofLength` bufferSize
   translatePar cWrapper
     (do buffer :: Arr Float <- newArr bufferSize
-        hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer, valArg bufferSize ]
+        hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer
         return (input, hasMore))
     chanSize
     (\output -> do
         Manifest bufferSize buffer' <- fromPull output
         buffer <- unsafeThawArr buffer'
-        needsMore :: Data Bool <- callFun "emit_samples" [arrArg buffer, valArg bufferSize]
+        needsMore :: Data Bool <- callFun "emit_samples" [ arrArg buffer ]
         return needsMore)
     chanSize
   callProc "teardown_queues" []
