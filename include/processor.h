@@ -84,10 +84,10 @@ void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 
 		/* now we have enough data for processing */
 		if (gRover >= FFT_SIZE) {
-		
+
 			gRover = IN_LATENCY;
 
-pitchShiftBody(pitchShift, FFT_SIZE, OVERLAP, SAMPLE_RATE, in_queue, accumulator);
+            pitchShiftBody(pitchShift, in_queue, accumulator);
 
             /* copy accum to out fifo */
 			memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
