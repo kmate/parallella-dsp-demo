@@ -17,6 +17,8 @@ FILE *dsp_out;
 #define FFT_SIZE    1024
 #define OVERLAP     4
 #define SAMPLE_RATE 44100
+#define STEP_SIZE   ((FFT_SIZE) / (OVERLAP))
+#define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))
 
 float gInFIFO[FFT_SIZE];
 float gOutFIFO[FFT_SIZE];
@@ -69,32 +71,31 @@ bool emit_samples(void *output, size_t length) {
 
 void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 	/* set up some handy variables */
-	int stepSize = FFT_SIZE/OVERLAP;
-	int inFifoLatency = FFT_SIZE-stepSize;
-	int gRover = inFifoLatency;
+	int gRover = IN_LATENCY;
 
-	/* main processing loop */
-	for (int i = 0; i < BUFFER_SIZE; i++){
+    /* main processing loop */
+	for (int i = 0; i < BUFFER_SIZE; i++) {
 
 		/* As long as we have not yet collected enough data just read in */
 		gInFIFO[gRover] = indata[i];
-		outdata[i] = gOutFIFO[gRover-inFifoLatency];
+		outdata[i] = gOutFIFO[gRover - IN_LATENCY];
 		gRover++;
 
 		/* now we have enough data for processing */
 		if (gRover >= FFT_SIZE) {
 		
-			gRover = inFifoLatency;
+			gRover = IN_LATENCY;
 
 pitchShiftBody(pitchShift, FFT_SIZE, OVERLAP, SAMPLE_RATE, gInFIFO, gOutputAccum);
 
-			memcpy(gOutFIFO, gOutputAccum, stepSize*sizeof(float));
+            /* copy accum to out fifo */
+			memcpy(gOutFIFO, gOutputAccum, STEP_SIZE * sizeof(float));
 
 			/* shift accumulator */
-			memmove(gOutputAccum, gOutputAccum+stepSize, FFT_SIZE*sizeof(float));
+			memmove(gOutputAccum, gOutputAccum + STEP_SIZE, FFT_SIZE * sizeof(float));
 
 			/* move input FIFO */
-			memmove(gInFIFO, gInFIFO+stepSize, inFifoLatency*sizeof(float));
+			memmove(gInFIFO, gInFIFO + STEP_SIZE, IN_LATENCY * sizeof(float));
 		}
 	}
 }
