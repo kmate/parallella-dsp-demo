@@ -80,13 +80,18 @@ void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 		if (gRover >= FFT_SIZE) {
       gRover = IN_LATENCY;
 
-      pitchShiftBody(pitchShift, in_queue, accumulator);
+      float buffer[FFT_SIZE];
+      memcpy(buffer, in_queue, FFT_SIZE * sizeof(float));
+      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
 
+      pitchShiftBody(pitchShift, buffer, buffer);
+
+      for(int k=0; k < FFT_SIZE; k++) {
+        accumulator[k] += buffer[k];
+      }
       memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
 			memcpy(outdata + i - STEP_SIZE + 1, out_queue, STEP_SIZE * sizeof(float));
-
       memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
-      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
 		}
 	}
 }

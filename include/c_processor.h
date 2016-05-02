@@ -193,7 +193,7 @@ void pitchShiftBody(float pitchShift, float *input, float *output) {
 	for(int k=0; k < FFT_SIZE; k++) {
 	    /* the window is exactly the same as above */
 		double window = -.5*cos(2.*M_PI*(double)k/(double)FFT_SIZE)+.5;
-		output[k] += window*gFFTworksp[2*k]/(FFT_SIZE*OVERLAP);
+		output[k] = window*gFFTworksp[2*k]/(FFT_SIZE*OVERLAP);
 	}
 }
 
