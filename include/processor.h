@@ -71,32 +71,22 @@ bool emit_samples(void *output, size_t length) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void smbPitchShift(float pitchShift, float *indata, float *outdata) {
-	/* set up some handy variables */
 	int gRover = IN_LATENCY;
 
-    /* main processing loop */
 	for (int i = 0; i < BUFFER_SIZE; i++) {
-
-		/* As long as we have not yet collected enough data just read in */
 		in_queue[gRover] = indata[i];
-		outdata[i] = out_queue[gRover - IN_LATENCY];
 		gRover++;
 
-		/* now we have enough data for processing */
 		if (gRover >= FFT_SIZE) {
+      gRover = IN_LATENCY;
 
-			gRover = IN_LATENCY;
+      pitchShiftBody(pitchShift, in_queue, accumulator);
 
-            pitchShiftBody(pitchShift, in_queue, accumulator);
+      memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
+			memcpy(outdata + i - STEP_SIZE + 1, out_queue, STEP_SIZE * sizeof(float));
 
-            /* copy accum to out fifo */
-			memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
-
-			/* shift accumulator */
-			memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
-
-			/* move input FIFO */
-			memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
+      memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
+      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
 		}
 	}
 }
