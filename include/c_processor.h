@@ -77,9 +77,10 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign) {
 
 #define BUFFER_SIZE  1024
 #define FFT_SIZE     1024
-#define FFT_SIZE2    ((FFT_SIZE) / 2)
 #define OVERLAP      4
 #define SAMPLE_RATE  44100
+
+#define FFT_SIZE2    ((FFT_SIZE) / 2)
 #define FREQ_PER_BIN ((SAMPLE_RATE) / (double)(FFT_SIZE))
 #define STEP_SIZE    ((FFT_SIZE) / (OVERLAP))
 #define IN_LATENCY   ((FFT_SIZE) - (STEP_SIZE))
