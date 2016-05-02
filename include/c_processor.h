@@ -1,3 +1,6 @@
+#ifndef C_PROCESSOR_H_
+#define C_PROCESSOR_H_
+
 /****************************************************************************
 *
 * NAME: smbPitchShift.cpp
@@ -316,22 +319,4 @@ double smbAtan2(double x, double y)
 // -----------------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------
 
-// TODO: reimplement in RAW-Feldspar / Zeldspar
-#include "processor.h"
-
-int main() {
-  setup_queues();
-
-  #define BUFFER_SIZE 1024
-  float buffer[BUFFER_SIZE];
-
-  for(;;) {
-    receive_samples(buffer, BUFFER_SIZE);
-    smbPitchShift(2, BUFFER_SIZE, BUFFER_SIZE, 4, 44100, buffer, buffer);
-    emit_samples(buffer, BUFFER_SIZE);
-  }
-
-  teardown_queues();
-  return 0;
-}
-
+#endif // C_PROCESSOR_H_

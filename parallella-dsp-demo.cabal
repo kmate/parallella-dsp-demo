@@ -18,8 +18,10 @@ executable parallella-dsp-demo
     raw-feldspar-mcs >= 0.1,
     zeldspar >= 0.2
 
-
   default-language: Haskell2010
+
+  default-extensions:
+    ScopedTypeVariables
 
   hs-source-dirs: src
 

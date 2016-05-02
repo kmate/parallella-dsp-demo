@@ -1,6 +1,9 @@
 rm -rf *.fifo
-gcc -std=c99 -Icsrc csrc/mongoose.c csrc/server.c -o dsp-server
-gcc -std=c99 -Icsrc csrc/processor.c -lm -o dsp-processor
+rm -rf gen/*
+cabal build
+dist/build/parallella-dsp-demo/parallella-dsp-demo
+gcc -std=c99 -Iinclude csrc/mongoose.c csrc/server.c -o dsp-server
+gcc -std=c99 -Iinclude -I../imperative-edsl/include ../imperative-edsl/csrc/chan.c gen/processor.c -lpthread -lm -o dsp-processor
 ./dsp-processor &
 ./dsp-server
 rm -rf dsp-processor

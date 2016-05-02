@@ -1,7 +1,6 @@
 #ifndef PROCESSOR_H_
 #define PROCESSOR_H_
 
-#include <stbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
