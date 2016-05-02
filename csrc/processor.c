@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 /****************************************************************************
 *
 * NAME: smbPitchShift.cpp
@@ -321,52 +316,22 @@ double smbAtan2(double x, double y)
 // -----------------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------
 
-#define BUFFER_SIZE 1024
-float input[BUFFER_SIZE];
-float output[BUFFER_SIZE];
-
-#define DSP_FIFO_IN  "dsp_in.fifo"
-#define DSP_FIFO_OUT "dsp_out.fifo"
-FILE *dsp_in;
-FILE *dsp_out;
-
-#define DEBUG(x) // printf(x)
-
-void process_samples(float *input, float *output, size_t length) {
-    smbPitchShift(2, length, length, 4, 44100, input, output);
-}
+// TODO: reimplement in RAW-Feldspar / Zeldspar
+#include "processor.h"
 
 int main() {
-  mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
-  if (NULL == (dsp_in = fopen(DSP_FIFO_IN, "r"))) {
-    perror("[Processor] fopen("DSP_FIFO_IN")");
-    return 2;
-  }
+  setup_queues();
 
-  mkfifo(DSP_FIFO_OUT, S_IRUSR | S_IWUSR);
-  if (NULL == (dsp_out = fopen(DSP_FIFO_OUT, "w"))) {
-    perror("[Processor] fopen("DSP_FIFO_OUT")");
-   return 2;
-  }
+  #define BUFFER_SIZE 1024
+  float buffer[BUFFER_SIZE];
 
-  printf("[Processor] Started.\n");
   for(;;) {
-    if (BUFFER_SIZE != fread(input, sizeof(float), BUFFER_SIZE, dsp_in)) {
-      printf("[Processor] Terminated (fread).\n");
-      return 0;
-    }
-    DEBUG("[Processor] Samples received.\n");
-    process_samples(input, output, BUFFER_SIZE);
-    if (BUFFER_SIZE != fwrite(output, sizeof(float), BUFFER_SIZE, dsp_out)) {
-      printf("[Processor] Terminated (fwrite).\n");
-      return 0;
-    }
-    fflush(dsp_out);
-    DEBUG("[Processor] Samples sent.\n");
+    receive_samples(buffer, BUFFER_SIZE);
+    smbPitchShift(2, BUFFER_SIZE, BUFFER_SIZE, 4, 44100, buffer, buffer);
+    emit_samples(buffer, BUFFER_SIZE);
   }
 
-  fclose(dsp_in);
-  fclose(dsp_out);
+  teardown_queues();
   return 0;
 }
 
