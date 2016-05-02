@@ -112,6 +112,7 @@ void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, 
 
 			/* do windowing and re,im interleave */
 			for (k = 0; k < fftFrameSize;k++) {
+			    /* Hann window */
 				window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
 				gFFTworksp[2*k] = gInFIFO[k] * window;
 				gFFTworksp[2*k+1] = 0.;
