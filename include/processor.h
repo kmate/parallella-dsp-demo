@@ -13,7 +13,20 @@ FILE *dsp_out;
 
 #define DEBUG(x) // printf(x)
 
+#define BUFFER_SIZE 1024
+#define FFT_SIZE    1024
+#define OVERLAP     4
+#define SAMPLE_RATE 44100
+
+float gInFIFO[FFT_SIZE];
+float gOutFIFO[FFT_SIZE];
+float gOutputAccum[2 * FFT_SIZE];
+
 void setup_queues() {
+  memset(gInFIFO, 0, FFT_SIZE * sizeof(float));
+  memset(gOutFIFO, 0, FFT_SIZE * sizeof(float));
+  memset(gOutputAccum, 0, 2 * FFT_SIZE * sizeof(float));
+
   mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
   if (NULL == (dsp_in = fopen(DSP_FIFO_IN, "r"))) {
     perror("[Processor] fopen("DSP_FIFO_IN")");
@@ -50,6 +63,40 @@ bool emit_samples(void *output, size_t length) {
   fflush(dsp_out);
   DEBUG("[Processor] Samples sent.\n");
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void smbPitchShift(float pitchShift, float *indata, float *outdata) {
+	/* set up some handy variables */
+	int stepSize = FFT_SIZE/OVERLAP;
+	int inFifoLatency = FFT_SIZE-stepSize;
+	int gRover = inFifoLatency;
+
+	/* main processing loop */
+	for (int i = 0; i < BUFFER_SIZE; i++){
+
+		/* As long as we have not yet collected enough data just read in */
+		gInFIFO[gRover] = indata[i];
+		outdata[i] = gOutFIFO[gRover-inFifoLatency];
+		gRover++;
+
+		/* now we have enough data for processing */
+		if (gRover >= FFT_SIZE) {
+		
+			gRover = inFifoLatency;
+
+pitchShiftBody(pitchShift, FFT_SIZE, OVERLAP, SAMPLE_RATE, gInFIFO, gOutputAccum);
+
+			memcpy(gOutFIFO, gOutputAccum, stepSize*sizeof(float));
+
+			/* shift accumulator */
+			memmove(gOutputAccum, gOutputAccum+stepSize, FFT_SIZE*sizeof(float));
+
+			/* move input FIFO */
+			memmove(gInFIFO, gInFIFO+stepSize, inFifoLatency*sizeof(float));
+		}
+	}
 }
 
 

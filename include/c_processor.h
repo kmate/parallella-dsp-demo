@@ -103,68 +103,6 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampleRate, float *input, float *output);
-
-#define MAX_FRAME_LENGTH 8192
-
-void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, long osamp, float sampleRate, float *indata, float *outdata)
-/*
-	Routine smbPitchShift(). See top of file for explanation
-	Purpose: doing pitch shifting while maintaining duration using the Short
-	Time Fourier Transform.
-	Author: (c)1999-2015 Stephan M. Bernsee <s.bernsee [AT] zynaptiq [DOT] com>
-*/
-{
-	static float gInFIFO[MAX_FRAME_LENGTH];
-	static float gOutFIFO[MAX_FRAME_LENGTH];
-	static float gOutputAccum[2*MAX_FRAME_LENGTH];
-
-	static long gRover = false, gInit = false;
-	long i, inFifoLatency, stepSize;
-
-	/* set up some handy variables */
-	stepSize = fftFrameSize/osamp;
-	inFifoLatency = fftFrameSize-stepSize;
-	if (gRover == false) gRover = inFifoLatency;
-
-	/* initialize our static arrays */
-	if (gInit == false) {
-		memset(gInFIFO, 0, MAX_FRAME_LENGTH*sizeof(float));
-		memset(gOutFIFO, 0, MAX_FRAME_LENGTH*sizeof(float));
-		memset(gOutputAccum, 0, 2*MAX_FRAME_LENGTH*sizeof(float));
-		gInit = true;
-	}
-
-	/* main processing loop */
-	for (i = 0; i < numSampsToProcess; i++){
-
-		/* As long as we have not yet collected enough data just read in */
-		gInFIFO[gRover] = indata[i];
-		outdata[i] = gOutFIFO[gRover-inFifoLatency];
-		gRover++;
-
-		/* now we have enough data for processing */
-		if (gRover >= fftFrameSize) {
-		
-			gRover = inFifoLatency;
-
-pitchShiftBody(pitchShift, fftFrameSize, osamp, sampleRate, gInFIFO, gOutputAccum);
-
-			memcpy(gOutFIFO, gOutputAccum, stepSize*sizeof(float));
-
-			/* shift accumulator */
-			memmove(gOutputAccum, gOutputAccum+stepSize, fftFrameSize*sizeof(float));
-
-			/* move input FIFO */
-			memmove(gInFIFO, gInFIFO+stepSize, inFifoLatency*sizeof(float));
-		}
-	}
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-
 void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampleRate, float *input, float *output) {
 	/* set up some handy variables */
 	long fftFrameSize2 = fftFrameSize/2;
@@ -173,7 +111,7 @@ void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampl
 	double expct = 2.*M_PI*(double)stepSize/(double)fftFrameSize;
 
 	/* do windowing and re,im interleave */
-	float gFFTworksp[2*MAX_FRAME_LENGTH];
+	float gFFTworksp[2*fftFrameSize];
 	for (int k = 0; k < fftFrameSize;k++) {
 	    /* Hann window */
 		double window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
@@ -186,9 +124,9 @@ void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampl
 	smbFft(gFFTworksp, fftFrameSize, -1);
 
     /* this is the analysis step */
-    float gAnaFreq[MAX_FRAME_LENGTH];
-    float gAnaMagn[MAX_FRAME_LENGTH];
-    float gLastPhase[MAX_FRAME_LENGTH/2+1];
+    float gAnaFreq[fftFrameSize];
+    float gAnaMagn[fftFrameSize];
+    float gLastPhase[fftFrameSize/2+1];
 	for (int k = 0; k <= fftFrameSize2; k++) {
 
 		/* de-interlace FFT buffer */
@@ -226,8 +164,8 @@ void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampl
 
 	/* ***************** PROCESSING ******************* */
 	/* this does the actual pitch shifting */
-    float gSynFreq[MAX_FRAME_LENGTH];
-    float gSynMagn[MAX_FRAME_LENGTH];
+    float gSynFreq[fftFrameSize];
+    float gSynMagn[fftFrameSize];
 	memset(gSynMagn, 0, fftFrameSize*sizeof(float));
 	memset(gSynFreq, 0, fftFrameSize*sizeof(float));
 	for (int k = 0; k <= fftFrameSize2; k++) { 
@@ -240,7 +178,7 @@ void pitchShiftBody(float pitchShift, long fftFrameSize, long osamp, float sampl
 	
 	/* ***************** SYNTHESIS ******************* */
 	/* this is the synthesis step */
-    float gSumPhase[MAX_FRAME_LENGTH/2+1];
+    float gSumPhase[fftFrameSize/2+1];
 	for (int k = 0; k <= fftFrameSize2; k++) {
 
 		/* get magnitude and true frequency from synthesis arrays */

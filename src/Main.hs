@@ -96,10 +96,6 @@ cWrapper = liftP $ do
     Manifest bufferSize buffer' <- lift $ fromPull input
     buffer <- lift $ unsafeThawArr buffer'
     lift $ callProc "smbPitchShift" [ valArg pitchShift
-                                    , valArg bufferSize
-                                    , valArg fftSize
-                                    , valArg overlap
-                                    , valArg sampleRate
                                     , arrArg buffer
                                     , arrArg buffer ]
     buffer'' <- lift $ unsafeFreezeArr buffer
