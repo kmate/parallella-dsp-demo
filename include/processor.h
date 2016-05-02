@@ -22,12 +22,12 @@ FILE *dsp_out;
 
 float in_queue[FFT_SIZE];
 float out_queue[FFT_SIZE];
-float accumulator[2 * FFT_SIZE];
+float accumulator[FFT_SIZE + STEP_SIZE];
 
 void setup_queues() {
   memset(in_queue, 0, FFT_SIZE * sizeof(float));
   memset(out_queue, 0, FFT_SIZE * sizeof(float));
-  memset(accumulator, 0, 2 * FFT_SIZE * sizeof(float));
+  memset(accumulator, 0, (FFT_SIZE + STEP_SIZE) * sizeof(float));
 
   mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
   if (NULL == (dsp_in = fopen(DSP_FIFO_IN, "r"))) {
@@ -70,8 +70,26 @@ bool emit_samples(void *output, size_t length) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void finish_loop(float *output, float *outdata) {
+  static int last_done = 0;
+  static float outFrame[BUFFER_SIZE];
+
+  for(int k=0; k < FFT_SIZE; k++) {
+    accumulator[k] += output[k];
+  }
+  memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
+  memcpy(outFrame + last_done, out_queue, STEP_SIZE * sizeof(float));
+  memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
+  last_done += STEP_SIZE;
+
+  if (BUFFER_SIZE == last_done) {
+    last_done = 0;
+    memcpy(outdata, outFrame, BUFFER_SIZE * sizeof(float));
+  }
+}
+
 void smbPitchShift(float pitchShift, float *indata, float *outdata) {
-	int gRover = IN_LATENCY;
+  int gRover = IN_LATENCY;
 
 	for (int i = 0; i < BUFFER_SIZE; i++) {
 		in_queue[gRover] = indata[i];
@@ -86,16 +104,10 @@ void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 
       pitchShiftBody(pitchShift, buffer, buffer);
 
-      for(int k=0; k < FFT_SIZE; k++) {
-        accumulator[k] += buffer[k];
-      }
-      memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
-			memcpy(outdata + i - STEP_SIZE + 1, out_queue, STEP_SIZE * sizeof(float));
-      memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
-		}
-	}
+      finish_loop(buffer, outdata);
+    }
+  }
 }
-
 
 #endif // PROCESSOR_H_
 
