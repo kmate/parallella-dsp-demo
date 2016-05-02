@@ -23,7 +23,7 @@ function captureSuccess(stream) {
     bufferNext = bufferSize;
     input.connect(recorder);
 
-    socket = new WebSocket("ws://localhost:8000/ws");
+    socket = new WebSocket("ws://" + window.location.host + "/ws");
     socket.binaryType = "arraybuffer";
     socket.onopen = function(event) {
         recorder.onaudioprocess = function(event) {
