@@ -20,14 +20,14 @@ FILE *dsp_out;
 #define STEP_SIZE   ((FFT_SIZE) / (OVERLAP))
 #define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))
 
-float gInFIFO[FFT_SIZE];
-float gOutFIFO[FFT_SIZE];
-float gOutputAccum[2 * FFT_SIZE];
+float in_queue[FFT_SIZE];
+float out_queue[FFT_SIZE];
+float accumulator[2 * FFT_SIZE];
 
 void setup_queues() {
-  memset(gInFIFO, 0, FFT_SIZE * sizeof(float));
-  memset(gOutFIFO, 0, FFT_SIZE * sizeof(float));
-  memset(gOutputAccum, 0, 2 * FFT_SIZE * sizeof(float));
+  memset(in_queue, 0, FFT_SIZE * sizeof(float));
+  memset(out_queue, 0, FFT_SIZE * sizeof(float));
+  memset(accumulator, 0, 2 * FFT_SIZE * sizeof(float));
 
   mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
   if (NULL == (dsp_in = fopen(DSP_FIFO_IN, "r"))) {
@@ -40,6 +40,7 @@ void setup_queues() {
     perror("[Processor] fopen("DSP_FIFO_OUT")");
     exit(2);
   }
+
   printf("[Processor] Started.\n");
 }
 
@@ -77,8 +78,8 @@ void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 	for (int i = 0; i < BUFFER_SIZE; i++) {
 
 		/* As long as we have not yet collected enough data just read in */
-		gInFIFO[gRover] = indata[i];
-		outdata[i] = gOutFIFO[gRover - IN_LATENCY];
+		in_queue[gRover] = indata[i];
+		outdata[i] = out_queue[gRover - IN_LATENCY];
 		gRover++;
 
 		/* now we have enough data for processing */
@@ -86,16 +87,16 @@ void smbPitchShift(float pitchShift, float *indata, float *outdata) {
 		
 			gRover = IN_LATENCY;
 
-pitchShiftBody(pitchShift, FFT_SIZE, OVERLAP, SAMPLE_RATE, gInFIFO, gOutputAccum);
+pitchShiftBody(pitchShift, FFT_SIZE, OVERLAP, SAMPLE_RATE, in_queue, accumulator);
 
             /* copy accum to out fifo */
-			memcpy(gOutFIFO, gOutputAccum, STEP_SIZE * sizeof(float));
+			memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
 
 			/* shift accumulator */
-			memmove(gOutputAccum, gOutputAccum + STEP_SIZE, FFT_SIZE * sizeof(float));
+			memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
 
 			/* move input FIFO */
-			memmove(gInFIFO, gInFIFO + STEP_SIZE, IN_LATENCY * sizeof(float));
+			memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
 		}
 	}
 }
