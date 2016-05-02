@@ -54,7 +54,7 @@ void *thread_t2(void *unused)
         for (v11 = 0; v11 < v7; v11++) {
             a10[v11] = a8[v11];
         }
-        smbPitchShift(2.0, v7, v7, 4, 44100.0, a10, a10);
+        smbPitchShift(2.0, v7, 1024, 4, 44100.0, a10, a10);
         r12 = v7;
         
         float _a13[v7];

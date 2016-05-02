@@ -97,7 +97,7 @@ cWrapper = liftP $ do
     buffer <- lift $ unsafeThawArr buffer'
     lift $ callProc "smbPitchShift" [ valArg pitchShift
                                     , valArg bufferSize
-                                    , valArg bufferSize
+                                    , valArg fftSize
                                     , valArg overlap
                                     , valArg sampleRate
                                     , arrArg buffer
@@ -115,12 +115,16 @@ cWrapper = liftP $ do
 bufferSize :: Data Length
 bufferSize = 1024
 
+fftSize :: Data Length
+fftSize = 1024
+
 overlap :: Data Length
 overlap = 4
 
 sampleRate :: Data Float
 sampleRate = 44100
 
+-- Value 1 means no shifting. 2 is one octave up, 0.5 is one octave down.
 pitchShift :: Data Float
 pitchShift = 2
 

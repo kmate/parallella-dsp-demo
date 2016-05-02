@@ -45,14 +45,65 @@
 #include <string.h>
 
 #define M_PI 3.14159265358979323846
-#define MAX_FRAME_LENGTH 8192
 
-void smbFft(float *fftBuffer, long fftFrameSize, long sign);
-double smbAtan2(double x, double y);
+void smbFft(float *fftBuffer, long fftFrameSize, long sign)
+/* 
+	FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
+	Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
+	time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
+	and returns the cosine and sine parts in an interleaved manner, ie.
+	fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
+	must be a power of 2. It expects a complex input signal (see footnote 2),
+	ie. when working with 'common' audio signals our input signal has to be
+	passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
+	of the frequencies of interest is in fftBuffer[0...fftFrameSize].
+*/
+{
+	float wr, wi, arg, *p1, *p2, temp;
+	float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
+	long i, bitm, j, le, le2, k;
 
+	for (i = 2; i < 2*fftFrameSize-2; i += 2) {
+		for (bitm = 2, j = 0; bitm < 2*fftFrameSize; bitm <<= 1) {
+			if (i & bitm) j++;
+			j <<= 1;
+		}
+		if (i < j) {
+			p1 = fftBuffer+i; p2 = fftBuffer+j;
+			temp = *p1; *(p1++) = *p2;
+			*(p2++) = temp; temp = *p1;
+			*p1 = *p2; *p2 = temp;
+		}
+	}
+	for (k = 0, le = 2; k < (long)(log(fftFrameSize)/log(2.)+.5); k++) {
+		le <<= 1;
+		le2 = le>>1;
+		ur = 1.0;
+		ui = 0.0;
+		arg = M_PI / (le2>>1);
+		wr = cos(arg);
+		wi = sign*sin(arg);
+		for (j = 0; j < le2; j += 2) {
+			p1r = fftBuffer+j; p1i = p1r+1;
+			p2r = p1r+le2; p2i = p2r+1;
+			for (i = j; i < 2*fftFrameSize; i += le) {
+				tr = *p2r * ur - *p2i * ui;
+				ti = *p2r * ui + *p2i * ur;
+				*p2r = *p1r - tr; *p2i = *p1i - ti;
+				*p1r += tr; *p1i += ti;
+				p1r += le; p1i += le;
+				p2r += le; p2i += le;
+			}
+			tr = ur*wr - ui*wi;
+			ui = ur*wi + ui*wr;
+			ur = tr;
+		}
+	}
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 
+#define MAX_FRAME_LENGTH 8192
 
 void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, long osamp, float sampleRate, float *indata, float *outdata)
 /*
@@ -99,6 +150,8 @@ void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, 
 		gInit = true;
 	}
 
+printf("process\n");
+
 	/* main processing loop */
 	for (i = 0; i < numSampsToProcess; i++){
 
@@ -109,7 +162,10 @@ void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, 
 
 		/* now we have enough data for processing */
 		if (gRover >= fftFrameSize) {
+		
 			gRover = inFifoLatency;
+
+printf("now we have enough data for processing - rover %d %d %d\n", gRover, i, fftFrameSize);
 
 			/* do windowing and re,im interleave */
 			for (k = 0; k < fftFrameSize;k++) {
@@ -209,114 +265,19 @@ void smbPitchShift(float pitchShift, long numSampsToProcess, long fftFrameSize, 
 
 			/* do windowing and add to output accumulator */
 			for(k=0; k < fftFrameSize; k++) {
+			    /* the window is exactly the same as above */
 				window = -.5*cos(2.*M_PI*(double)k/(double)fftFrameSize)+.5;
 				gOutputAccum[k] += 2.*window*gFFTworksp[2*k]/(fftFrameSize2*osamp);
 			}
-			for (k = 0; k < stepSize; k++) gOutFIFO[k] = gOutputAccum[k];
+			memcpy(gOutFIFO, gOutputAccum, stepSize*sizeof(float));
 
 			/* shift accumulator */
 			memmove(gOutputAccum, gOutputAccum+stepSize, fftFrameSize*sizeof(float));
 
 			/* move input FIFO */
-			for (k = 0; k < inFifoLatency; k++) gInFIFO[k] = gInFIFO[k+stepSize];
+			memmove(gInFIFO, gInFIFO+stepSize, inFifoLatency*sizeof(float));
 		}
 	}
 }
-
-// -----------------------------------------------------------------------------------------------------------------
-
-
-void smbFft(float *fftBuffer, long fftFrameSize, long sign)
-/* 
-	FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
-	Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
-	time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
-	and returns the cosine and sine parts in an interleaved manner, ie.
-	fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
-	must be a power of 2. It expects a complex input signal (see footnote 2),
-	ie. when working with 'common' audio signals our input signal has to be
-	passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
-	of the frequencies of interest is in fftBuffer[0...fftFrameSize].
-*/
-{
-	float wr, wi, arg, *p1, *p2, temp;
-	float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
-	long i, bitm, j, le, le2, k;
-
-	for (i = 2; i < 2*fftFrameSize-2; i += 2) {
-		for (bitm = 2, j = 0; bitm < 2*fftFrameSize; bitm <<= 1) {
-			if (i & bitm) j++;
-			j <<= 1;
-		}
-		if (i < j) {
-			p1 = fftBuffer+i; p2 = fftBuffer+j;
-			temp = *p1; *(p1++) = *p2;
-			*(p2++) = temp; temp = *p1;
-			*p1 = *p2; *p2 = temp;
-		}
-	}
-	for (k = 0, le = 2; k < (long)(log(fftFrameSize)/log(2.)+.5); k++) {
-		le <<= 1;
-		le2 = le>>1;
-		ur = 1.0;
-		ui = 0.0;
-		arg = M_PI / (le2>>1);
-		wr = cos(arg);
-		wi = sign*sin(arg);
-		for (j = 0; j < le2; j += 2) {
-			p1r = fftBuffer+j; p1i = p1r+1;
-			p2r = p1r+le2; p2i = p2r+1;
-			for (i = j; i < 2*fftFrameSize; i += le) {
-				tr = *p2r * ur - *p2i * ui;
-				ti = *p2r * ui + *p2i * ur;
-				*p2r = *p1r - tr; *p2i = *p1i - ti;
-				*p1r += tr; *p1i += ti;
-				p1r += le; p1i += le;
-				p2r += le; p2i += le;
-			}
-			tr = ur*wr - ui*wi;
-			ui = ur*wi + ui*wr;
-			ur = tr;
-		}
-	}
-}
-
-
-// -----------------------------------------------------------------------------------------------------------------
-
-/*
-
-    12/12/02, smb
-    
-    PLEASE NOTE:
-    
-    There have been some reports on domain errors when the atan2() function was used
-    as in the above code. Usually, a domain error should not interrupt the program flow
-    (maybe except in Debug mode) but rather be handled "silently" and a global variable
-    should be set according to this error. However, on some occasions people ran into
-    this kind of scenario, so a replacement atan2() function is provided here.
-    
-    If you are experiencing domain errors and your program stops, simply replace all
-    instances of atan2() with calls to the smbAtan2() function below.
-    
-*/
-
-
-double smbAtan2(double x, double y)
-{
-  double signx;
-  if (x > 0.) signx = 1.;
-  else signx = -1.;
-
-  if (x == 0.) return 0.;
-  if (y == 0.) return signx * M_PI / 2.;
-
-  return atan2(x, y);
-}
-
-
-// -----------------------------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------------------------
 
 #endif // C_PROCESSOR_H_
