@@ -21,12 +21,10 @@ FILE *dsp_out;
 #define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))
 
 float in_queue[FFT_SIZE];
-float out_queue[FFT_SIZE];
 float accumulator[FFT_SIZE + STEP_SIZE];
 
 void setup_queues() {
   memset(in_queue, 0, FFT_SIZE * sizeof(float));
-  memset(out_queue, 0, FFT_SIZE * sizeof(float));
   memset(accumulator, 0, (FFT_SIZE + STEP_SIZE) * sizeof(float));
 
   mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
@@ -50,47 +48,39 @@ void teardown_queues() {
 }
 
 bool receive_samples(float *input) {
+  static int window_start = BUFFER_SIZE;
   static float inFrame[BUFFER_SIZE];
-  static int cursor = IN_LATENCY;
-  static int sample = BUFFER_SIZE;
 
-  if (BUFFER_SIZE <= sample) {
+  if (BUFFER_SIZE == window_start) {
+    window_start = 0;
+
     if (BUFFER_SIZE != fread(inFrame, sizeof(float), BUFFER_SIZE, dsp_in)) {
       printf("[Processor] Terminated (fread).\n");
       return false;
     }
     DEBUG("[Processor] Samples received.\n");
-
-    cursor = IN_LATENCY;
-    sample = 0;
   }
 
-  for (; sample < BUFFER_SIZE; ++sample) {
-    in_queue[cursor++] = inFrame[sample];
-    if (FFT_SIZE <= cursor) {
-      cursor = IN_LATENCY;
-      memcpy(input, in_queue, FFT_SIZE * sizeof(float));
-      memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
-      break;
-    }
-  }
+  memcpy(in_queue + IN_LATENCY, inFrame + window_start, STEP_SIZE * sizeof(float));
+  memcpy(input, in_queue, FFT_SIZE * sizeof(float));
+  memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
+  window_start += STEP_SIZE;
   return true;
 }
 
 bool emit_samples(float *output) {
-  static int last_done = 0;
+  static int window_start = 0;
   static float outFrame[BUFFER_SIZE];
 
-  for (int k = 0; k < FFT_SIZE; ++k) {
+  for(int k=0; k < FFT_SIZE; k++) {
     accumulator[k] += output[k];
   }
-  memcpy(out_queue, accumulator, STEP_SIZE * sizeof(float));
-  memcpy(outFrame + last_done, out_queue, STEP_SIZE * sizeof(float));
+  memcpy(outFrame + window_start, accumulator, STEP_SIZE * sizeof(float));
   memmove(accumulator, accumulator + STEP_SIZE, FFT_SIZE * sizeof(float));
-  last_done += STEP_SIZE;
+  window_start += STEP_SIZE;
 
-  if (BUFFER_SIZE < last_done) {
-    last_done = 0;
+  if (BUFFER_SIZE <= window_start) {
+    window_start = 0;
 
     if (BUFFER_SIZE != fwrite(outFrame, sizeof(float), BUFFER_SIZE, dsp_out)) {
       printf("[Processor] Terminated (fwrite).\n");
