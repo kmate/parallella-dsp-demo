@@ -30,12 +30,12 @@ riffle :: Data Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
 riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
 
 -- | Parallel bit reversal of a vector with length 'n'.
-bitRevPar :: PrimType a
-          => Length  -- ^ Length of a vector
-          -> Length  -- ^ Maximum number of vectors on internal channels
-          -> ParZun (Vector (Data a)) (Vector (Data a)) ()
-bitRevPar n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
-            [ liftP $ riffle $ value k | k <- [1..n'] ]
+bitRev :: PrimType a
+       => Length  -- ^ Length of a vector
+       -> Length  -- ^ Maximum number of vectors on internal channels
+       -> ParZun (Vector (Data a)) (Vector (Data a)) ()
+bitRev n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
+           [ liftP $ riffle $ value k | k <- [1..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
 
@@ -44,19 +44,19 @@ bitRevPar n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fftPar :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fftPar = fftBase False
+fft :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+fft = fftBase False
 
-ifftPar :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-ifftPar = fftBase True
+ifft :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+ifft = fftBase True
 
 fftBase :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fftBase inv n m = fftCorePar inv n m |>>value m`ofLength`value n>>| bitRevPar n m
+fftBase inv n m = fftCore inv n m |>>value m`ofLength`value n>>| bitRev n m
 
 -- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
-fftCorePar :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fftCorePar inv n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
-                   [ liftP $ step inv $ value k | k <- Prelude.reverse [0..n'] ]
+fftCore :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+fftCore inv n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
+                [ liftP $ step inv $ value k | k <- Prelude.reverse [0..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
 
@@ -96,7 +96,7 @@ interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
-{-  FIXME: Unfortunately, this function could not be implemented effectively.
+{-  FIXME: Unfortunately, this function could not be implemented efficiently.
     See the following C implemention:
 
     float clampPhase(float phase) {
@@ -158,18 +158,13 @@ mulImag c n = complex (realPart c) (n * imagPart c)
 shiftPitch :: Zun ComplexSamples ComplexSamples ()
 shiftPitch = loop $ do
   input <- receive
-  buffer <- lift $ newArr numPosBins
-  lift $ for (0, 1, Excl numPosBins) $ \k -> do
-    let index = round $ i2n k * pitchShift
-        value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ (0)
-    -- FIXME: We need an explicit integer variable here as the index expression
-    -- is a call to `round`, which returns a double. Then the C compiler
-    -- complains about a non-integer array subscript expression.
-    typedIxRef <- initRef index
-    index' <- getRef typedIxRef
-    setArr index' value buffer
-  buffer' <- lift $ unsafeFreezeArr buffer
-  let output = toPull $ Manifest numPosBins buffer'
+  output <- lift $ do
+    buffer <- newArr numPosBins
+    for (0, 1, Excl numPosBins) $ \k -> do
+      let index = round $ i2n k * pitchShift
+          value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
+      setArr index value buffer
+    unsafeFreezeVec numPosBins buffer
   emit output
 
 synthetize :: Zun ComplexSamples ComplexSamples ()
@@ -248,11 +243,11 @@ mainProgram = do
   let chanSize = 10 `ofLength` fftSize
       halfChanSize = 10 `ofLength` numPosBins
   translatePar ((window >>> interleave)      |>>chanSize>>|
-                (fftPar 1024 10)             |>>chanSize>>|
+                (fft 1024 10)                |>>chanSize>>|
                 analyze                      |>>halfChanSize>>|
                 shiftPitch                   |>>halfChanSize>>|
                 (synthetize >>> zeroNegBins) |>>chanSize>>|
-                (ifftPar 1024 10)            |>>chanSize>>|
+                (ifft 1024 10)               |>>chanSize>>|
                 (accumulate >>> window))
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
