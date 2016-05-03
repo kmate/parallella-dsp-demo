@@ -7,8 +7,8 @@ import Zeldspar
 import Zeldspar.Parallel
 
 
-type Samples  = Vector (Data (Complex Double))
-type Twiddles = Vector (Data (Complex Double))
+type Samples  = Vector (Data (Complex Float))
+type Twiddles = Vector (Data (Complex Float))
 
 
 --------------------------------------------------------------------------------
@@ -87,9 +87,24 @@ testBit a i = a .&. (1 .<<. i2n i) /= 0
 -- Temporary C wrapper in Zeldspar
 --------------------------------------------------------------------------------
 
+hann :: Data Length -> Vector (Data Float)
+hann width = Indexed width
+           $ \k -> -0.5 * cos(2 * π * (i2n k) / (i2n width)) + 0.5
+
+window :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
+window = loop $ do
+  input <- receive
+  emit $ zipWith (*) input (hann fftSize)
+
+interleave :: Zun (Vector (Data Float)) (Vector (Data (Complex Float))) ()
+interleave = loop $ do
+  input <- receive
+  emit $ map (flip complex 0) input
+
 -- TODO: reimplement wrapped functionality in Zeldspar
-cWrapper :: ParZun (Vector (Data Float)) (Vector (Data Float)) ()
-cWrapper = liftP $ do
+-- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
+cWrapper :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
+cWrapper = do
   lift $ addInclude "\"c_processor.h\""
   loop $ do
     input <- receive
@@ -130,7 +145,7 @@ mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar cWrapper
+  translatePar (liftP ({-window >>> interleave >>> (fft 1024) >>>-} cWrapper))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer
