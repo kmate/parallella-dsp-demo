@@ -150,21 +150,23 @@ shiftPitch = loop $ do
   let output = toPull $ Manifest bufferSize buffer'
   emit output
 
--- TODO: reimplement wrapped functionality in Zeldspar
--- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
-cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
-cWrapper = do
-  lift $ addInclude "\"c_processor.h\""
+synthetize :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+synthetize = do
+  sumPhase <- lift $ newArr numPosBins
   loop $ do
     input <- receive
-    Manifest bufferSize buffer' <- lift $ fromPull input
-    inBuffer <- lift $ unsafeThawArr buffer'
-    outBuffer <- lift $ newArr bufferSize
-    lift $ callProc "smbPitchShift" [ valArg pitchShift
-                                    , arrArg inBuffer
-                                    , arrArg outBuffer ]
-    buffer'' <- lift $ unsafeFreezeArr outBuffer
-    let output = toPull $ Manifest bufferSize buffer''
+    buffer <- lift $ newArr numPosBins
+    lift $ for (0, 1, Excl numPosBins) $ \k -> do
+      sphs :: Data Float <- getArr k sumPhase
+      let magn  = realPart (input ! k)
+          tmp   = imagPart (input ! k)
+          tmp'  = 2 * π * ((tmp - i2n k * freqPerBin) / freqPerBin) / i2n overlap
+          tmp'' = tmp' + i2n k * expectedDiff
+          phs   = sphs + tmp''
+      setArr k phs sumPhase
+      setArr k (complex (magn * cos phs) (magn * sin phs)) buffer -- TODO: atan/atan2?
+    buffer' <- lift $ unsafeFreezeArr buffer
+    let output = toPull $ Manifest bufferSize buffer'
     emit output
 
 zeroNegBins :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
@@ -219,7 +221,7 @@ mainProgram = do
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
   translatePar (liftP (window >>> interleave >>> (fft 1024) >>> analyze >>>
-                       cWrapper >>> shiftPitch >>>
+                       shiftPitch >>> synthetize >>>
                        zeroNegBins >>> (ifft 1024) >>> accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]

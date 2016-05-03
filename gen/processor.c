@@ -1,4 +1,3 @@
-#include "c_processor.h"
 #include "chan.h"
 #include "processor.h"
 #include <pthread.h>
@@ -7,8 +6,8 @@
 #include <string.h>
 #include <tgmath.h>
 void *thread_t2(void *unused);
-void *thread_t144(void *unused);
-pthread_t t144;
+void *thread_t149(void *unused);
+pthread_t t149;
 pthread_t t2;
 chan_t chan0;
 chan_t chan1;
@@ -17,610 +16,638 @@ void *thread_t2(void *unused)
 {
     float _a3[513];
     float *a3 = _a3;
+    float _a4[513];
+    float *a4 = _a4;
     
     while (1) {
-        uint32_t v4;
-        bool v6;
-        uint32_t r7;
-        uint32_t v8;
-        bool v10;
-        uint32_t r11;
-        uint32_t v13;
-        uint32_t r14;
-        uint32_t v16;
-        uint32_t r17;
-        uint32_t v19;
-        uint32_t r20;
-        uint32_t v22;
-        uint32_t r23;
-        uint32_t v25;
-        uint32_t r26;
-        uint32_t v28;
-        uint32_t r29;
-        uint32_t v31;
-        uint32_t r32;
-        uint32_t v34;
-        uint32_t r35;
-        uint32_t v37;
-        uint32_t r38;
-        uint32_t v40;
-        uint32_t r41;
-        uint32_t v43;
-        uint32_t r44;
-        uint32_t v46;
-        uint32_t r47;
-        uint32_t v49;
-        uint32_t r50;
-        uint32_t v52;
-        uint32_t r53;
-        uint32_t v55;
-        uint32_t r56;
-        uint32_t v58;
-        uint32_t r59;
-        uint32_t v61;
-        uint32_t r62;
-        uint32_t v64;
-        uint32_t r65;
-        uint32_t v67;
-        float _Complex _a68[513];
-        float _Complex *a68 = _a68;
-        uint32_t v69;
-        float _Complex _a77[1024];
-        float _Complex *a77 = _a77;
-        uint32_t v78;
-        float _Complex _a79[1024];
-        float _Complex *a79 = _a79;
-        uint32_t r80;
-        float _Complex _a81[1024];
-        float _Complex *a81 = _a81;
-        uint32_t v82;
-        uint32_t r83;
-        uint32_t v85;
-        uint32_t r86;
-        uint32_t v88;
-        uint32_t r89;
-        uint32_t v91;
-        uint32_t r92;
-        uint32_t v94;
-        uint32_t r95;
-        uint32_t v97;
-        uint32_t r98;
-        uint32_t v100;
-        uint32_t r101;
-        uint32_t v103;
-        uint32_t r104;
-        uint32_t v106;
-        uint32_t r107;
-        uint32_t v109;
-        uint32_t r110;
-        uint32_t v112;
-        uint32_t r113;
-        uint32_t v115;
-        uint32_t r116;
-        uint32_t v118;
-        uint32_t r119;
-        uint32_t v121;
-        uint32_t r122;
-        uint32_t v124;
-        uint32_t r125;
-        uint32_t v127;
-        uint32_t r128;
-        uint32_t v130;
-        uint32_t r131;
-        uint32_t v133;
-        uint32_t r134;
-        uint32_t v136;
-        uint32_t r137;
-        uint32_t v139;
-        uint32_t v140;
+        uint32_t v5;
+        bool v7;
+        uint32_t r8;
+        uint32_t v9;
+        bool v11;
+        uint32_t r12;
+        uint32_t v14;
+        uint32_t r15;
+        uint32_t v17;
+        uint32_t r18;
+        uint32_t v20;
+        uint32_t r21;
+        uint32_t v23;
+        uint32_t r24;
+        uint32_t v26;
+        uint32_t r27;
+        uint32_t v29;
+        uint32_t r30;
+        uint32_t v32;
+        uint32_t r33;
+        uint32_t v35;
+        uint32_t r36;
+        uint32_t v38;
+        uint32_t r39;
+        uint32_t v41;
+        uint32_t r42;
+        uint32_t v44;
+        uint32_t r45;
+        uint32_t v47;
+        uint32_t r48;
+        uint32_t v50;
+        uint32_t r51;
+        uint32_t v53;
+        uint32_t r54;
+        uint32_t v56;
+        uint32_t r57;
+        uint32_t v59;
+        uint32_t r60;
+        uint32_t v62;
+        uint32_t r63;
+        uint32_t v65;
+        uint32_t r66;
+        uint32_t v68;
+        float _Complex _a69[513];
+        float _Complex *a69 = _a69;
+        uint32_t v70;
+        float _Complex _a78[513];
+        float _Complex *a78 = _a78;
+        uint32_t v79;
+        float _Complex _a82[513];
+        float _Complex *a82 = _a82;
+        uint32_t v83;
+        uint32_t r85;
+        float _Complex _a86[1024];
+        float _Complex *a86 = _a86;
+        uint32_t v87;
+        uint32_t r88;
+        uint32_t v90;
+        uint32_t r91;
+        uint32_t v93;
+        uint32_t r94;
+        uint32_t v96;
+        uint32_t r97;
+        uint32_t v99;
+        uint32_t r100;
+        uint32_t v102;
+        uint32_t r103;
+        uint32_t v105;
+        uint32_t r106;
+        uint32_t v108;
+        uint32_t r109;
+        uint32_t v111;
+        uint32_t r112;
+        uint32_t v114;
+        uint32_t r115;
+        uint32_t v117;
+        uint32_t r118;
+        uint32_t v120;
+        uint32_t r121;
+        uint32_t v123;
+        uint32_t r124;
+        uint32_t v126;
+        uint32_t r127;
+        uint32_t v129;
+        uint32_t r130;
+        uint32_t v132;
+        uint32_t r133;
+        uint32_t v135;
+        uint32_t r136;
+        uint32_t v138;
+        uint32_t r139;
         uint32_t v141;
-        bool v142;
-        bool v143;
+        uint32_t r142;
+        uint32_t v144;
+        uint32_t v145;
+        uint32_t v146;
+        bool v147;
+        bool v148;
         
-        chan_read(chan0, sizeof(v4), &v4);
+        chan_read(chan0, sizeof(v5), &v5);
         
-        float _a5[v4];
-        float *a5 = _a5;
+        float _a6[v5];
+        float *a6 = _a6;
         
-        chan_read(chan0, sizeof(*a5) * (v4 - 0), &a5[0]);
-        v6 = chan_last_read_ok(chan0);
-        r7 = v4;
-        v8 = r7;
+        chan_read(chan0, sizeof(*a6) * (v5 - 0), &a6[0]);
+        v7 = chan_last_read_ok(chan0);
+        r8 = v5;
+        v9 = r8;
         
-        float _a9[v8];
-        float *a9 = _a9;
+        float _a10[v9];
+        float *a10 = _a10;
         
-        memcpy(a9, a5, v8 * sizeof(float));
-        v10 = chan_last_read_ok(chan0);
-        if (!v10) {
+        memcpy(a10, a6, v9 * sizeof(float));
+        v11 = chan_last_read_ok(chan0);
+        if (!v11) {
             chan_close(chan1);
             pthread_cancel(t2);
             pthread_join(t2, NULL);
         }
-        r11 = v8;
+        r12 = v9 <= 1024 ? v9 : 1024;
         
-        float _Complex _a12[v8];
-        float _Complex *a12 = _a12;
+        float _Complex _a13[v9 <= 1024 ? v9 : 1024];
+        float _Complex *a13 = _a13;
         
-        for (v13 = 0; v13 < v8; v13++) {
-            a12[v13] = !((v13 & 512) == 0) ? exp(I * (-3.1415927 *
-                                                      (float) (v13 & 511) /
-                                                      512.0)) * (a9[v13 ^ 512] *
+        for (v14 = 0; v14 < (v9 <= 1024 ? v9 : 1024); v14++) {
+            a13[v14] = !((v14 & 512) == 0) ? exp(I * (-3.1415927 *
+                                                      (float) (v14 & 511) /
+                                                      512.0)) * (a10[v14 ^
+                                                                     512] *
                                                                  (-(0.5 *
                                                                     cos(2.0 *
                                                                     FELD_PI *
-                                                                    (float) (v13 ^
+                                                                    (float) (v14 ^
                                                                              512) /
-                                                                    (float) v8)) +
+                                                                    1024.0)) +
                                                                   0.5) -
-                                                                 a9[v13] *
+                                                                 a10[v14] *
                                                                  (-(0.5 *
                                                                     cos(2.0 *
                                                                     FELD_PI *
-                                                                    (float) v13 /
-                                                                    (float) v8)) +
-                                                                  0.5)) : a9[v13] *
-                (-(0.5 * cos(2.0 * FELD_PI * (float) v13 / (float) v8)) + 0.5) +
-                a9[v13 ^ 512] * (-(0.5 * cos(2.0 * FELD_PI * (float) (v13 ^
-                                                                      512) /
-                                   (float) v8)) + 0.5);
+                                                                    (float) v14 /
+                                                                    1024.0)) +
+                                                                  0.5)) : a10[v14] *
+                (-(0.5 * cos(2.0 * FELD_PI * (float) v14 / 1024.0)) + 0.5) +
+                a10[v14 ^ 512] * (-(0.5 * cos(2.0 * FELD_PI * (float) (v14 ^
+                                                                       512) /
+                                    1024.0)) + 0.5);
         }
-        r14 = r11;
+        r15 = r12;
         
-        float _Complex _a15[r11];
-        float _Complex *a15 = _a15;
+        float _Complex _a16[r12];
+        float _Complex *a16 = _a16;
         
-        for (v16 = 0; v16 < r11; v16++) {
-            a15[v16] = !((v16 & 256) == 0) ? exp(I * (-3.1415927 *
-                                                      (float) (v16 & 255) /
-                                                      256.0)) * (a12[v16 ^
+        for (v17 = 0; v17 < r12; v17++) {
+            a16[v17] = !((v17 & 256) == 0) ? exp(I * (-3.1415927 *
+                                                      (float) (v17 & 255) /
+                                                      256.0)) * (a13[v17 ^
                                                                      256] -
-                                                                 a12[v16]) : a12[v16] +
-                a12[v16 ^ 256];
+                                                                 a13[v17]) : a13[v17] +
+                a13[v17 ^ 256];
         }
-        r17 = r14;
+        r18 = r15;
         
-        float _Complex _a18[r14];
-        float _Complex *a18 = _a18;
+        float _Complex _a19[r15];
+        float _Complex *a19 = _a19;
         
-        for (v19 = 0; v19 < r14; v19++) {
-            a18[v19] = !((v19 & 128) == 0) ? exp(I * (-3.1415927 *
-                                                      (float) (v19 & 127) /
-                                                      128.0)) * (a15[v19 ^
+        for (v20 = 0; v20 < r15; v20++) {
+            a19[v20] = !((v20 & 128) == 0) ? exp(I * (-3.1415927 *
+                                                      (float) (v20 & 127) /
+                                                      128.0)) * (a16[v20 ^
                                                                      128] -
-                                                                 a15[v19]) : a15[v19] +
-                a15[v19 ^ 128];
+                                                                 a16[v20]) : a16[v20] +
+                a16[v20 ^ 128];
         }
-        r20 = r17;
+        r21 = r18;
         
-        float _Complex _a21[r17];
-        float _Complex *a21 = _a21;
+        float _Complex _a22[r18];
+        float _Complex *a22 = _a22;
         
-        for (v22 = 0; v22 < r17; v22++) {
-            a21[v22] = !((v22 & 64) == 0) ? exp(I * (-3.1415927 * (float) (v22 &
+        for (v23 = 0; v23 < r18; v23++) {
+            a22[v23] = !((v23 & 64) == 0) ? exp(I * (-3.1415927 * (float) (v23 &
                                                                            63) /
-                                                     64.0)) * (a18[v22 ^ 64] -
-                                                               a18[v22]) : a18[v22] +
-                a18[v22 ^ 64];
+                                                     64.0)) * (a19[v23 ^ 64] -
+                                                               a19[v23]) : a19[v23] +
+                a19[v23 ^ 64];
         }
-        r23 = r20;
+        r24 = r21;
         
-        float _Complex _a24[r20];
-        float _Complex *a24 = _a24;
+        float _Complex _a25[r21];
+        float _Complex *a25 = _a25;
         
-        for (v25 = 0; v25 < r20; v25++) {
-            a24[v25] = !((v25 & 32) == 0) ? exp(I * (-3.1415927 * (float) (v25 &
+        for (v26 = 0; v26 < r21; v26++) {
+            a25[v26] = !((v26 & 32) == 0) ? exp(I * (-3.1415927 * (float) (v26 &
                                                                            31) /
-                                                     32.0)) * (a21[v25 ^ 32] -
-                                                               a21[v25]) : a21[v25] +
-                a21[v25 ^ 32];
+                                                     32.0)) * (a22[v26 ^ 32] -
+                                                               a22[v26]) : a22[v26] +
+                a22[v26 ^ 32];
         }
-        r26 = r23;
+        r27 = r24;
         
-        float _Complex _a27[r23];
-        float _Complex *a27 = _a27;
+        float _Complex _a28[r24];
+        float _Complex *a28 = _a28;
         
-        for (v28 = 0; v28 < r23; v28++) {
-            a27[v28] = !((v28 & 16) == 0) ? exp(I * (-3.1415927 * (float) (v28 &
+        for (v29 = 0; v29 < r24; v29++) {
+            a28[v29] = !((v29 & 16) == 0) ? exp(I * (-3.1415927 * (float) (v29 &
                                                                            15) /
-                                                     16.0)) * (a24[v28 ^ 16] -
-                                                               a24[v28]) : a24[v28] +
-                a24[v28 ^ 16];
+                                                     16.0)) * (a25[v29 ^ 16] -
+                                                               a25[v29]) : a25[v29] +
+                a25[v29 ^ 16];
         }
-        r29 = r26;
+        r30 = r27;
         
-        float _Complex _a30[r26];
-        float _Complex *a30 = _a30;
+        float _Complex _a31[r27];
+        float _Complex *a31 = _a31;
         
-        for (v31 = 0; v31 < r26; v31++) {
-            a30[v31] = !((v31 & 8) == 0) ? exp(I * (-3.1415927 * (float) (v31 &
+        for (v32 = 0; v32 < r27; v32++) {
+            a31[v32] = !((v32 & 8) == 0) ? exp(I * (-3.1415927 * (float) (v32 &
                                                                           7) /
-                                                    8.0)) * (a27[v31 ^ 8] -
-                                                             a27[v31]) : a27[v31] +
-                a27[v31 ^ 8];
+                                                    8.0)) * (a28[v32 ^ 8] -
+                                                             a28[v32]) : a28[v32] +
+                a28[v32 ^ 8];
         }
-        r32 = r29;
+        r33 = r30;
         
-        float _Complex _a33[r29];
-        float _Complex *a33 = _a33;
+        float _Complex _a34[r30];
+        float _Complex *a34 = _a34;
         
-        for (v34 = 0; v34 < r29; v34++) {
-            a33[v34] = !((v34 & 4) == 0) ? exp(I * (-3.1415927 * (float) (v34 &
+        for (v35 = 0; v35 < r30; v35++) {
+            a34[v35] = !((v35 & 4) == 0) ? exp(I * (-3.1415927 * (float) (v35 &
                                                                           3) /
-                                                    4.0)) * (a30[v34 ^ 4] -
-                                                             a30[v34]) : a30[v34] +
-                a30[v34 ^ 4];
+                                                    4.0)) * (a31[v35 ^ 4] -
+                                                             a31[v35]) : a31[v35] +
+                a31[v35 ^ 4];
         }
-        r35 = r32;
+        r36 = r33;
         
-        float _Complex _a36[r32];
-        float _Complex *a36 = _a36;
+        float _Complex _a37[r33];
+        float _Complex *a37 = _a37;
         
-        for (v37 = 0; v37 < r32; v37++) {
-            a36[v37] = !((v37 & 2) == 0) ? exp(I * (-3.1415927 * (float) (v37 &
+        for (v38 = 0; v38 < r33; v38++) {
+            a37[v38] = !((v38 & 2) == 0) ? exp(I * (-3.1415927 * (float) (v38 &
                                                                           1) /
-                                                    2.0)) * (a33[v37 ^ 2] -
-                                                             a33[v37]) : a33[v37] +
-                a33[v37 ^ 2];
+                                                    2.0)) * (a34[v38 ^ 2] -
+                                                             a34[v38]) : a34[v38] +
+                a34[v38 ^ 2];
         }
-        r38 = r35;
+        r39 = r36;
         
-        float _Complex _a39[r35];
-        float _Complex *a39 = _a39;
+        float _Complex _a40[r36];
+        float _Complex *a40 = _a40;
         
-        for (v40 = 0; v40 < r35; v40++) {
-            a39[v40] = !((v40 & 1) == 0) ? exp(I * (-3.1415927 * (float) (v40 &
+        for (v41 = 0; v41 < r36; v41++) {
+            a40[v41] = !((v41 & 1) == 0) ? exp(I * (-3.1415927 * (float) (v41 &
                                                                           0) /
-                                                    1.0)) * (a36[v40 ^ 1] -
-                                                             a36[v40]) : a36[v40] +
-                a36[v40 ^ 1];
+                                                    1.0)) * (a37[v41 ^ 1] -
+                                                             a37[v41]) : a37[v41] +
+                a37[v41 ^ 1];
         }
-        r41 = r38;
+        r42 = r39;
         
-        float _Complex _a42[r38];
-        float _Complex *a42 = _a42;
+        float _Complex _a43[r39];
+        float _Complex *a43 = _a43;
         
-        for (v43 = 0; v43 < r38; v43++) {
-            a42[v43] = a39[(v43 >> 1 >> 1 << 1 | (v43 & 1)) << 1 | (v43 >> 1 &
+        for (v44 = 0; v44 < r39; v44++) {
+            a43[v44] = a40[(v44 >> 1 >> 1 << 1 | (v44 & 1)) << 1 | (v44 >> 1 &
                                                                     1)];
         }
-        r44 = r41;
+        r45 = r42;
         
-        float _Complex _a45[r41];
-        float _Complex *a45 = _a45;
+        float _Complex _a46[r42];
+        float _Complex *a46 = _a46;
         
-        for (v46 = 0; v46 < r41; v46++) {
-            a45[v46] = a42[(v46 >> 1 >> 2 << 1 | (v46 & 1)) << 2 | (v46 >> 1 &
+        for (v47 = 0; v47 < r42; v47++) {
+            a46[v47] = a43[(v47 >> 1 >> 2 << 1 | (v47 & 1)) << 2 | (v47 >> 1 &
                                                                     3)];
         }
-        r47 = r44;
+        r48 = r45;
         
-        float _Complex _a48[r44];
-        float _Complex *a48 = _a48;
+        float _Complex _a49[r45];
+        float _Complex *a49 = _a49;
         
-        for (v49 = 0; v49 < r44; v49++) {
-            a48[v49] = a45[(v49 >> 1 >> 3 << 1 | (v49 & 1)) << 3 | (v49 >> 1 &
+        for (v50 = 0; v50 < r45; v50++) {
+            a49[v50] = a46[(v50 >> 1 >> 3 << 1 | (v50 & 1)) << 3 | (v50 >> 1 &
                                                                     7)];
         }
-        r50 = r47;
+        r51 = r48;
         
-        float _Complex _a51[r47];
-        float _Complex *a51 = _a51;
+        float _Complex _a52[r48];
+        float _Complex *a52 = _a52;
         
-        for (v52 = 0; v52 < r47; v52++) {
-            a51[v52] = a48[(v52 >> 1 >> 4 << 1 | (v52 & 1)) << 4 | (v52 >> 1 &
+        for (v53 = 0; v53 < r48; v53++) {
+            a52[v53] = a49[(v53 >> 1 >> 4 << 1 | (v53 & 1)) << 4 | (v53 >> 1 &
                                                                     15)];
         }
-        r53 = r50;
+        r54 = r51;
         
-        float _Complex _a54[r50];
-        float _Complex *a54 = _a54;
+        float _Complex _a55[r51];
+        float _Complex *a55 = _a55;
         
-        for (v55 = 0; v55 < r50; v55++) {
-            a54[v55] = a51[(v55 >> 1 >> 5 << 1 | (v55 & 1)) << 5 | (v55 >> 1 &
+        for (v56 = 0; v56 < r51; v56++) {
+            a55[v56] = a52[(v56 >> 1 >> 5 << 1 | (v56 & 1)) << 5 | (v56 >> 1 &
                                                                     31)];
         }
-        r56 = r53;
+        r57 = r54;
         
-        float _Complex _a57[r53];
-        float _Complex *a57 = _a57;
+        float _Complex _a58[r54];
+        float _Complex *a58 = _a58;
         
-        for (v58 = 0; v58 < r53; v58++) {
-            a57[v58] = a54[(v58 >> 1 >> 6 << 1 | (v58 & 1)) << 6 | (v58 >> 1 &
+        for (v59 = 0; v59 < r54; v59++) {
+            a58[v59] = a55[(v59 >> 1 >> 6 << 1 | (v59 & 1)) << 6 | (v59 >> 1 &
                                                                     63)];
         }
-        r59 = r56;
+        r60 = r57;
         
-        float _Complex _a60[r56];
-        float _Complex *a60 = _a60;
+        float _Complex _a61[r57];
+        float _Complex *a61 = _a61;
         
-        for (v61 = 0; v61 < r56; v61++) {
-            a60[v61] = a57[(v61 >> 1 >> 7 << 1 | (v61 & 1)) << 7 | (v61 >> 1 &
+        for (v62 = 0; v62 < r57; v62++) {
+            a61[v62] = a58[(v62 >> 1 >> 7 << 1 | (v62 & 1)) << 7 | (v62 >> 1 &
                                                                     127)];
         }
-        r62 = r59;
+        r63 = r60;
         
-        float _Complex _a63[r59];
-        float _Complex *a63 = _a63;
+        float _Complex _a64[r60];
+        float _Complex *a64 = _a64;
         
-        for (v64 = 0; v64 < r59; v64++) {
-            a63[v64] = a60[(v64 >> 1 >> 8 << 1 | (v64 & 1)) << 8 | (v64 >> 1 &
+        for (v65 = 0; v65 < r60; v65++) {
+            a64[v65] = a61[(v65 >> 1 >> 8 << 1 | (v65 & 1)) << 8 | (v65 >> 1 &
                                                                     255)];
         }
-        r65 = r62;
+        r66 = r63;
         
-        float _Complex _a66[r62];
-        float _Complex *a66 = _a66;
+        float _Complex _a67[r63];
+        float _Complex *a67 = _a67;
         
-        for (v67 = 0; v67 < r62; v67++) {
-            a66[v67] = a63[(v67 >> 1 >> 9 << 1 | (v67 & 1)) << 9 | (v67 >> 1 &
+        for (v68 = 0; v68 < r63; v68++) {
+            a67[v68] = a64[(v68 >> 1 >> 9 << 1 | (v68 & 1)) << 9 | (v68 >> 1 &
                                                                     511)];
         }
-        for (v69 = 0; v69 <= 513; v69++) {
-            float v70;
-            float r71;
-            float v76;
+        for (v70 = 0; v70 < 513; v70++) {
+            float v71;
+            float r72;
+            float v77;
             
-            v70 = a3[v69];
-            a3[v69] = carg(a66[v69]);
-            r71 = carg(a66[v69]) - v70 - (float) v69 * 1.5707964;
+            v71 = a3[v70];
+            a3[v70] = carg(a67[v70]);
+            r72 = carg(a67[v70]) - v71 - (float) v70 * 1.5707964;
             while (1) {
-                float v72;
                 float v73;
+                float v74;
                 
-                v72 = r71;
-                if (!(v72 > FELD_PI))
+                v73 = r72;
+                if (!(v73 > FELD_PI))
                     break;
-                v73 = r71;
-                r71 = v73 + -6.2831855;
+                v74 = r72;
+                r72 = v74 + -6.2831855;
             }
             while (1) {
-                float v74;
                 float v75;
+                float v76;
                 
-                v74 = r71;
-                if (!(v74 < -3.1415927))
+                v75 = r72;
+                if (!(v75 < -3.1415927))
                     break;
-                v75 = r71;
-                r71 = v75 + 6.2831855;
+                v76 = r72;
+                r72 = v76 + 6.2831855;
             }
-            v76 = r71;
-            a68[v69] = 2.0 * cabs(a66[v69]) + I * (((float) v69 + 4.0 * v76 /
+            v77 = r72;
+            a69[v70] = 2.0 * cabs(a67[v70]) + I * (((float) v70 + 4.0 * v77 /
                                                     (2.0 * FELD_PI)) *
                                                    43.066406);
         }
-        for (v78 = 0; v78 < 1024; v78++) {
-            a77[v78] = a68[v78];
+        for (v79 = 0; v79 < 513; v79++) {
+            uint32_t r80;
+            uint32_t v81;
+            
+            r80 = round((float) v79 * 2.0);
+            v81 = r80;
+            a78[v81] = round((float) v79 * 2.0) < 513 ? creal(a69[v79]) + I *
+                (2.0 * cimag(a69[v79])) : 0.0;
         }
-        smbPitchShift(2.0, a77, a79);
-        r80 = 1024;
-        for (v82 = 0; v82 < 1024; v82++) {
-            a81[v82] = !((v82 & 512) == 0) ? exp(I * (FELD_PI * (float) (v82 &
+        for (v83 = 0; v83 < 513; v83++) {
+            float v84;
+            
+            v84 = a4[v83];
+            a4[v83] = v84 + (2.0 * FELD_PI * ((cimag(a78[v83]) - (float) v83 *
+                                               43.066406) / 43.066406) / 4.0 +
+                             (float) v83 * 1.5707964);
+            a82[v83] = creal(a78[v83]) * cos(v84 + (2.0 * FELD_PI *
+                                                    ((cimag(a78[v83]) -
+                                                      (float) v83 * 43.066406) /
+                                                     43.066406) / 4.0 +
+                                                    (float) v83 * 1.5707964)) +
+                I * (creal(a78[v83]) * sin(v84 + (2.0 * FELD_PI *
+                                                  ((cimag(a78[v83]) -
+                                                    (float) v83 * 43.066406) /
+                                                   43.066406) / 4.0 +
+                                                  (float) v83 * 1.5707964)));
+        }
+        r85 = 1024;
+        for (v87 = 0; v87 < 1024; v87++) {
+            a86[v87] = !((v87 & 512) == 0) ? exp(I * (FELD_PI * (float) (v87 &
                                                                          511) /
-                                                      512.0)) * (((v82 ^ 512) <=
-                                                                  513 ? a79[v82 ^
+                                                      512.0)) * (((v87 ^ 512) <=
+                                                                  513 ? a82[v87 ^
                                                                             512] : 0.0) -
-                                                                 (v82 <=
-                                                                  513 ? a79[v82] : 0.0)) : (v82 <=
-                                                                                            513 ? a79[v82] : 0.0) +
-                ((v82 ^ 512) <= 513 ? a79[v82 ^ 512] : 0.0);
+                                                                 (v87 <=
+                                                                  513 ? a82[v87] : 0.0)) : (v87 <=
+                                                                                            513 ? a82[v87] : 0.0) +
+                ((v87 ^ 512) <= 513 ? a82[v87 ^ 512] : 0.0);
         }
-        r83 = r80;
+        r88 = r85;
         
-        float _Complex _a84[r80];
-        float _Complex *a84 = _a84;
+        float _Complex _a89[r85];
+        float _Complex *a89 = _a89;
         
-        for (v85 = 0; v85 < r80; v85++) {
-            a84[v85] = !((v85 & 256) == 0) ? exp(I * (FELD_PI * (float) (v85 &
+        for (v90 = 0; v90 < r85; v90++) {
+            a89[v90] = !((v90 & 256) == 0) ? exp(I * (FELD_PI * (float) (v90 &
                                                                          255) /
-                                                      256.0)) * (a81[v85 ^
+                                                      256.0)) * (a86[v90 ^
                                                                      256] -
-                                                                 a81[v85]) : a81[v85] +
-                a81[v85 ^ 256];
+                                                                 a86[v90]) : a86[v90] +
+                a86[v90 ^ 256];
         }
-        r86 = r83;
+        r91 = r88;
         
-        float _Complex _a87[r83];
-        float _Complex *a87 = _a87;
+        float _Complex _a92[r88];
+        float _Complex *a92 = _a92;
         
-        for (v88 = 0; v88 < r83; v88++) {
-            a87[v88] = !((v88 & 128) == 0) ? exp(I * (FELD_PI * (float) (v88 &
+        for (v93 = 0; v93 < r88; v93++) {
+            a92[v93] = !((v93 & 128) == 0) ? exp(I * (FELD_PI * (float) (v93 &
                                                                          127) /
-                                                      128.0)) * (a84[v88 ^
+                                                      128.0)) * (a89[v93 ^
                                                                      128] -
-                                                                 a84[v88]) : a84[v88] +
-                a84[v88 ^ 128];
+                                                                 a89[v93]) : a89[v93] +
+                a89[v93 ^ 128];
         }
-        r89 = r86;
+        r94 = r91;
         
-        float _Complex _a90[r86];
-        float _Complex *a90 = _a90;
+        float _Complex _a95[r91];
+        float _Complex *a95 = _a95;
         
-        for (v91 = 0; v91 < r86; v91++) {
-            a90[v91] = !((v91 & 64) == 0) ? exp(I * (FELD_PI * (float) (v91 &
+        for (v96 = 0; v96 < r91; v96++) {
+            a95[v96] = !((v96 & 64) == 0) ? exp(I * (FELD_PI * (float) (v96 &
                                                                         63) /
-                                                     64.0)) * (a87[v91 ^ 64] -
-                                                               a87[v91]) : a87[v91] +
-                a87[v91 ^ 64];
+                                                     64.0)) * (a92[v96 ^ 64] -
+                                                               a92[v96]) : a92[v96] +
+                a92[v96 ^ 64];
         }
-        r92 = r89;
+        r97 = r94;
         
-        float _Complex _a93[r89];
-        float _Complex *a93 = _a93;
+        float _Complex _a98[r94];
+        float _Complex *a98 = _a98;
         
-        for (v94 = 0; v94 < r89; v94++) {
-            a93[v94] = !((v94 & 32) == 0) ? exp(I * (FELD_PI * (float) (v94 &
+        for (v99 = 0; v99 < r94; v99++) {
+            a98[v99] = !((v99 & 32) == 0) ? exp(I * (FELD_PI * (float) (v99 &
                                                                         31) /
-                                                     32.0)) * (a90[v94 ^ 32] -
-                                                               a90[v94]) : a90[v94] +
-                a90[v94 ^ 32];
+                                                     32.0)) * (a95[v99 ^ 32] -
+                                                               a95[v99]) : a95[v99] +
+                a95[v99 ^ 32];
         }
-        r95 = r92;
+        r100 = r97;
         
-        float _Complex _a96[r92];
-        float _Complex *a96 = _a96;
+        float _Complex _a101[r97];
+        float _Complex *a101 = _a101;
         
-        for (v97 = 0; v97 < r92; v97++) {
-            a96[v97] = !((v97 & 16) == 0) ? exp(I * (FELD_PI * (float) (v97 &
-                                                                        15) /
-                                                     16.0)) * (a93[v97 ^ 16] -
-                                                               a93[v97]) : a93[v97] +
-                a93[v97 ^ 16];
+        for (v102 = 0; v102 < r97; v102++) {
+            a101[v102] = !((v102 & 16) == 0) ? exp(I * (FELD_PI *
+                                                        (float) (v102 & 15) /
+                                                        16.0)) * (a98[v102 ^
+                                                                      16] -
+                                                                  a98[v102]) : a98[v102] +
+                a98[v102 ^ 16];
         }
-        r98 = r95;
+        r103 = r100;
         
-        float _Complex _a99[r95];
-        float _Complex *a99 = _a99;
+        float _Complex _a104[r100];
+        float _Complex *a104 = _a104;
         
-        for (v100 = 0; v100 < r95; v100++) {
-            a99[v100] = !((v100 & 8) == 0) ? exp(I * (FELD_PI * (float) (v100 &
-                                                                         7) /
-                                                      8.0)) * (a96[v100 ^ 8] -
-                                                               a96[v100]) : a96[v100] +
-                a96[v100 ^ 8];
+        for (v105 = 0; v105 < r100; v105++) {
+            a104[v105] = !((v105 & 8) == 0) ? exp(I * (FELD_PI * (float) (v105 &
+                                                                          7) /
+                                                       8.0)) * (a101[v105 ^ 8] -
+                                                                a101[v105]) : a101[v105] +
+                a101[v105 ^ 8];
         }
-        r101 = r98;
+        r106 = r103;
         
-        float _Complex _a102[r98];
-        float _Complex *a102 = _a102;
+        float _Complex _a107[r103];
+        float _Complex *a107 = _a107;
         
-        for (v103 = 0; v103 < r98; v103++) {
-            a102[v103] = !((v103 & 4) == 0) ? exp(I * (FELD_PI * (float) (v103 &
+        for (v108 = 0; v108 < r103; v108++) {
+            a107[v108] = !((v108 & 4) == 0) ? exp(I * (FELD_PI * (float) (v108 &
                                                                           3) /
-                                                       4.0)) * (a99[v103 ^ 4] -
-                                                                a99[v103]) : a99[v103] +
-                a99[v103 ^ 4];
+                                                       4.0)) * (a104[v108 ^ 4] -
+                                                                a104[v108]) : a104[v108] +
+                a104[v108 ^ 4];
         }
-        r104 = r101;
+        r109 = r106;
         
-        float _Complex _a105[r101];
-        float _Complex *a105 = _a105;
+        float _Complex _a110[r106];
+        float _Complex *a110 = _a110;
         
-        for (v106 = 0; v106 < r101; v106++) {
-            a105[v106] = !((v106 & 2) == 0) ? exp(I * (FELD_PI * (float) (v106 &
+        for (v111 = 0; v111 < r106; v111++) {
+            a110[v111] = !((v111 & 2) == 0) ? exp(I * (FELD_PI * (float) (v111 &
                                                                           1) /
-                                                       2.0)) * (a102[v106 ^ 2] -
-                                                                a102[v106]) : a102[v106] +
-                a102[v106 ^ 2];
+                                                       2.0)) * (a107[v111 ^ 2] -
+                                                                a107[v111]) : a107[v111] +
+                a107[v111 ^ 2];
         }
-        r107 = r104;
+        r112 = r109;
         
-        float _Complex _a108[r104];
-        float _Complex *a108 = _a108;
+        float _Complex _a113[r109];
+        float _Complex *a113 = _a113;
         
-        for (v109 = 0; v109 < r104; v109++) {
-            a108[v109] = !((v109 & 1) == 0) ? exp(I * (FELD_PI * (float) (v109 &
+        for (v114 = 0; v114 < r109; v114++) {
+            a113[v114] = !((v114 & 1) == 0) ? exp(I * (FELD_PI * (float) (v114 &
                                                                           0) /
-                                                       1.0)) * (a105[v109 ^ 1] -
-                                                                a105[v109]) : a105[v109] +
-                a105[v109 ^ 1];
+                                                       1.0)) * (a110[v114 ^ 1] -
+                                                                a110[v114]) : a110[v114] +
+                a110[v114 ^ 1];
         }
-        r110 = r107;
+        r115 = r112;
         
-        float _Complex _a111[r107];
-        float _Complex *a111 = _a111;
+        float _Complex _a116[r112];
+        float _Complex *a116 = _a116;
         
-        for (v112 = 0; v112 < r107; v112++) {
-            a111[v112] = a108[(v112 >> 1 >> 1 << 1 | (v112 & 1)) << 1 | (v112 >>
+        for (v117 = 0; v117 < r112; v117++) {
+            a116[v117] = a113[(v117 >> 1 >> 1 << 1 | (v117 & 1)) << 1 | (v117 >>
                                                                          1 &
                                                                          1)];
         }
-        r113 = r110;
+        r118 = r115;
         
-        float _Complex _a114[r110];
-        float _Complex *a114 = _a114;
+        float _Complex _a119[r115];
+        float _Complex *a119 = _a119;
         
-        for (v115 = 0; v115 < r110; v115++) {
-            a114[v115] = a111[(v115 >> 1 >> 2 << 1 | (v115 & 1)) << 2 | (v115 >>
+        for (v120 = 0; v120 < r115; v120++) {
+            a119[v120] = a116[(v120 >> 1 >> 2 << 1 | (v120 & 1)) << 2 | (v120 >>
                                                                          1 &
                                                                          3)];
         }
-        r116 = r113;
+        r121 = r118;
         
-        float _Complex _a117[r113];
-        float _Complex *a117 = _a117;
+        float _Complex _a122[r118];
+        float _Complex *a122 = _a122;
         
-        for (v118 = 0; v118 < r113; v118++) {
-            a117[v118] = a114[(v118 >> 1 >> 3 << 1 | (v118 & 1)) << 3 | (v118 >>
+        for (v123 = 0; v123 < r118; v123++) {
+            a122[v123] = a119[(v123 >> 1 >> 3 << 1 | (v123 & 1)) << 3 | (v123 >>
                                                                          1 &
                                                                          7)];
         }
-        r119 = r116;
+        r124 = r121;
         
-        float _Complex _a120[r116];
-        float _Complex *a120 = _a120;
+        float _Complex _a125[r121];
+        float _Complex *a125 = _a125;
         
-        for (v121 = 0; v121 < r116; v121++) {
-            a120[v121] = a117[(v121 >> 1 >> 4 << 1 | (v121 & 1)) << 4 | (v121 >>
+        for (v126 = 0; v126 < r121; v126++) {
+            a125[v126] = a122[(v126 >> 1 >> 4 << 1 | (v126 & 1)) << 4 | (v126 >>
                                                                          1 &
                                                                          15)];
         }
-        r122 = r119;
+        r127 = r124;
         
-        float _Complex _a123[r119];
-        float _Complex *a123 = _a123;
+        float _Complex _a128[r124];
+        float _Complex *a128 = _a128;
         
-        for (v124 = 0; v124 < r119; v124++) {
-            a123[v124] = a120[(v124 >> 1 >> 5 << 1 | (v124 & 1)) << 5 | (v124 >>
+        for (v129 = 0; v129 < r124; v129++) {
+            a128[v129] = a125[(v129 >> 1 >> 5 << 1 | (v129 & 1)) << 5 | (v129 >>
                                                                          1 &
                                                                          31)];
         }
-        r125 = r122;
+        r130 = r127;
         
-        float _Complex _a126[r122];
-        float _Complex *a126 = _a126;
+        float _Complex _a131[r127];
+        float _Complex *a131 = _a131;
         
-        for (v127 = 0; v127 < r122; v127++) {
-            a126[v127] = a123[(v127 >> 1 >> 6 << 1 | (v127 & 1)) << 6 | (v127 >>
+        for (v132 = 0; v132 < r127; v132++) {
+            a131[v132] = a128[(v132 >> 1 >> 6 << 1 | (v132 & 1)) << 6 | (v132 >>
                                                                          1 &
                                                                          63)];
         }
-        r128 = r125;
+        r133 = r130;
         
-        float _Complex _a129[r125];
-        float _Complex *a129 = _a129;
+        float _Complex _a134[r130];
+        float _Complex *a134 = _a134;
         
-        for (v130 = 0; v130 < r125; v130++) {
-            a129[v130] = a126[(v130 >> 1 >> 7 << 1 | (v130 & 1)) << 7 | (v130 >>
+        for (v135 = 0; v135 < r130; v135++) {
+            a134[v135] = a131[(v135 >> 1 >> 7 << 1 | (v135 & 1)) << 7 | (v135 >>
                                                                          1 &
                                                                          127)];
         }
-        r131 = r128;
+        r136 = r133;
         
-        float _Complex _a132[r128];
-        float _Complex *a132 = _a132;
+        float _Complex _a137[r133];
+        float _Complex *a137 = _a137;
         
-        for (v133 = 0; v133 < r128; v133++) {
-            a132[v133] = a129[(v133 >> 1 >> 8 << 1 | (v133 & 1)) << 8 | (v133 >>
+        for (v138 = 0; v138 < r133; v138++) {
+            a137[v138] = a134[(v138 >> 1 >> 8 << 1 | (v138 & 1)) << 8 | (v138 >>
                                                                          1 &
                                                                          255)];
         }
-        r134 = r131;
+        r139 = r136;
         
-        float _Complex _a135[r131];
-        float _Complex *a135 = _a135;
+        float _Complex _a140[r136];
+        float _Complex *a140 = _a140;
         
-        for (v136 = 0; v136 < r131; v136++) {
-            a135[v136] = a132[(v136 >> 1 >> 9 << 1 | (v136 & 1)) << 9 | (v136 >>
+        for (v141 = 0; v141 < r136; v141++) {
+            a140[v141] = a137[(v141 >> 1 >> 9 << 1 | (v141 & 1)) << 9 | (v141 >>
                                                                          1 &
                                                                          511)];
         }
-        r137 = r134;
+        r142 = r139 <= 1024 ? r139 : 1024;
         
-        float _a138[r134];
-        float *a138 = _a138;
+        float _a143[r139 <= 1024 ? r139 : 1024];
+        float *a143 = _a143;
         
-        for (v139 = 0; v139 < r134; v139++) {
-            a138[v139] = creal(a135[v139]) / 4096.0 * (-(0.5 * cos(2.0 *
+        for (v144 = 0; v144 < (r139 <= 1024 ? r139 : 1024); v144++) {
+            a143[v144] = creal(a140[v144]) / 4096.0 * (-(0.5 * cos(2.0 *
                                                          FELD_PI *
-                                                         (float) v139 /
-                                                         (float) r134)) + 0.5);
+                                                         (float) v144 /
+                                                         1024.0)) + 0.5);
         }
-        v140 = r137;
-        v141 = v140;
-        v142 = chan_write(chan1, sizeof(v141), &v141);
-        v143 = chan_write(chan1, sizeof(*a138) * (v140 - 0), &a138[0]);
-        if (!v143) {
+        v145 = r142;
+        v146 = v145;
+        v147 = chan_write(chan1, sizeof(v146), &v146);
+        v148 = chan_write(chan1, sizeof(*a143) * (v145 - 0), &a143[0]);
+        if (!v148) {
             chan_close(chan0);
             pthread_cancel(t2);
             pthread_join(t2, NULL);
@@ -630,48 +657,48 @@ void *thread_t2(void *unused)
     chan_close(chan1);
     return NULL;
 }
-void *thread_t144(void *unused)
+void *thread_t149(void *unused)
 {
     while (1) {
-        uint32_t v145;
-        bool v147;
-        uint32_t r148;
-        uint32_t v149;
-        bool v151;
-        uint32_t v153;
-        bool v154;
+        uint32_t v150;
+        bool v152;
+        uint32_t r153;
+        uint32_t v154;
+        bool v156;
+        uint32_t v158;
+        bool v159;
         
-        chan_read(chan1, sizeof(v145), &v145);
+        chan_read(chan1, sizeof(v150), &v150);
         
-        float _a146[v145];
-        float *a146 = _a146;
+        float _a151[v150];
+        float *a151 = _a151;
         
-        chan_read(chan1, sizeof(*a146) * (v145 - 0), &a146[0]);
-        v147 = chan_last_read_ok(chan1);
-        r148 = v145;
-        v149 = r148;
+        chan_read(chan1, sizeof(*a151) * (v150 - 0), &a151[0]);
+        v152 = chan_last_read_ok(chan1);
+        r153 = v150;
+        v154 = r153;
         
-        float _a150[v149];
-        float *a150 = _a150;
+        float _a155[v154];
+        float *a155 = _a155;
         
-        memcpy(a150, a146, v149 * sizeof(float));
-        v151 = chan_last_read_ok(chan1);
-        if (!v151) {
-            pthread_cancel(t144);
-            pthread_join(t144, NULL);
+        memcpy(a155, a151, v154 * sizeof(float));
+        v156 = chan_last_read_ok(chan1);
+        if (!v156) {
+            pthread_cancel(t149);
+            pthread_join(t149, NULL);
         }
         
-        float _a152[v149];
-        float *a152 = _a152;
+        float _a157[v154];
+        float *a157 = _a157;
         
-        for (v153 = 0; v153 < v149; v153++) {
-            a152[v153] = a150[v153];
+        for (v158 = 0; v158 < v154; v158++) {
+            a157[v158] = a155[v158];
         }
-        v154 = emit_samples(a152);
-        if (!v154) {
+        v159 = emit_samples(a157);
+        if (!v159) {
             chan_close(chan1);
-            pthread_cancel(t144);
-            pthread_join(t144, NULL);
+            pthread_cancel(t149);
+            pthread_join(t149, NULL);
         }
     }
     return NULL;
@@ -682,38 +709,38 @@ int main()
     chan0 = chan_new(10 * sizeof(uint32_t) + 10 * (1024 * sizeof(float)));
     chan1 = chan_new(10 * sizeof(uint32_t) + 10 * (1024 * sizeof(float)));
     pthread_create(&t2, NULL, thread_t2, NULL);
-    pthread_create(&t144, NULL, thread_t144, NULL);
+    pthread_create(&t149, NULL, thread_t149, NULL);
     while (1) {
-        float _a155[1024];
-        float *a155 = _a155;
-        bool v156;
-        uint32_t r157;
-        float _a158[1024];
-        float *a158 = _a158;
-        uint32_t v159;
-        uint32_t v160;
-        uint32_t v161;
-        bool v162;
-        bool v163;
+        float _a160[1024];
+        float *a160 = _a160;
+        bool v161;
+        uint32_t r162;
+        float _a163[1024];
+        float *a163 = _a163;
+        uint32_t v164;
+        uint32_t v165;
+        uint32_t v166;
+        bool v167;
+        bool v168;
         
-        v156 = receive_samples(a155);
-        if (!v156) {
+        v161 = receive_samples(a160);
+        if (!v161) {
             break;
         }
-        r157 = 1024;
-        for (v159 = 0; v159 < 1024; v159++) {
-            a158[v159] = a155[v159];
+        r162 = 1024;
+        for (v164 = 0; v164 < 1024; v164++) {
+            a163[v164] = a160[v164];
         }
-        v160 = r157;
-        v161 = v160;
-        v162 = chan_write(chan0, sizeof(v161), &v161);
-        v163 = chan_write(chan0, sizeof(*a158) * (v160 - 0), &a158[0]);
-        if (!v163) {
+        v165 = r162;
+        v166 = v165;
+        v167 = chan_write(chan0, sizeof(v166), &v166);
+        v168 = chan_write(chan0, sizeof(*a163) * (v165 - 0), &a163[0]);
+        if (!v168) {
             break;
         }
     }
     chan_close(chan0);
-    pthread_join(t144, NULL);
+    pthread_join(t149, NULL);
     teardown_queues();
     return 0;
 }
