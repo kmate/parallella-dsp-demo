@@ -96,25 +96,54 @@ interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
+{-  Unfortunately, this function could not be implemented effectively now.
+    See the following implemention in C:
+
+  float clampPhase(float phase) {
+    int q = phase / FELD_PI;
+    if (q >= 0) {
+      q += q & 1;
+    } else {
+      q -= q & 1;
+    }
+    phase -= FELD_PI * (double)q;
+    return phase;
+  }
+
+    The current implementation is an expression generator, that is only able to
+    recover values in range [-nπ..nπ].
+-}
+clampPhase :: Data Float -> Data Float
+clampPhase = clampPhase' 8
+
+clampPhase' :: Length -> Data Float -> Data Float
+clampPhase' 0 phase = phase
+clampPhase' n phase = (phase < -π) ?
+  (clampPhase' (n - 1) (phase + 2 * π)) $
+  ((phase > π) ?
+     (clampPhase' (n - 1) (phase - 2 * π)) $
+     phase)
+
+zeroes :: Data Length -> RealSamples
+zeroes l = Indexed l $ const 0
+
 analyze :: Zun ComplexSamples ComplexSamples ()
 analyze = do
-  lastPhase <- lift $ newArr numPosBins
+  lastPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
     input <- receive
-    buffer <- lift $ newArr numPosBins
-    lift $ for (0, 1, Excl numPosBins) $ \k -> do
-      lphs :: Data Float <- getArr k lastPhase
-      let magn  = 2 * magnitude (input ! k)
-          phs   = phase (input ! k)
-          tmp   = phs - lphs
-      setArr k phs lastPhase
-      let tmp'  = tmp - i2n k * expectedDiff
-      tmp'' <- callFun "clampPhase" [ valArg tmp' ]
-      let deriv = (i2n overlap * tmp'') / (2 * π)
-          freq  = (i2n k + deriv) * freqPerBin
-      setArr k (complex magn freq) buffer
-    buffer' <- lift $ unsafeFreezeArr buffer
-    let output = toPull $ Manifest bufferSize buffer'
+    lastPhase <- lift $ readStore lastPhaseS
+    let result = Indexed numPosBins ixf
+        ixf k = (complex magn freq, phs)
+          where
+            magn  = 2 * magnitude (input ! k)
+            phs   = phase (input ! k)
+            diff  = phs - lastPhase ! k
+            expct = clampPhase (diff - i2n k * expectedDiff)
+            deriv = (i2n overlap * expct) / (2 * π)
+            freq  = (i2n k + deriv) * freqPerBin
+    let (output, lastPhase') = unzip result
+    lift $ writeStore lastPhaseS lastPhase'
     emit output
 
 mulImag :: (Num a, PrimType a, PrimType (Complex a))
@@ -131,11 +160,11 @@ shiftPitch = loop $ do
     -- FIXME: We need an explicit integer variable here as the index expression
     -- is a call to `round`, which returns a double. Then the C compiler
     -- complains about a non-integer array subscript expression.
-    typedIxRef <- initRef index
+    typedIxRef <- initRef index -- TODO: use store + unsafeFreezeStore
     index' <- getRef typedIxRef
     setArr index' value buffer
   buffer' <- lift $ unsafeFreezeArr buffer
-  let output = toPull $ Manifest bufferSize buffer'
+  let output = toPull $ Manifest numPosBins buffer'
   emit output
 
 synthetize :: Zun ComplexSamples ComplexSamples ()
@@ -154,7 +183,7 @@ synthetize = do
       setArr k phs sumPhase
       setArr k (polar magn phs) buffer
     buffer' <- lift $ unsafeFreezeArr buffer
-    let output = toPull $ Manifest bufferSize buffer'
+    let output = toPull $ Manifest numPosBins buffer'
     emit output
 
 zeroNegBins :: Zun ComplexSamples ComplexSamples ()
@@ -176,10 +205,7 @@ accumulate = loop $ do
 pitchShift :: Data Float
 pitchShift = 2
 
--- Needed to be in sync with C and JS code!
-bufferSize :: Data Length
-bufferSize = 1024
-
+-- Needed to be in sync with C the code!
 fftSize :: Data Length
 fftSize = 1024
 
@@ -207,17 +233,18 @@ mainProgram :: Run ()
 mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
-  let chanSize = 10 `ofLength` bufferSize
+  let chanSize = 10 `ofLength` fftSize
+      halfChanSize = 10 `ofLength` numPosBins
   translatePar ((window >>> interleave)      |>>chanSize>>|
                 (fftPar 1024 10)             |>>chanSize>>|
-                analyze                      |>>chanSize>>|
-                shiftPitch                   |>>chanSize>>|
+                analyze                      |>>halfChanSize>>|
+                shiftPitch                   |>>halfChanSize>>|
                 (synthetize >>> zeroNegBins) |>>chanSize>>|
                 (ifftPar 1024 10)            |>>chanSize>>|
                 (accumulate >>> window))
-    (do buffer :: Arr Float <- newArr bufferSize
+    (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
-        input <- unsafeFreezeVec bufferSize buffer
+        input <- unsafeFreezeVec fftSize buffer
         return (input, hasMore))
     chanSize
     (\output -> do

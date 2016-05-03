@@ -93,19 +93,5 @@ bool emit_samples(float *output) {
   return true;
 }
 
-// Maps a phase value back to the [-PI..PI] interval.
-// It could not be done effectively from Feldspar currently.
-float clampPhase(float phase) {
-#define FELD_PI 3.141592653589793  // use the same value as Feldspar
-  int q = phase / FELD_PI;
-  if (q >= 0) {
-    q += q & 1;
-  } else {
-    q -= q & 1;
-  }
-  phase -= FELD_PI * (double)q;
-  return phase;
-}
-
 #endif // PROCESSOR_H_
 
