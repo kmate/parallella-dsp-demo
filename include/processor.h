@@ -1,8 +1,10 @@
 #ifndef PROCESSOR_H_
 #define PROCESSOR_H_
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
