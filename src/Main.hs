@@ -103,17 +103,18 @@ interleave = loop $ do
 
 -- TODO: reimplement wrapped functionality in Zeldspar
 -- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
-cWrapper :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
+cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
 cWrapper = do
   lift $ addInclude "\"c_processor.h\""
   loop $ do
     input <- receive
     Manifest bufferSize buffer' <- lift $ fromPull input
-    buffer <- lift $ unsafeThawArr buffer'
+    inBuffer <- lift $ unsafeThawArr buffer'
+    outBuffer <- lift $ newArr bufferSize
     lift $ callProc "smbPitchShift" [ valArg pitchShift
-                                    , arrArg buffer
-                                    , arrArg buffer ]
-    buffer'' <- lift $ unsafeFreezeArr buffer
+                                    , arrArg inBuffer
+                                    , arrArg outBuffer ]
+    buffer'' <- lift $ unsafeFreezeArr outBuffer
     let output = toPull $ Manifest bufferSize buffer''
     emit output
 
@@ -145,7 +146,7 @@ mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar (liftP ({-window >>> interleave >>> (fft 1024) >>>-} cWrapper))
+  translatePar (liftP (window >>> interleave >>>{- (fft 1024) >>>-} cWrapper))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer
