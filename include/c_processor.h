@@ -44,28 +44,17 @@
 
 void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *output) {
 
-	/* ***************** PROCESSING ******************* */
-	/* this does the actual pitch shifting */
-  float gSynFreq[FFT_SIZE];
-  float gSynMagn[FFT_SIZE];
-	memset(gSynMagn, 0, FFT_SIZE*sizeof(float));
-	memset(gSynFreq, 0, FFT_SIZE*sizeof(float));
-	for (int k = 0; k <= FFT_SIZE2; k++) { 
-		int index = k*pitchShift;
-		if (index <= FFT_SIZE2) { 
-			gSynMagn[index] += creal(input[k]);
-			gSynFreq[index] = cimag(input[k]) * pitchShift;
-		} 
-	}
-	
 	/* ***************** SYNTHESIS ******************* */
 	/* this is the synthesis step */
   float gSumPhase[FFT_SIZE/2+1];
 	for (int k = 0; k <= FFT_SIZE2; k++) {
 
 		/* get magnitude and true frequency from synthesis arrays */
-		double magn = gSynMagn[k];
-		double tmp = gSynFreq[k];
+		double magn = creal(input[k]);
+		double tmp = cimag(input[k]);
+
+		//double magn = gSynMagn[k];
+		//double tmp = gSynFreq[k];
 
 		/* subtract bin mid frequency */
 		tmp -= (double)k*FREQ_PER_BIN;

@@ -97,7 +97,7 @@ hann width = Indexed width
 window :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
 window = loop $ do
   input <- receive
-  emit $ zipWith (*) input (hann $ length input)
+  emit $ zipWith (*) input (hann fftSize)
 
 interleave :: Zun (Vector (Data Float)) (Vector (Data (Complex Float))) ()
 interleave = loop $ do
@@ -117,7 +117,7 @@ analyze = do
   loop $ do
     input <- receive
     buffer <- lift $ newArr numPosBins
-    lift $ for (0, 1, Incl numPosBins) $ \k -> do
+    lift $ for (0, 1, Excl numPosBins) $ \k -> do
       lphs :: Data Float <- getArr k lastPhase
       let magn  = 2 * magnitude (input ! k)
           phs   = phase (input ! k)
@@ -131,6 +131,24 @@ analyze = do
     buffer' <- lift $ unsafeFreezeArr buffer
     let output = toPull $ Manifest bufferSize buffer'
     emit output
+
+mulImag :: (Num a, PrimType a, PrimType (Complex a))
+        => Data (Complex a) -> Data a -> Data (Complex a)
+mulImag c n = complex (realPart c) (n * imagPart c)
+
+shiftPitch :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+shiftPitch = loop $ do
+  input <- receive
+  buffer <- lift $ newArr numPosBins
+  lift $ for (0, 1, Excl numPosBins) $ \k -> do
+    let index = round $ i2n k * pitchShift
+        value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ (0)
+    typedIxRef <- initRef index
+    index' <- getRef typedIxRef
+    setArr index' value buffer
+  buffer' <- lift $ unsafeFreezeArr buffer
+  let output = toPull $ Manifest bufferSize buffer'
+  emit output
 
 -- TODO: reimplement wrapped functionality in Zeldspar
 -- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
@@ -152,9 +170,7 @@ cWrapper = do
 zeroNegBins :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
 zeroNegBins = loop $ do
   input <- receive
-  let l = length input
-      l2 = l `div` 2 + 1
-  emit $ Indexed l $ \i -> (i <= l2) ? (input ! i) $ 0
+  emit $ Indexed fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
 accumulate :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
 accumulate = loop $ do
@@ -203,7 +219,7 @@ mainProgram = do
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
   translatePar (liftP (window >>> interleave >>> (fft 1024) >>> analyze >>>
-                       cWrapper >>>
+                       cWrapper >>> shiftPitch >>>
                        zeroNegBins >>> (ifft 1024) >>> accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
