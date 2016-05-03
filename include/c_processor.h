@@ -44,44 +44,6 @@
 
 void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *output) {
 
-  /* this is the analysis step */
-  float gAnaFreq[FFT_SIZE];
-  float gAnaMagn[FFT_SIZE];
-  float gLastPhase[FFT_SIZE/2+1];
-	for (int k = 0; k <= FFT_SIZE2; k++) {
-
-		/* de-interlace FFT buffer */
-		double real = crealf(input[k]);
-		double imag = cimagf(input[k]);
-
-		/* compute magnitude and phase */
-		double magn = 2.*sqrt(real*real + imag*imag);
-		double phase = atan2(imag,real);
-
-		/* compute phase difference */
-		double tmp = phase - gLastPhase[k];
-		gLastPhase[k] = phase;
-
-		/* subtract expected phase difference */
-		tmp -= (double)k*EXPCT_DIFF;
-
-		/* map delta phase into +/- Pi interval */
-		int qpd = tmp/M_PI;
-		if (qpd >= 0) qpd += qpd&1;
-		else qpd -= qpd&1;
-		tmp -= M_PI*(double)qpd;
-
-		/* get deviation from bin frequency from the +/- Pi interval */
-		tmp = OVERLAP*tmp/(2.*M_PI);
-
-		/* compute the k-th partials' true frequency */
-		tmp = (double)k*FREQ_PER_BIN + tmp*FREQ_PER_BIN;
-
-		/* store magnitude and true frequency in analysis arrays */
-		gAnaMagn[k] = magn;
-		gAnaFreq[k] = tmp;
-	}
-
 	/* ***************** PROCESSING ******************* */
 	/* this does the actual pitch shifting */
   float gSynFreq[FFT_SIZE];
@@ -91,10 +53,8 @@ void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *outp
 	for (int k = 0; k <= FFT_SIZE2; k++) { 
 		int index = k*pitchShift;
 		if (index <= FFT_SIZE2) { 
-			//gSynMagn[index] += creal(input[k]);
-			//gSynFreq[index] = cimag(input[k]) * pitchShift;
-			gSynMagn[index] += gAnaMagn[k];
-			gSynFreq[index] = gAnaFreq[k] * pitchShift;
+			gSynMagn[index] += creal(input[k]);
+			gSynFreq[index] = cimag(input[k]) * pitchShift;
 		} 
 	}
 	

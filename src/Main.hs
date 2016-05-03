@@ -104,6 +104,34 @@ interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
+backToCircle :: Data Float -> Run (Data Float)
+backToCircle v = do
+  tmp <- initRef v
+  while ((>π) <$> getRef tmp) ((+(-(π * 2))) <$> getRef tmp >>= setRef tmp)
+  while ((<(-π)) <$> getRef tmp) ((+(π * 2)) <$> getRef tmp >>= setRef tmp)
+  getRef tmp
+
+analyze :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+analyze = do
+  lastPhase <- lift $ newArr numPosBins
+  loop $ do
+    input <- receive
+    buffer <- lift $ newArr numPosBins
+    lift $ for (0, 1, Incl numPosBins) $ \k -> do
+      lphs :: Data Float <- getArr k lastPhase
+      let magn  = 2 * magnitude (input ! k)
+          phs   = phase (input ! k)
+          tmp   = phs - lphs
+      setArr k phs lastPhase
+      let tmp'  = tmp - i2n k * expectedDiff
+      tmp'' <- backToCircle tmp'
+      let deriv = (i2n overlap * tmp'') / (2 * π)
+          freq  = (i2n k + deriv) * freqPerBin
+      setArr k (complex magn freq) buffer
+    buffer' <- lift $ unsafeFreezeArr buffer
+    let output = toPull $ Manifest bufferSize buffer'
+    emit output
+
 -- TODO: reimplement wrapped functionality in Zeldspar
 -- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
 cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
@@ -121,8 +149,8 @@ cWrapper = do
     let output = toPull $ Manifest bufferSize buffer''
     emit output
 
-zeroNegFreqs :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
-zeroNegFreqs = loop $ do
+zeroNegBins :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+zeroNegBins = loop $ do
   input <- receive
   let l = length input
       l2 = l `div` 2 + 1
@@ -137,6 +165,10 @@ accumulate = loop $ do
 -- Main program and constants
 --------------------------------------------------------------------------------
 
+-- Value 1 means no shifting. 2 is one octave up, 0.5 is one octave down.
+pitchShift :: Data Float
+pitchShift = 2
+
 -- Needed to be in sync with C and JS code!
 bufferSize :: Data Length
 bufferSize = 1024
@@ -150,9 +182,19 @@ overlap = 4
 sampleRate :: Data Float
 sampleRate = 44100
 
--- Value 1 means no shifting. 2 is one octave up, 0.5 is one octave down.
-pitchShift :: Data Float
-pitchShift = 2
+-- Derived constants
+stepSize :: Data Length
+stepSize = fftSize `div` overlap
+
+numPosBins :: Data Length
+numPosBins = fftSize `div` 2 + 1
+
+freqPerBin :: Data Float
+freqPerBin = sampleRate / i2n fftSize
+
+expectedDiff :: Data Float
+expectedDiff = 2 * π * i2n stepSize / i2n fftSize
+
 
 
 mainProgram :: Run ()
@@ -160,9 +202,9 @@ mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar (liftP (window >>> interleave >>> (fft 1024) >>>
+  translatePar (liftP (window >>> interleave >>> (fft 1024) >>> analyze >>>
                        cWrapper >>>
-                       zeroNegFreqs >>> (ifft 1024) >>> accumulate >>> window))
+                       zeroNegBins >>> (ifft 1024) >>> accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer
