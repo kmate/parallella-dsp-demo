@@ -96,34 +96,6 @@ interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
-{-  FIXME: Unfortunately, this function could not be implemented efficiently.
-    See the following C implemention:
-
-    float clampPhase(float phase) {
-      int q = phase / FELD_PI;
-      if (q >= 0) {
-        q += q & 1;
-      } else {
-        q -= q & 1;
-      }
-      phase -= FELD_PI * (double)q;
-      return phase;
-    }
-
-    The current implementation is an expression generator, that is only able to
-    recover values in range [-nπ..nπ], instantiated with n = 8.
--}
-clampPhase :: Data Float -> Data Float
-clampPhase = clampPhase' 8
-
-clampPhase' :: Length -> Data Float -> Data Float
-clampPhase' 0 phase = phase
-clampPhase' n phase = (phase < -π) ?
-  (clampPhase' (n - 1) (phase + 2 * π)) $
-  ((phase > π) ?
-     (clampPhase' (n - 1) (phase - 2 * π)) $
-     phase)
-
 zeroes :: Data Length -> RealSamples
 zeroes l = Indexed l $ const 0
 
@@ -142,7 +114,7 @@ analyze = do
             -- compute phase difference
             diff  = phs - lastPhase ! k
             -- subtract expected phase difference
-            expct = clampPhase (diff - i2n k * expectedDiff)
+            expct = diff - i2n k * expectedDiff
             -- get deviation from bin frequency from the ±π interval
             deriv = (i2n overlap * expct) / (2 * π)
             -- compute the k-th partials' true frequency
