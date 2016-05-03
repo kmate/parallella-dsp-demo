@@ -142,7 +142,6 @@ void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *outp
 	}
 	
 	/* ***************** SYNTHESIS ******************* */
-  float gFFTworksp[2*FFT_SIZE];
 	/* this is the synthesis step */
   float gSumPhase[FFT_SIZE/2+1];
 	for (int k = 0; k <= FFT_SIZE2; k++) {
@@ -168,16 +167,11 @@ void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *outp
 		double phase = gSumPhase[k];
 
 		/* get real and imag part and re-interleave */
-		gFFTworksp[2*k] = magn*cos(phase);
-		gFFTworksp[2*k+1] = magn*sin(phase);
+		output[k] = magn*cos(phase) + I * magn*sin(phase);
 	} 
 
 	/* zero negative frequencies */
-	for (int k = FFT_SIZE+2; k < 2*FFT_SIZE; k++) gFFTworksp[k] = 0.;
-
-  for (int k = 0; k <= FFT_SIZE; k++) {
-    output[k] = gFFTworksp[2*k] + I * gFFTworksp[2*k+1];
-  }
+	for (int k = FFT_SIZE+2; k < 2*FFT_SIZE; k++) output[k] = 0.;
 }
 
 #endif // C_PROCESSOR_H_
