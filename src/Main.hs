@@ -96,22 +96,22 @@ interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
-{-  Unfortunately, this function could not be implemented effectively now.
-    See the following implemention in C:
+{-  FIXME: Unfortunately, this function could not be implemented effectively.
+    See the following C implemention:
 
-  float clampPhase(float phase) {
-    int q = phase / FELD_PI;
-    if (q >= 0) {
-      q += q & 1;
-    } else {
-      q -= q & 1;
+    float clampPhase(float phase) {
+      int q = phase / FELD_PI;
+      if (q >= 0) {
+        q += q & 1;
+      } else {
+        q -= q & 1;
+      }
+      phase -= FELD_PI * (double)q;
+      return phase;
     }
-    phase -= FELD_PI * (double)q;
-    return phase;
-  }
 
     The current implementation is an expression generator, that is only able to
-    recover values in range [-nπ..nπ].
+    recover values in range [-nπ..nπ], instantiated with n = 8.
 -}
 clampPhase :: Data Float -> Data Float
 clampPhase = clampPhase' 8
@@ -136,11 +136,16 @@ analyze = do
     let result = Indexed numPosBins ixf
         ixf k = (complex magn freq, phs)
           where
+            -- compute magnitude and phase
             magn  = 2 * magnitude (input ! k)
             phs   = phase (input ! k)
+            -- compute phase difference
             diff  = phs - lastPhase ! k
+            -- subtract expected phase difference
             expct = clampPhase (diff - i2n k * expectedDiff)
+            -- get deviation from bin frequency from the ±π interval
             deriv = (i2n overlap * expct) / (2 * π)
+            -- compute the k-th partials' true frequency
             freq  = (i2n k + deriv) * freqPerBin
     let (output, lastPhase') = unzip result
     lift $ writeStore lastPhaseS lastPhase'
@@ -160,7 +165,7 @@ shiftPitch = loop $ do
     -- FIXME: We need an explicit integer variable here as the index expression
     -- is a call to `round`, which returns a double. Then the C compiler
     -- complains about a non-integer array subscript expression.
-    typedIxRef <- initRef index -- TODO: use store + unsafeFreezeStore
+    typedIxRef <- initRef index
     index' <- getRef typedIxRef
     setArr index' value buffer
   buffer' <- lift $ unsafeFreezeArr buffer
@@ -169,21 +174,28 @@ shiftPitch = loop $ do
 
 synthetize :: Zun ComplexSamples ComplexSamples ()
 synthetize = do
-  sumPhase <- lift $ newArr numPosBins
+  sumPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
     input <- receive
-    buffer <- lift $ newArr numPosBins
-    lift $ for (0, 1, Excl numPosBins) $ \k -> do
-      sphs :: Data Float <- getArr k sumPhase
-      let magn  = realPart (input ! k)
-          tmp   = imagPart (input ! k)
-          tmp'  = 2 * π * ((tmp - i2n k * freqPerBin) / freqPerBin) / i2n overlap
-          tmp'' = tmp' + i2n k * expectedDiff
-          phs   = sphs + tmp''
-      setArr k phs sumPhase
-      setArr k (polar magn phs) buffer
-    buffer' <- lift $ unsafeFreezeArr buffer
-    let output = toPull $ Manifest numPosBins buffer'
+    sumPhase <- lift $ readStore sumPhaseS
+    let result = Indexed numPosBins ixf
+        ixf k = (polar magn phs, phs)
+          where
+            -- get magnitude and true frequency
+            magn  = realPart (input ! k)
+            freq  = imagPart (input ! k)
+            -- subtract bin mid frequency
+            mfreq = freq - i2n k * freqPerBin
+            -- get bin deviation from freq deviation
+            deriv = mfreq / freqPerBin
+            -- take overlap into account
+            olap  = 2 * π * deriv / i2n overlap
+            -- add the overlap phase advance back in
+            expct = olap + i2n k * expectedDiff
+            -- accumulate delta phase to get bin phase
+            phs   = (sumPhase ! k) + expct
+    let (output, sumPhase') = unzip result
+    lift $ writeStore sumPhaseS sumPhase'
     emit output
 
 zeroNegBins :: Zun ComplexSamples ComplexSamples ()
