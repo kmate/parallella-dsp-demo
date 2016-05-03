@@ -49,6 +49,9 @@ bitRevPar n = foldl1 (\a b -> a |>>10`ofLength`value n>>| b)
 fft :: Length -> Zun Samples Samples ()
 fft n = fftCore n False >>> bitRev n
 
+ifft :: Length -> Zun Samples Samples ()
+ifft n = fftCore n True >>> bitRev n
+
 fftPar :: Length -> ParZun Samples Samples ()
 fftPar n = fftCorePar n False |>>10`ofLength`value n>>| bitRevPar n
 
@@ -94,7 +97,7 @@ hann width = Indexed width
 window :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
 window = loop $ do
   input <- receive
-  emit $ zipWith (*) input (hann fftSize)
+  emit $ zipWith (*) input (hann $ length input)
 
 interleave :: Zun (Vector (Data Float)) (Vector (Data (Complex Float))) ()
 interleave = loop $ do
@@ -103,7 +106,7 @@ interleave = loop $ do
 
 -- TODO: reimplement wrapped functionality in Zeldspar
 -- cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
-cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
+cWrapper :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
 cWrapper = do
   lift $ addInclude "\"c_processor.h\""
   loop $ do
@@ -118,6 +121,17 @@ cWrapper = do
     let output = toPull $ Manifest bufferSize buffer''
     emit output
 
+zeroNegFreqs :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+zeroNegFreqs = do
+  input <- receive
+  let l = length input
+      l2 = l `div` 2
+  emit $ Indexed l $ \i -> (i < l2) ? (input ! i) $ 0
+
+accumulate :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
+accumulate = loop $ do
+  input <- receive
+  emit $ map ((/ i2n (fftSize * overlap)) . realPart) input
 
 --------------------------------------------------------------------------------
 -- Main program and constants
@@ -146,7 +160,9 @@ mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar (liftP (window >>> interleave >>> (fft 1024) >>> cWrapper))
+  translatePar (liftP (window >>> interleave >>> (fft 1024) >>>
+                       cWrapper >>>
+                       {-zeroNegFreqs >>> -} (ifft 1024) >>> accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer

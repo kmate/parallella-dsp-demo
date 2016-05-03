@@ -7,9 +7,9 @@
 #include <string.h>
 #include <tgmath.h>
 void *thread_t2(void *unused);
-void *thread_t77(void *unused);
+void *thread_t134(void *unused);
+pthread_t t134;
 pthread_t t2;
-pthread_t t77;
 chan_t chan0;
 chan_t chan1;
 #define FELD_PI 3.141592653589793
@@ -62,10 +62,48 @@ void *thread_t2(void *unused)
         uint32_t v68;
         uint32_t r70;
         uint32_t v72;
-        uint32_t v73;
-        uint32_t v74;
-        bool v75;
-        bool v76;
+        uint32_t r73;
+        uint32_t v75;
+        uint32_t r76;
+        uint32_t v78;
+        uint32_t r79;
+        uint32_t v81;
+        uint32_t r82;
+        uint32_t v84;
+        uint32_t r85;
+        uint32_t v87;
+        uint32_t r88;
+        uint32_t v90;
+        uint32_t r91;
+        uint32_t v93;
+        uint32_t r94;
+        uint32_t v96;
+        uint32_t r97;
+        uint32_t v99;
+        uint32_t r100;
+        uint32_t v102;
+        uint32_t r103;
+        uint32_t v105;
+        uint32_t r106;
+        uint32_t v108;
+        uint32_t r109;
+        uint32_t v111;
+        uint32_t r112;
+        uint32_t v114;
+        uint32_t r115;
+        uint32_t v117;
+        uint32_t r118;
+        uint32_t v120;
+        uint32_t r121;
+        uint32_t v123;
+        uint32_t r124;
+        uint32_t v126;
+        uint32_t r127;
+        uint32_t v129;
+        uint32_t v130;
+        uint32_t v131;
+        bool v132;
+        bool v133;
         
         chan_read(chan0, sizeof(v3), &v3);
         
@@ -87,12 +125,12 @@ void *thread_t2(void *unused)
             pthread_cancel(t2);
             pthread_join(t2, NULL);
         }
-        r10 = v7 <= 1024 ? v7 : 1024;
+        r10 = v7;
         
-        float _Complex _a11[v7 <= 1024 ? v7 : 1024];
+        float _Complex _a11[v7];
         float _Complex *a11 = _a11;
         
-        for (v12 = 0; v12 < (v7 <= 1024 ? v7 : 1024); v12++) {
+        for (v12 = 0; v12 < v7; v12++) {
             a11[v12] = !((v12 & 512) == 0) ? exp(I * (-3.1415927 *
                                                       (float) (v12 & 511) /
                                                       512.0)) * (a8[v12 ^ 512] *
@@ -101,19 +139,19 @@ void *thread_t2(void *unused)
                                                                     FELD_PI *
                                                                     (float) (v12 ^
                                                                              512) /
-                                                                    1024.0)) +
+                                                                    (float) v7)) +
                                                                   0.5) -
                                                                  a8[v12] *
                                                                  (-(0.5 *
                                                                     cos(2.0 *
                                                                     FELD_PI *
                                                                     (float) v12 /
-                                                                    1024.0)) +
+                                                                    (float) v7)) +
                                                                   0.5)) : a8[v12] *
-                (-(0.5 * cos(2.0 * FELD_PI * (float) v12 / 1024.0)) + 0.5) +
+                (-(0.5 * cos(2.0 * FELD_PI * (float) v12 / (float) v7)) + 0.5) +
                 a8[v12 ^ 512] * (-(0.5 * cos(2.0 * FELD_PI * (float) (v12 ^
                                                                       512) /
-                                   1024.0)) + 0.5);
+                                   (float) v7)) + 0.5);
         }
         r13 = r10;
         
@@ -314,23 +352,238 @@ void *thread_t2(void *unused)
             a67[v68] = a65[v68];
         }
         
-        float _a69[r64];
-        float *a69 = _a69;
+        float _Complex _a69[r64];
+        float _Complex *a69 = _a69;
         
         smbPitchShift(2.0, a67, a69);
         r70 = r64;
         
-        float _a71[r64];
-        float *a71 = _a71;
+        float _Complex _a71[r64];
+        float _Complex *a71 = _a71;
         
         for (v72 = 0; v72 < r64; v72++) {
-            a71[v72] = a69[v72];
+            a71[v72] = !((v72 & 512) == 0) ? exp(I * (FELD_PI * (float) (v72 &
+                                                                         511) /
+                                                      512.0)) * (a69[v72 ^
+                                                                     512] -
+                                                                 a69[v72]) : a69[v72] +
+                a69[v72 ^ 512];
         }
-        v73 = r70;
-        v74 = v73;
-        v75 = chan_write(chan1, sizeof(v74), &v74);
-        v76 = chan_write(chan1, sizeof(*a71) * (v73 - 0), &a71[0]);
-        if (!v76) {
+        r73 = r70;
+        
+        float _Complex _a74[r70];
+        float _Complex *a74 = _a74;
+        
+        for (v75 = 0; v75 < r70; v75++) {
+            a74[v75] = !((v75 & 256) == 0) ? exp(I * (FELD_PI * (float) (v75 &
+                                                                         255) /
+                                                      256.0)) * (a71[v75 ^
+                                                                     256] -
+                                                                 a71[v75]) : a71[v75] +
+                a71[v75 ^ 256];
+        }
+        r76 = r73;
+        
+        float _Complex _a77[r73];
+        float _Complex *a77 = _a77;
+        
+        for (v78 = 0; v78 < r73; v78++) {
+            a77[v78] = !((v78 & 128) == 0) ? exp(I * (FELD_PI * (float) (v78 &
+                                                                         127) /
+                                                      128.0)) * (a74[v78 ^
+                                                                     128] -
+                                                                 a74[v78]) : a74[v78] +
+                a74[v78 ^ 128];
+        }
+        r79 = r76;
+        
+        float _Complex _a80[r76];
+        float _Complex *a80 = _a80;
+        
+        for (v81 = 0; v81 < r76; v81++) {
+            a80[v81] = !((v81 & 64) == 0) ? exp(I * (FELD_PI * (float) (v81 &
+                                                                        63) /
+                                                     64.0)) * (a77[v81 ^ 64] -
+                                                               a77[v81]) : a77[v81] +
+                a77[v81 ^ 64];
+        }
+        r82 = r79;
+        
+        float _Complex _a83[r79];
+        float _Complex *a83 = _a83;
+        
+        for (v84 = 0; v84 < r79; v84++) {
+            a83[v84] = !((v84 & 32) == 0) ? exp(I * (FELD_PI * (float) (v84 &
+                                                                        31) /
+                                                     32.0)) * (a80[v84 ^ 32] -
+                                                               a80[v84]) : a80[v84] +
+                a80[v84 ^ 32];
+        }
+        r85 = r82;
+        
+        float _Complex _a86[r82];
+        float _Complex *a86 = _a86;
+        
+        for (v87 = 0; v87 < r82; v87++) {
+            a86[v87] = !((v87 & 16) == 0) ? exp(I * (FELD_PI * (float) (v87 &
+                                                                        15) /
+                                                     16.0)) * (a83[v87 ^ 16] -
+                                                               a83[v87]) : a83[v87] +
+                a83[v87 ^ 16];
+        }
+        r88 = r85;
+        
+        float _Complex _a89[r85];
+        float _Complex *a89 = _a89;
+        
+        for (v90 = 0; v90 < r85; v90++) {
+            a89[v90] = !((v90 & 8) == 0) ? exp(I * (FELD_PI * (float) (v90 &
+                                                                       7) /
+                                                    8.0)) * (a86[v90 ^ 8] -
+                                                             a86[v90]) : a86[v90] +
+                a86[v90 ^ 8];
+        }
+        r91 = r88;
+        
+        float _Complex _a92[r88];
+        float _Complex *a92 = _a92;
+        
+        for (v93 = 0; v93 < r88; v93++) {
+            a92[v93] = !((v93 & 4) == 0) ? exp(I * (FELD_PI * (float) (v93 &
+                                                                       3) /
+                                                    4.0)) * (a89[v93 ^ 4] -
+                                                             a89[v93]) : a89[v93] +
+                a89[v93 ^ 4];
+        }
+        r94 = r91;
+        
+        float _Complex _a95[r91];
+        float _Complex *a95 = _a95;
+        
+        for (v96 = 0; v96 < r91; v96++) {
+            a95[v96] = !((v96 & 2) == 0) ? exp(I * (FELD_PI * (float) (v96 &
+                                                                       1) /
+                                                    2.0)) * (a92[v96 ^ 2] -
+                                                             a92[v96]) : a92[v96] +
+                a92[v96 ^ 2];
+        }
+        r97 = r94;
+        
+        float _Complex _a98[r94];
+        float _Complex *a98 = _a98;
+        
+        for (v99 = 0; v99 < r94; v99++) {
+            a98[v99] = !((v99 & 1) == 0) ? exp(I * (FELD_PI * (float) (v99 &
+                                                                       0) /
+                                                    1.0)) * (a95[v99 ^ 1] -
+                                                             a95[v99]) : a95[v99] +
+                a95[v99 ^ 1];
+        }
+        r100 = r97;
+        
+        float _Complex _a101[r97];
+        float _Complex *a101 = _a101;
+        
+        for (v102 = 0; v102 < r97; v102++) {
+            a101[v102] = a98[(v102 >> 1 >> 1 << 1 | (v102 & 1)) << 1 | (v102 >>
+                                                                        1 & 1)];
+        }
+        r103 = r100;
+        
+        float _Complex _a104[r100];
+        float _Complex *a104 = _a104;
+        
+        for (v105 = 0; v105 < r100; v105++) {
+            a104[v105] = a101[(v105 >> 1 >> 2 << 1 | (v105 & 1)) << 2 | (v105 >>
+                                                                         1 &
+                                                                         3)];
+        }
+        r106 = r103;
+        
+        float _Complex _a107[r103];
+        float _Complex *a107 = _a107;
+        
+        for (v108 = 0; v108 < r103; v108++) {
+            a107[v108] = a104[(v108 >> 1 >> 3 << 1 | (v108 & 1)) << 3 | (v108 >>
+                                                                         1 &
+                                                                         7)];
+        }
+        r109 = r106;
+        
+        float _Complex _a110[r106];
+        float _Complex *a110 = _a110;
+        
+        for (v111 = 0; v111 < r106; v111++) {
+            a110[v111] = a107[(v111 >> 1 >> 4 << 1 | (v111 & 1)) << 4 | (v111 >>
+                                                                         1 &
+                                                                         15)];
+        }
+        r112 = r109;
+        
+        float _Complex _a113[r109];
+        float _Complex *a113 = _a113;
+        
+        for (v114 = 0; v114 < r109; v114++) {
+            a113[v114] = a110[(v114 >> 1 >> 5 << 1 | (v114 & 1)) << 5 | (v114 >>
+                                                                         1 &
+                                                                         31)];
+        }
+        r115 = r112;
+        
+        float _Complex _a116[r112];
+        float _Complex *a116 = _a116;
+        
+        for (v117 = 0; v117 < r112; v117++) {
+            a116[v117] = a113[(v117 >> 1 >> 6 << 1 | (v117 & 1)) << 6 | (v117 >>
+                                                                         1 &
+                                                                         63)];
+        }
+        r118 = r115;
+        
+        float _Complex _a119[r115];
+        float _Complex *a119 = _a119;
+        
+        for (v120 = 0; v120 < r115; v120++) {
+            a119[v120] = a116[(v120 >> 1 >> 7 << 1 | (v120 & 1)) << 7 | (v120 >>
+                                                                         1 &
+                                                                         127)];
+        }
+        r121 = r118;
+        
+        float _Complex _a122[r118];
+        float _Complex *a122 = _a122;
+        
+        for (v123 = 0; v123 < r118; v123++) {
+            a122[v123] = a119[(v123 >> 1 >> 8 << 1 | (v123 & 1)) << 8 | (v123 >>
+                                                                         1 &
+                                                                         255)];
+        }
+        r124 = r121;
+        
+        float _Complex _a125[r121];
+        float _Complex *a125 = _a125;
+        
+        for (v126 = 0; v126 < r121; v126++) {
+            a125[v126] = a122[(v126 >> 1 >> 9 << 1 | (v126 & 1)) << 9 | (v126 >>
+                                                                         1 &
+                                                                         511)];
+        }
+        r127 = r124;
+        
+        float _a128[r124];
+        float *a128 = _a128;
+        
+        for (v129 = 0; v129 < r124; v129++) {
+            a128[v129] = creal(a125[v129]) / 4096.0 * (-(0.5 * cos(2.0 *
+                                                         FELD_PI *
+                                                         (float) v129 /
+                                                         (float) r124)) + 0.5);
+        }
+        v130 = r127;
+        v131 = v130;
+        v132 = chan_write(chan1, sizeof(v131), &v131);
+        v133 = chan_write(chan1, sizeof(*a128) * (v130 - 0), &a128[0]);
+        if (!v133) {
             chan_close(chan0);
             pthread_cancel(t2);
             pthread_join(t2, NULL);
@@ -340,48 +593,48 @@ void *thread_t2(void *unused)
     chan_close(chan1);
     return NULL;
 }
-void *thread_t77(void *unused)
+void *thread_t134(void *unused)
 {
     while (1) {
-        uint32_t v78;
-        bool v80;
-        uint32_t r81;
-        uint32_t v82;
-        bool v84;
-        uint32_t v86;
-        bool v87;
+        uint32_t v135;
+        bool v137;
+        uint32_t r138;
+        uint32_t v139;
+        bool v141;
+        uint32_t v143;
+        bool v144;
         
-        chan_read(chan1, sizeof(v78), &v78);
+        chan_read(chan1, sizeof(v135), &v135);
         
-        float _a79[v78];
-        float *a79 = _a79;
+        float _a136[v135];
+        float *a136 = _a136;
         
-        chan_read(chan1, sizeof(*a79) * (v78 - 0), &a79[0]);
-        v80 = chan_last_read_ok(chan1);
-        r81 = v78;
-        v82 = r81;
+        chan_read(chan1, sizeof(*a136) * (v135 - 0), &a136[0]);
+        v137 = chan_last_read_ok(chan1);
+        r138 = v135;
+        v139 = r138;
         
-        float _a83[v82];
-        float *a83 = _a83;
+        float _a140[v139];
+        float *a140 = _a140;
         
-        memcpy(a83, a79, v82 * sizeof(float));
-        v84 = chan_last_read_ok(chan1);
-        if (!v84) {
-            pthread_cancel(t77);
-            pthread_join(t77, NULL);
+        memcpy(a140, a136, v139 * sizeof(float));
+        v141 = chan_last_read_ok(chan1);
+        if (!v141) {
+            pthread_cancel(t134);
+            pthread_join(t134, NULL);
         }
         
-        float _a85[v82];
-        float *a85 = _a85;
+        float _a142[v139];
+        float *a142 = _a142;
         
-        for (v86 = 0; v86 < v82; v86++) {
-            a85[v86] = a83[v86];
+        for (v143 = 0; v143 < v139; v143++) {
+            a142[v143] = a140[v143];
         }
-        v87 = emit_samples(a85);
-        if (!v87) {
+        v144 = emit_samples(a142);
+        if (!v144) {
             chan_close(chan1);
-            pthread_cancel(t77);
-            pthread_join(t77, NULL);
+            pthread_cancel(t134);
+            pthread_join(t134, NULL);
         }
     }
     return NULL;
@@ -392,38 +645,38 @@ int main()
     chan0 = chan_new(10 * sizeof(uint32_t) + 10 * (1024 * sizeof(float)));
     chan1 = chan_new(10 * sizeof(uint32_t) + 10 * (1024 * sizeof(float)));
     pthread_create(&t2, NULL, thread_t2, NULL);
-    pthread_create(&t77, NULL, thread_t77, NULL);
+    pthread_create(&t134, NULL, thread_t134, NULL);
     while (1) {
-        float _a88[1024];
-        float *a88 = _a88;
-        bool v89;
-        uint32_t r90;
-        float _a91[1024];
-        float *a91 = _a91;
-        uint32_t v92;
-        uint32_t v93;
-        uint32_t v94;
-        bool v95;
-        bool v96;
+        float _a145[1024];
+        float *a145 = _a145;
+        bool v146;
+        uint32_t r147;
+        float _a148[1024];
+        float *a148 = _a148;
+        uint32_t v149;
+        uint32_t v150;
+        uint32_t v151;
+        bool v152;
+        bool v153;
         
-        v89 = receive_samples(a88);
-        if (!v89) {
+        v146 = receive_samples(a145);
+        if (!v146) {
             break;
         }
-        r90 = 1024;
-        for (v92 = 0; v92 < 1024; v92++) {
-            a91[v92] = a88[v92];
+        r147 = 1024;
+        for (v149 = 0; v149 < 1024; v149++) {
+            a148[v149] = a145[v149];
         }
-        v93 = r90;
-        v94 = v93;
-        v95 = chan_write(chan0, sizeof(v94), &v94);
-        v96 = chan_write(chan0, sizeof(*a91) * (v93 - 0), &a91[0]);
-        if (!v96) {
+        v150 = r147;
+        v151 = v150;
+        v152 = chan_write(chan0, sizeof(v151), &v151);
+        v153 = chan_write(chan0, sizeof(*a148) * (v150 - 0), &a148[0]);
+        if (!v153) {
             break;
         }
     }
     chan_close(chan0);
-    pthread_join(t77, NULL);
+    pthread_join(t134, NULL);
     teardown_queues();
     return 0;
 }

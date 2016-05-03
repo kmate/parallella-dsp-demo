@@ -23,6 +23,7 @@
 *
 *****************************************************************************/ 
 
+#include <complex.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -86,13 +87,7 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign) {
 #define IN_LATENCY   ((FFT_SIZE) - (STEP_SIZE))
 #define EXPCT_DIFF   (2.0 * (M_PI) * (double)(STEP_SIZE) / (double)(FFT_SIZE))
 
-void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
-
-  float gFFTworksp[2*FFT_SIZE];
-  for (int k = 0; k <= FFT_SIZE; k++) {
-    gFFTworksp[2*k] = crealf(input[k]); 
-    gFFTworksp[2*k+1] = cimagf(input[k]);
-  }
+void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *output) {
 
   /* this is the analysis step */
   float gAnaFreq[FFT_SIZE];
@@ -101,8 +96,8 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
 	for (int k = 0; k <= FFT_SIZE2; k++) {
 
 		/* de-interlace FFT buffer */
-		double real = gFFTworksp[2*k];
-		double imag = gFFTworksp[2*k+1];
+		double real = crealf(input[k]);
+		double imag = cimagf(input[k]);
 
 		/* compute magnitude and phase */
 		double magn = 2.*sqrt(real*real + imag*imag);
@@ -147,6 +142,7 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
 	}
 	
 	/* ***************** SYNTHESIS ******************* */
+  float gFFTworksp[2*FFT_SIZE];
 	/* this is the synthesis step */
   float gSumPhase[FFT_SIZE/2+1];
 	for (int k = 0; k <= FFT_SIZE2; k++) {
@@ -179,15 +175,9 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
 	/* zero negative frequencies */
 	for (int k = FFT_SIZE+2; k < 2*FFT_SIZE; k++) gFFTworksp[k] = 0.;
 
-	/* do inverse transform */
-	smbFft(gFFTworksp, FFT_SIZE, 1);
-
-	/* do windowing and add to output accumulator */
-	for(int k=0; k < FFT_SIZE; k++) {
-	    /* the window is exactly the same as above */
-		double window = -.5*cos(2.*M_PI*(double)k/(double)FFT_SIZE)+.5;
-		output[k] = window*gFFTworksp[2*k]/(FFT_SIZE*OVERLAP);
-	}
+  for (int k = 0; k <= FFT_SIZE; k++) {
+    output[k] = gFFTworksp[2*k] + I * gFFTworksp[2*k+1];
+  }
 }
 
 #endif // C_PROCESSOR_H_
