@@ -122,11 +122,11 @@ cWrapper = do
     emit output
 
 zeroNegFreqs :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
-zeroNegFreqs = do
+zeroNegFreqs = loop $ do
   input <- receive
   let l = length input
-      l2 = l `div` 2
-  emit $ Indexed l $ \i -> (i < l2) ? (input ! i) $ 0
+      l2 = l `div` 2 + 1
+  emit $ Indexed l $ \i -> (i <= l2) ? (input ! i) $ 0
 
 accumulate :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
 accumulate = loop $ do
@@ -162,7 +162,7 @@ mainProgram = do
   let chanSize = 10 `ofLength` bufferSize
   translatePar (liftP (window >>> interleave >>> (fft 1024) >>>
                        cWrapper >>>
-                       {-zeroNegFreqs >>> -} (ifft 1024) >>> accumulate >>> window))
+                       zeroNegFreqs >>> (ifft 1024) >>> accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer

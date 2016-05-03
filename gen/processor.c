@@ -13,6 +13,15 @@ pthread_t t2;
 chan_t chan0;
 chan_t chan1;
 #define FELD_PI 3.141592653589793
+int feld_div(int x, int y)
+{
+    int q = x / y;
+    int r = x % y;
+    
+    if (r != 0 && r < 0 != y < 0)
+        --q;
+    return q;
+}
 void *thread_t2(void *unused)
 {
     while (1) {
@@ -364,10 +373,19 @@ void *thread_t2(void *unused)
         for (v72 = 0; v72 < r64; v72++) {
             a71[v72] = !((v72 & 512) == 0) ? exp(I * (FELD_PI * (float) (v72 &
                                                                          511) /
-                                                      512.0)) * (a69[v72 ^
-                                                                     512] -
-                                                                 a69[v72]) : a69[v72] +
-                a69[v72 ^ 512];
+                                                      512.0)) * (((v72 ^ 512) <=
+                                                                  feld_div(r64,
+                                                                           2) +
+                                                                  1 ? a69[v72 ^
+                                                                          512] : 0.0) -
+                                                                 (v72 <=
+                                                                  feld_div(r64,
+                                                                           2) +
+                                                                  1 ? a69[v72] : 0.0)) : (v72 <=
+                                                                                          feld_div(r64,
+                                                                                                   2) +
+                                                                                          1 ? a69[v72] : 0.0) +
+                ((v72 ^ 512) <= feld_div(r64, 2) + 1 ? a69[v72 ^ 512] : 0.0);
         }
         r73 = r70;
         

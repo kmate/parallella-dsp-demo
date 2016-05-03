@@ -168,10 +168,7 @@ void smbPitchShift(float pitchShift, _Complex float *input, _Complex float *outp
 
 		/* get real and imag part and re-interleave */
 		output[k] = magn*cos(phase) + I * magn*sin(phase);
-	} 
-
-	/* zero negative frequencies */
-	for (int k = FFT_SIZE+2; k < 2*FFT_SIZE; k++) output[k] = 0.;
+	}
 }
 
 #endif // C_PROCESSOR_H_
