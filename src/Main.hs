@@ -7,8 +7,9 @@ import Zeldspar
 import Zeldspar.Parallel
 
 
-type Samples  = Vector (Data (Complex Float))
-type Twiddles = Vector (Data (Complex Float))
+type RealSamples     = Vector (Data Float)
+type ComplexSamples  = Vector (Data (Complex Float))
+type Twiddles        = Vector (Data (Complex Float))
 
 
 --------------------------------------------------------------------------------
@@ -28,48 +29,39 @@ rotBit k i = lefts .|. rights
 riffle :: Data Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
 riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
 
--- | Bit reversal of a vector with length 'n'.
-bitRev :: PrimType a => Length -> Zun (Vector (Data a)) (Vector (Data a)) ()
-bitRev n = foldl1 (>>>) [ riffle (value k) >>> loop store | k <- [1..n'] ]
-  where
-    n' = floor (logBase 2 $ fromIntegral n) - 1
-
 -- | Parallel bit reversal of a vector with length 'n'.
-bitRevPar :: PrimType a => Length -> ParZun (Vector (Data a)) (Vector (Data a)) ()
-bitRevPar n = foldl1 (\a b -> a |>>10`ofLength`value n>>| b)
+bitRevPar :: PrimType a
+          => Length  -- ^ Length of a vector
+          -> Length  -- ^ Maximum number of vectors on internal channels
+          -> ParZun (Vector (Data a)) (Vector (Data a)) ()
+bitRevPar n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
             [ liftP $ riffle $ value k | k <- [1..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
 
 
 --------------------------------------------------------------------------------
--- "Pull-style" FFT
+-- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> Zun Samples Samples ()
-fft n = fftCore n False >>> bitRev n
+fftPar :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+fftPar = fftBase False
 
-ifft :: Length -> Zun Samples Samples ()
-ifft n = fftCore n True >>> bitRev n
+ifftPar :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+ifftPar = fftBase True
 
-fftPar :: Length -> ParZun Samples Samples ()
-fftPar n = fftCorePar n False |>>10`ofLength`value n>>| bitRevPar n
+fftBase :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+fftBase inv n m = fftCorePar inv n m |>>value m`ofLength`value n>>| bitRevPar n m
 
 -- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
-fftCore :: Length -> Bool -> Zun Samples Samples ()
-fftCore n inv = foldl1 (>>>) [ step inv (value k) >>> loop store
-                             | k <- Prelude.reverse [0..n'] ]
-  where
-    n' = floor (logBase 2 $ fromIntegral n) - 1
-
-fftCorePar :: Length -> Bool -> ParZun Samples Samples ()
-fftCorePar n inv = foldl1 (\a b -> a |>>10`ofLength`value n>>| b)
-                 [ liftP $ step inv $ value k | k <- Prelude.reverse [0..n'] ]
+fftCorePar :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
+fftCorePar inv n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
+                   [ liftP $ step inv $ value k | k <- Prelude.reverse [0..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
 
 -- | Performs the 'k'th FFT/IFFT stage on a sample vector.
-step :: Bool -> Data Length -> Zun Samples Samples ()
+step :: Bool -> Data Length -> Zun ComplexSamples ComplexSamples ()
 step inv k = loop $ do
     v <- receive
     let ixf i = testBit i k ? (twid * (b - a)) $ (a + b)
@@ -90,28 +82,21 @@ testBit a i = a .&. (1 .<<. i2n i) /= 0
 -- Temporary C wrapper in Zeldspar
 --------------------------------------------------------------------------------
 
-hann :: Data Length -> Vector (Data Float)
+hann :: Data Length -> RealSamples
 hann width = Indexed width
            $ \k -> -0.5 * cos(2 * π * (i2n k) / (i2n width)) + 0.5
 
-window :: Zun (Vector (Data Float)) (Vector (Data Float)) ()
+window :: Zun RealSamples RealSamples ()
 window = loop $ do
   input <- receive
   emit $ zipWith (*) input (hann fftSize)
 
-interleave :: Zun (Vector (Data Float)) (Vector (Data (Complex Float))) ()
+interleave :: Zun RealSamples ComplexSamples ()
 interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
 
-backToCircle :: Data Float -> Run (Data Float)
-backToCircle v = do
-  tmp <- initRef v
-  while ((>π) <$> getRef tmp) ((+(-(π * 2))) <$> getRef tmp >>= setRef tmp)
-  while ((<(-π)) <$> getRef tmp) ((+(π * 2)) <$> getRef tmp >>= setRef tmp)
-  getRef tmp
-
-analyze :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+analyze :: Zun ComplexSamples ComplexSamples ()
 analyze = do
   lastPhase <- lift $ newArr numPosBins
   loop $ do
@@ -124,7 +109,7 @@ analyze = do
           tmp   = phs - lphs
       setArr k phs lastPhase
       let tmp'  = tmp - i2n k * expectedDiff
-      tmp'' <- backToCircle tmp'
+      tmp'' <- callFun "clampPhase" [ valArg tmp' ]
       let deriv = (i2n overlap * tmp'') / (2 * π)
           freq  = (i2n k + deriv) * freqPerBin
       setArr k (complex magn freq) buffer
@@ -136,13 +121,16 @@ mulImag :: (Num a, PrimType a, PrimType (Complex a))
         => Data (Complex a) -> Data a -> Data (Complex a)
 mulImag c n = complex (realPart c) (n * imagPart c)
 
-shiftPitch :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+shiftPitch :: Zun ComplexSamples ComplexSamples ()
 shiftPitch = loop $ do
   input <- receive
   buffer <- lift $ newArr numPosBins
   lift $ for (0, 1, Excl numPosBins) $ \k -> do
     let index = round $ i2n k * pitchShift
         value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ (0)
+    -- FIXME: We need an explicit integer variable here as the index expression
+    -- is a call to `round`, which returns a double. Then the C compiler
+    -- complains about a non-integer array subscript expression.
     typedIxRef <- initRef index
     index' <- getRef typedIxRef
     setArr index' value buffer
@@ -150,7 +138,7 @@ shiftPitch = loop $ do
   let output = toPull $ Manifest bufferSize buffer'
   emit output
 
-synthetize :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+synthetize :: Zun ComplexSamples ComplexSamples ()
 synthetize = do
   sumPhase <- lift $ newArr numPosBins
   loop $ do
@@ -164,20 +152,21 @@ synthetize = do
           tmp'' = tmp' + i2n k * expectedDiff
           phs   = sphs + tmp''
       setArr k phs sumPhase
-      setArr k (complex (magn * cos phs) (magn * sin phs)) buffer -- TODO: atan/atan2?
+      setArr k (polar magn phs) buffer
     buffer' <- lift $ unsafeFreezeArr buffer
     let output = toPull $ Manifest bufferSize buffer'
     emit output
 
-zeroNegBins :: Zun (Vector (Data (Complex Float))) (Vector (Data (Complex Float))) ()
+zeroNegBins :: Zun ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
   input <- receive
   emit $ Indexed fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
-accumulate :: Zun (Vector (Data (Complex Float))) (Vector (Data Float)) ()
+accumulate :: Zun ComplexSamples RealSamples ()
 accumulate = loop $ do
   input <- receive
   emit $ map ((/ i2n (fftSize * overlap)) . realPart) input
+
 
 --------------------------------------------------------------------------------
 -- Main program and constants
@@ -214,15 +203,18 @@ expectedDiff :: Data Float
 expectedDiff = 2 * π * i2n stepSize / i2n fftSize
 
 
-
 mainProgram :: Run ()
 mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar (liftP (window >>> interleave >>> (fft 1024) >>> analyze >>>
-                       shiftPitch >>> synthetize >>>
-                       zeroNegBins >>> (ifft 1024) >>> accumulate >>> window))
+  translatePar ((window >>> interleave)      |>>chanSize>>|
+                (fftPar 1024 10)             |>>chanSize>>|
+                analyze                      |>>chanSize>>|
+                shiftPitch                   |>>chanSize>>|
+                (synthetize >>> zeroNegBins) |>>chanSize>>|
+                (ifftPar 1024 10)            |>>chanSize>>|
+                (accumulate >>> window))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer

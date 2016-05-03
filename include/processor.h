@@ -18,7 +18,6 @@ FILE *dsp_out;
 #define BUFFER_SIZE 1024
 #define FFT_SIZE    1024
 #define OVERLAP     4
-#define SAMPLE_RATE 44100
 #define STEP_SIZE   ((FFT_SIZE) / (OVERLAP))
 #define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))
 
@@ -92,6 +91,20 @@ bool emit_samples(float *output) {
     DEBUG("[Processor] Samples sent.\n");
   }
   return true;
+}
+
+// Maps a phase value back to the [-PI..PI] interval.
+// It could not be done effectively from Feldspar currently.
+float clampPhase(float phase) {
+#define FELD_PI 3.141592653589793  // use the same value as Feldspar
+  int q = phase / FELD_PI;
+  if (q >= 0) {
+    q += q & 1;
+  } else {
+    q -= q & 1;
+  }
+  phase -= FELD_PI * (double)q;
+  return phase;
 }
 
 #endif // PROCESSOR_H_
