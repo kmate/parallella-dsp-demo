@@ -30,7 +30,7 @@ riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
 
 -- | Bit reversal of a vector with length 'n'.
 bitRev :: PrimType a => Length -> Zun (Vector (Data a)) (Vector (Data a)) ()
-bitRev n = foldl1 (>>>) [ riffle $ value k | k <- [1..n'] ]
+bitRev n = foldl1 (>>>) [ riffle (value k) >>> loop store | k <- [1..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
 
@@ -47,14 +47,14 @@ bitRevPar n = foldl1 (\a b -> a |>>10`ofLength`value n>>| b)
 --------------------------------------------------------------------------------
 
 fft :: Length -> Zun Samples Samples ()
-fft n = fftCore n False >>> loop store >>> bitRev n
+fft n = fftCore n False >>> bitRev n
 
 fftPar :: Length -> ParZun Samples Samples ()
 fftPar n = fftCorePar n False |>>10`ofLength`value n>>| bitRevPar n
 
 -- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
 fftCore :: Length -> Bool -> Zun Samples Samples ()
-fftCore n inv = foldl1 (>>>) [ step inv $ value k
+fftCore n inv = foldl1 (>>>) [ step inv (value k) >>> loop store
                              | k <- Prelude.reverse [0..n'] ]
   where
     n' = floor (logBase 2 $ fromIntegral n) - 1
@@ -146,7 +146,7 @@ mainProgram = do
   addInclude "\"processor.h\""
   callProc "setup_queues" []
   let chanSize = 10 `ofLength` bufferSize
-  translatePar (liftP (window >>> interleave >>>{- (fft 1024) >>>-} cWrapper))
+  translatePar (liftP (window >>> interleave >>> (fft 1024) >>> cWrapper))
     (do buffer :: Arr Float <- newArr bufferSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec bufferSize buffer

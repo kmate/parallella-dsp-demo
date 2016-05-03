@@ -94,12 +94,10 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
     gFFTworksp[2*k+1] = cimagf(input[k]);
   }
 
-	smbFft(gFFTworksp, FFT_SIZE, -1);
-
-    /* this is the analysis step */
-    float gAnaFreq[FFT_SIZE];
-    float gAnaMagn[FFT_SIZE];
-    float gLastPhase[FFT_SIZE/2+1];
+  /* this is the analysis step */
+  float gAnaFreq[FFT_SIZE];
+  float gAnaMagn[FFT_SIZE];
+  float gLastPhase[FFT_SIZE/2+1];
 	for (int k = 0; k <= FFT_SIZE2; k++) {
 
 		/* de-interlace FFT buffer */
@@ -132,13 +130,12 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
 		/* store magnitude and true frequency in analysis arrays */
 		gAnaMagn[k] = magn;
 		gAnaFreq[k] = tmp;
-
 	}
 
 	/* ***************** PROCESSING ******************* */
 	/* this does the actual pitch shifting */
-    float gSynFreq[FFT_SIZE];
-    float gSynMagn[FFT_SIZE];
+  float gSynFreq[FFT_SIZE];
+  float gSynMagn[FFT_SIZE];
 	memset(gSynMagn, 0, FFT_SIZE*sizeof(float));
 	memset(gSynFreq, 0, FFT_SIZE*sizeof(float));
 	for (int k = 0; k <= FFT_SIZE2; k++) { 
@@ -151,7 +148,7 @@ void smbPitchShift(float pitchShift, _Complex float *input, float *output) {
 	
 	/* ***************** SYNTHESIS ******************* */
 	/* this is the synthesis step */
-    float gSumPhase[FFT_SIZE/2+1];
+  float gSumPhase[FFT_SIZE/2+1];
 	for (int k = 0; k <= FFT_SIZE2; k++) {
 
 		/* get magnitude and true frequency from synthesis arrays */
