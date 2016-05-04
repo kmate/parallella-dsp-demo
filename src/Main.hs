@@ -12,6 +12,24 @@ type ComplexSamples  = Vector (Data (Complex Float))
 type Twiddles        = Vector (Data (Complex Float))
 
 
+flipFlop :: Storable a
+         => (Store a, Store a)
+         -> [a -> a]
+         -> Zun a a ()
+flipFlop (a, b) fs = do
+  let fs' = P.zip fs (P.cycle [(a, b), (b, a)])
+      go _ (f, (src, dst)) = do
+          input <- unsafeFreezeStore src
+          let output = f input
+          writeStore dst output
+          return output
+  loop $ do
+    input <- receive
+    lift $ writeStore a input
+    output <- lift $ foldM go input fs'
+    emit output
+
+
 --------------------------------------------------------------------------------
 -- Bit reversal
 --------------------------------------------------------------------------------
@@ -26,14 +44,12 @@ rotBit k i = lefts .|. rights
     lefts  = (((ir .>>. k') .<<. 1) .|. (i .&. 1)) .<<. k'
 
 -- | Permute the vector by applying 'rotBit k' on its indices.
-riffle :: Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
-riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
+riffle :: Index -> Vector (Data a) -> Vector (Data a)
+riffle k = permute (const $ rotBit k)
 
--- | Parallel bit reversal of a vector with length 'n'.
-bitRev :: PrimType a => Length -> Zun (Vector (Data a)) (Vector (Data a)) ()
-bitRev n = P.foldl1 (\a b -> a >>> loop store >>> b) [ riffle k | k <- [1..n'] ]
-  where
-    n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
+-- | Generates parallel bit reversal of a vector with length 'n'.
+bitRev :: PrimType a => Length -> [ Vector (Data a) -> Vector (Data a) ]
+bitRev n = [ riffle k | k <- [1..P.floor (logBase 2 $ P.fromIntegral n) - 1] ]
 
 
 --------------------------------------------------------------------------------
@@ -49,30 +65,33 @@ ifft = liftP . fftBase True
 -- Fusion of a whole FFT is not possible for 'n' = 1024,
 -- so we store the internal result after each stage to the same store.
 fftBase :: Bool ->  Length -> Zun ComplexSamples ComplexSamples ()
-fftBase inv n =  fftCore inv n >>> loop store >>> bitRev n
+fftBase inv n = do
+  core <- lift $ fftCore inv n
+  let rev = bitRev n
+      n'  = P.fromIntegral n
+  a <- lift $ newStore n'
+  b <- lift $ newStore n'
+  flipFlop (a, b) (core P.++ rev)
 
--- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
-fftCore :: Bool -> Length -> Zun ComplexSamples ComplexSamples ()
+-- | Generates all 'ilog2 n' FFT/IFFT stages for a sample vector.
+fftCore :: Bool -> Length -> Run [ ComplexSamples -> ComplexSamples ]
 fftCore inv n = do
-  twids <- lift $ precompute (twids inv n)
-  P.foldl1 (\a b -> a >>> loop store >>> b)
-           [ step twids n k | k <- P.reverse [0..n'] ]
-  where
-    n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
+  twids <- precompute (twids inv n)
+  let n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
+  return [ step twids n k | k <- P.reverse [0..n'] ]
 
 -- | Performs the 'k'th FFT/IFFT stage on a sample vector.
-step :: Twiddles -> Length -> Length -> Zun ComplexSamples ComplexSamples ()
-step twids n k = loop $ do
-  v <- receive
-  let ixf i = testBit i (i2n k') ? ((twids ! t) * (b - a)) $ (a + b)
-        where
-          a  = v ! i
-          b  = v ! (i `xor` (1 .<<. i2n k'))
-          k' = value k
-          t  = lsbs (i2n $ value n') (i .<<. value p)
-          p  = P.fromIntegral $ n' - k
-          n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
-  emit $ Indexed (value n) ixf
+step :: Twiddles -> Length -> Length -> ComplexSamples -> ComplexSamples
+step twids n k v = Indexed (value n) ixf
+  where
+    ixf i = testBit i (i2n k') ? ((twids ! t) * (b - a)) $ (a + b)
+      where
+        a  = v ! i
+        b  = v ! (i `xor` (1 .<<. i2n k'))
+        k' = value k
+        t  = lsbs (i2n $ value n') (i .<<. value p)
+        p  = P.fromIntegral $ n' - k
+        n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
 
 twids :: Bool -> Length -> Twiddles
 twids inv n = Indexed (value (n `P.div` 2)) ixf
