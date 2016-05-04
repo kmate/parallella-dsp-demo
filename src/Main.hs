@@ -17,22 +17,21 @@ type Twiddles        = Vector (Data (Complex Float))
 --------------------------------------------------------------------------------
 
 -- | Rotates the 'k + 1' LSB bits right with 1.
-rotBit :: Data Index -> Data Index -> Data Index
+rotBit :: Index -> Data Index -> Data Index
 rotBit k i = lefts .|. rights
   where
-    k'     = i2n k
+    k'     = i2n $ value k
     ir     = i .>>. 1
     rights = ir .&. oneBits k'
     lefts  = (((ir .>>. k') .<<. 1) .|. (i .&. 1)) .<<. k'
 
 -- | Permute the vector by applying 'rotBit k' on its indices.
-riffle :: Data Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
+riffle :: Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
 riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
 
 -- | Parallel bit reversal of a vector with length 'n'.
 bitRev :: PrimType a => Length -> Zun (Vector (Data a)) (Vector (Data a)) ()
-bitRev n = P.foldl1 (\a b -> a >>> loop store >>> b)
-           [ riffle $ value k | k <- [1..n'] ]
+bitRev n = P.foldl1 (\a b -> a >>> loop store >>> b) [ riffle k | k <- [1..n'] ]
   where
     n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
 
@@ -54,31 +53,32 @@ fftBase inv n =  fftCore inv n >>> loop store >>> bitRev n
 
 -- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
 fftCore :: Bool -> Length -> Zun ComplexSamples ComplexSamples ()
-fftCore inv n = P.foldl1 (\a b -> a >>> loop store >>> b)
-                [ step inv n $ value k | k <- P.reverse [0..n'] ]
+fftCore inv n = do
+  twids <- lift $ precompute (twids inv n)
+  P.foldl1 (\a b -> a >>> loop store >>> b)
+           [ step twids n k | k <- P.reverse [0..n'] ]
   where
     n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
 
 -- | Performs the 'k'th FFT/IFFT stage on a sample vector.
-step :: Bool -> Length -> Data Length -> Zun ComplexSamples ComplexSamples ()
-step inv n k = do
-  twids <- lift $ precompute (twids inv n k)
-  loop $ do
-    v <- receive
-    let ixf i = testBit i k ? ((twids ! i) * (b - a)) $ (a + b)
-          where
-            k'   = i2n k
-            a    = v ! i
-            b    = v ! (i `xor` k2)
-            k2   = 1 .<<. k'
-    emit $ Indexed (value n) ixf
+step :: Twiddles -> Length -> Length -> Zun ComplexSamples ComplexSamples ()
+step twids n k = loop $ do
+  v <- receive
+  let ixf i = testBit i (i2n k') ? ((twids ! t) * (b - a)) $ (a + b)
+        where
+          a  = v ! i
+          b  = v ! (i `xor` (1 .<<. i2n k'))
+          k' = value k
+          t  = lsbs (i2n $ value n') (i .<<. value p)
+          p  = P.fromIntegral $ n' - k
+          n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
+  emit $ Indexed (value n) ixf
 
-twids :: Bool -> Length -> Data Length -> Vector (Data (Complex Float))
-twids inv n k = Indexed (value n) ixf
+twids :: Bool -> Length -> Twiddles
+twids inv n = Indexed (value (n `P.div` 2)) ixf
   where
-    ixf i = polar 1 ((if inv then π else -π) * i2n (lsbs k' i) / i2n k2)
-    k' = i2n k
-    k2 :: Data Word32 = 1 .<<. k'
+    scale = if inv then 1 else -1
+    ixf i = polar 1 (π * i2n i * value (scale * 2 P./ P.fromIntegral n))
 
 -- | Indicates whether the 'i'th bit of 'a' is set.
 testBit :: (Bits a, Num a, PrimType a) => Data a -> Data Index -> Data Bool
