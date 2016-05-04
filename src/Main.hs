@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude ((++), floor, foldl1, fromIntegral, reverse)
+import qualified Prelude as P
 import System.IO
 
 import Zeldspar
@@ -30,48 +30,55 @@ riffle :: Data Index -> Zun (Vector (Data a)) (Vector (Data a)) ()
 riffle k = loop $ receive >>= emit . permute (const $ rotBit k)
 
 -- | Parallel bit reversal of a vector with length 'n'.
-bitRev :: PrimType a
-       => Length  -- ^ Length of a vector
-       -> Length  -- ^ Maximum number of vectors on internal channels
-       -> ParZun (Vector (Data a)) (Vector (Data a)) ()
-bitRev n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
-           [ liftP $ riffle $ value k | k <- [1..n'] ]
+bitRev :: PrimType a => Length -> Zun (Vector (Data a)) (Vector (Data a)) ()
+bitRev n = P.foldl1 (\a b -> a >>> loop store >>> b)
+           [ riffle $ value k | k <- [1..n'] ]
   where
-    n' = floor (logBase 2 $ fromIntegral n) - 1
+    n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
 
 
 --------------------------------------------------------------------------------
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fft = fftBase False
+fft :: Length -> ParZun ComplexSamples ComplexSamples ()
+fft = liftP . fftBase False
 
-ifft :: Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-ifft = fftBase True
+ifft :: Length -> ParZun ComplexSamples ComplexSamples ()
+ifft = liftP . fftBase True
 
-fftBase :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fftBase inv n m = fftCore inv n m |>>value m`ofLength`value n>>| bitRev n m
+-- Fusion of a whole FFT is not possible for 'n' = 1024,
+-- so we store the internal result after each stage to the same store.
+fftBase :: Bool ->  Length -> Zun ComplexSamples ComplexSamples ()
+fftBase inv n =  fftCore inv n >>> loop store >>> bitRev n
 
 -- | Performs all 'ilog2 n' FFT/IFFT stages on a sample vector.
-fftCore :: Bool -> Length -> Length -> ParZun ComplexSamples ComplexSamples ()
-fftCore inv n m = foldl1 (\a b -> a |>>value m`ofLength`value n>>| b)
-                [ liftP $ step inv $ value k | k <- Prelude.reverse [0..n'] ]
+fftCore :: Bool -> Length -> Zun ComplexSamples ComplexSamples ()
+fftCore inv n = P.foldl1 (\a b -> a >>> loop store >>> b)
+                [ step inv n $ value k | k <- P.reverse [0..n'] ]
   where
-    n' = floor (logBase 2 $ fromIntegral n) - 1
+    n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
 
 -- | Performs the 'k'th FFT/IFFT stage on a sample vector.
-step :: Bool -> Data Length -> Zun ComplexSamples ComplexSamples ()
-step inv k = loop $ do
+step :: Bool -> Length -> Data Length -> Zun ComplexSamples ComplexSamples ()
+step inv n k = do
+  twids <- lift $ precompute (twids inv n k)
+  loop $ do
     v <- receive
-    let ixf i = testBit i k ? (twid * (b - a)) $ (a + b)
+    let ixf i = testBit i k ? ((twids ! i) * (b - a)) $ (a + b)
           where
             k'   = i2n k
             a    = v ! i
             b    = v ! (i `xor` k2)
-            twid = polar 1 ((if inv then π else -π) * i2n (lsbs k' i) / i2n k2)
             k2   = 1 .<<. k'
-    emit $ Indexed (length v) ixf
+    emit $ Indexed (value n) ixf
+
+twids :: Bool -> Length -> Data Length -> Vector (Data (Complex Float))
+twids inv n k = Indexed (value n) ixf
+  where
+    ixf i = polar 1 ((if inv then π else -π) * i2n (lsbs k' i) / i2n k2)
+    k' = i2n k
+    k2 :: Data Word32 = 1 .<<. k'
 
 -- | Indicates whether the 'i'th bit of 'a' is set.
 testBit :: (Bits a, Num a, PrimType a) => Data a -> Data Index -> Data Bool
@@ -87,9 +94,11 @@ hann width = Indexed width
            $ \k -> -0.5 * cos(2 * π * (i2n k) / (i2n width)) + 0.5
 
 window :: Zun RealSamples RealSamples ()
-window = loop $ do
-  input <- receive
-  emit $ zipWith (*) input (hann fftSize)
+window = do
+  hann <- lift $ precompute (hann fftSize)
+  loop $ do
+    input <- receive
+    emit $ zipWith (*) input hann
 
 interleave :: Zun RealSamples ComplexSamples ()
 interleave = loop $ do
@@ -215,11 +224,11 @@ mainProgram = do
   let chanSize = 10 `ofLength` fftSize
       halfChanSize = 10 `ofLength` numPosBins
   translatePar ((window >>> interleave)      |>>chanSize>>|
-                (fft 1024 10)                |>>chanSize>>|
+                (fft 1024)                   |>>chanSize>>|
                 analyze                      |>>halfChanSize>>|
                 shiftPitch                   |>>halfChanSize>>|
                 (synthetize >>> zeroNegBins) |>>chanSize>>|
-                (ifft 1024 10)               |>>chanSize>>|
+                (ifft 1024)                  |>>chanSize>>|
                 (accumulate >>> window))
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
@@ -240,4 +249,4 @@ main = do
     h <- openFile outFile WriteMode
     hPutStrLn h $ compile mainProgram
     hClose h
-    putStrLn $ "Source generated: " ++ show outFile
+    putStrLn $ "Source generated: " P.++ show outFile
