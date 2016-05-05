@@ -132,7 +132,7 @@ analyze = do
   lastPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
     input <- receive
-    lastPhase <- lift $ readStore lastPhaseS
+    lastPhase <- lift $ unsafeFreezeStore lastPhaseS
     let result = Indexed numPosBins ixf
         ixf k = (complex magn freq, phs)
           where
@@ -148,8 +148,8 @@ analyze = do
             -- compute the k-th partials' true frequency
             freq  = (i2n k + deriv) * freqPerBin
     let (output, lastPhase') = unzip result
+    emit output  -- emit before store!
     lift $ writeStore lastPhaseS lastPhase'
-    emit output
 
 mulImag :: (Num a, PrimType a, PrimType (Complex a))
         => Data (Complex a) -> Data a -> Data (Complex a)
@@ -172,7 +172,7 @@ synthetize = do
   sumPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
     input <- receive
-    sumPhase <- lift $ readStore sumPhaseS
+    sumPhase <- lift $ unsafeFreezeStore sumPhaseS
     let result = Indexed numPosBins ixf
         ixf k = (polar magn phs, phs)
           where
@@ -190,8 +190,8 @@ synthetize = do
             -- accumulate delta phase to get bin phase
             phs   = (sumPhase ! k) + expct
     let (output, sumPhase') = unzip result
+    emit output  -- emit before store!
     lift $ writeStore sumPhaseS sumPhase'
-    emit output
 
 zeroNegBins :: Zun ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
