@@ -4,14 +4,14 @@
 #include <string.h>
 #include <tgmath.h>
 uint32_t *const la23 = (uint32_t *) 8192;
-uint32_t *const la24 = (uint32_t *) 2222993432;
-uint32_t *const la25 = (uint32_t *) 2222993436;
+uint32_t *const la24 = (uint32_t *) 2226139160;
+uint32_t *const la25 = (uint32_t *) 2226139164;
 uint32_t *const la26 = (uint32_t *) 8196;
 float _Complex *const la27 = (float _Complex *) 8200;
 uint32_t *const la29 = (uint32_t *) 16400;
 uint32_t *const la30 = (uint32_t *) 16404;
-uint32_t *const la31 = (uint32_t *) 2225086468;
-float _Complex *const la32 = (float _Complex *) 2225086472;
+uint32_t *const la31 = (uint32_t *) 2360352772;
+float _Complex *const la32 = (float _Complex *) 2360352776;
 #define FELD_PI 3.141592653589793
 int main()
 {

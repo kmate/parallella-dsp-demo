@@ -10,8 +10,8 @@ uint32_t *const la16 = (uint32_t *) 8196;
 float _Complex *const la17 = (float _Complex *) 8200;
 uint32_t *const la19 = (uint32_t *) 12312;
 uint32_t *const la20 = (uint32_t *) 12316;
-uint32_t *const la21 = (uint32_t *) 2222989316;
-float _Complex *const la22 = (float _Complex *) 2222989320;
+uint32_t *const la21 = (uint32_t *) 2226135044;
+float _Complex *const la22 = (float _Complex *) 2226135048;
 int main()
 {
     while (1) {

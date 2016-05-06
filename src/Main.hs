@@ -249,11 +249,11 @@ mainProgram = do
     addInclude "\"processor.h\""
     callProc "setup_queues" []
   translatePar ((window >>> interleave)      `on` 0  |>>chanSize>>|
-                (fft 1024)                   `on` 1  |>>chanSize>>|
+                (fft fftSize')               `on` 1  |>>chanSize>>|
                 analyze                      `on` 2  |>>halfChanSize>>|
                 shiftPitch                   `on` 3  |>>halfChanSize>>|
                 (synthetize >>> zeroNegBins) `on` 7  |>>chanSize>>|
-                (ifft 1024)                  `on` 11 |>>chanSize>>|
+                (ifft fftSize')              `on` 11 |>>chanSize>>|
                 (accumulate >>> window)      `on` 15 )
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]

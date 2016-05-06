@@ -10,8 +10,8 @@ uint32_t *const la21 = (uint32_t *) 8196;
 float _Complex *const la22 = (float _Complex *) 8200;
 uint32_t *const la24 = (uint32_t *) 12312;
 uint32_t *const la25 = (uint32_t *) 12316;
-uint32_t *const la26 = (uint32_t *) 2224037892;
-float _Complex *const la27 = (float _Complex *) 2224037896;
+uint32_t *const la26 = (uint32_t *) 2293243908;
+float _Complex *const la27 = (float _Complex *) 2293243912;
 #define FELD_PI 3.141592653589793
 int main()
 {

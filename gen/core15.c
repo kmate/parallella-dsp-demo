@@ -5,8 +5,8 @@
 #include <string.h>
 #include <tgmath.h>
 uint32_t *const la28 = (uint32_t *) 8192;
-uint32_t *const la29 = (uint32_t *) 2224046096;
-uint32_t *const la30 = (uint32_t *) 2224046100;
+uint32_t *const la29 = (uint32_t *) 2293252112;
+uint32_t *const la30 = (uint32_t *) 2293252116;
 uint32_t *const la31 = (uint32_t *) 8196;
 float _Complex *const la32 = (float _Complex *) 8200;
 uint32_t *const la33 = (uint32_t *) 16400;

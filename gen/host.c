@@ -141,38 +141,38 @@ int main()
     host_write_local(&group0, 0, 3, la16, a15, 0, 0, 0);
     e_load("core2.srec", &group0, 0, 2, 1);
     a16[0] = 0;
-    host_write_local(&group0, 1, 0, la18, a16, 0, 0, 0);
+    host_write_local(&group0, 1, 3, la18, a16, 0, 0, 0);
     a17[0] = 0;
     host_write_local(&group0, 0, 3, la19, a17, 0, 0, 0);
     a18[0] = 0;
     host_write_local(&group0, 0, 3, la20, a18, 0, 0, 0);
     a19[0] = 0;
-    host_write_local(&group0, 1, 0, la21, a19, 0, 0, 0);
+    host_write_local(&group0, 1, 3, la21, a19, 0, 0, 0);
     e_load("core3.srec", &group0, 0, 3, 1);
     a20[0] = 0;
-    host_write_local(&group0, 1, 1, la23, a20, 0, 0, 0);
+    host_write_local(&group0, 2, 3, la23, a20, 0, 0, 0);
     a21[0] = 0;
-    host_write_local(&group0, 1, 0, la24, a21, 0, 0, 0);
+    host_write_local(&group0, 1, 3, la24, a21, 0, 0, 0);
     a22[0] = 0;
-    host_write_local(&group0, 1, 0, la25, a22, 0, 0, 0);
+    host_write_local(&group0, 1, 3, la25, a22, 0, 0, 0);
     a23[0] = 0;
-    host_write_local(&group0, 1, 1, la26, a23, 0, 0, 0);
-    e_load("core4.srec", &group0, 1, 0, 1);
+    host_write_local(&group0, 2, 3, la26, a23, 0, 0, 0);
+    e_load("core7.srec", &group0, 1, 3, 1);
     a24[0] = 0;
-    host_write_local(&group0, 1, 2, la28, a24, 0, 0, 0);
+    host_write_local(&group0, 3, 3, la28, a24, 0, 0, 0);
     a25[0] = 0;
-    host_write_local(&group0, 1, 1, la29, a25, 0, 0, 0);
+    host_write_local(&group0, 2, 3, la29, a25, 0, 0, 0);
     a26[0] = 0;
-    host_write_local(&group0, 1, 1, la30, a26, 0, 0, 0);
+    host_write_local(&group0, 2, 3, la30, a26, 0, 0, 0);
     a27[0] = 0;
-    host_write_local(&group0, 1, 2, la31, a27, 0, 0, 0);
-    e_load("core5.srec", &group0, 1, 1, 1);
+    host_write_local(&group0, 3, 3, la31, a27, 0, 0, 0);
+    e_load("core11.srec", &group0, 2, 3, 1);
     e_alloc(&shm28, sa35, 4100);
     a29[0] = 0;
-    host_write_local(&group0, 1, 2, la33, a29, 0, 0, 0);
+    host_write_local(&group0, 3, 3, la33, a29, 0, 0, 0);
     a30[0] = 0;
-    host_write_local(&group0, 1, 2, la34, a30, 0, 0, 0);
-    e_load("core6.srec", &group0, 1, 2, 1);
+    host_write_local(&group0, 3, 3, la34, a30, 0, 0, 0);
+    e_load("core15.srec", &group0, 3, 3, 1);
     r31 = true;
     while (1) {
         bool v32;
@@ -301,16 +301,16 @@ int main()
                     uint32_t *a56 = _a56;
                     uint32_t v57;
                     
-                    host_read_local(&group0, 1, 2, la33, a54, 0, 0, 0);
+                    host_read_local(&group0, 3, 3, la33, a54, 0, 0, 0);
                     v55 = a54[0];
-                    host_read_local(&group0, 1, 2, la34, a56, 0, 0, 0);
+                    host_read_local(&group0, 3, 3, la34, a56, 0, 0, 0);
                     v57 = a56[0];
                     if (!(v55 == v57))
                         break;
                 }
-                host_read_local(&group0, 1, 2, la33, a58, 0, 0, 0);
+                host_read_local(&group0, 3, 3, la33, a58, 0, 0, 0);
                 v59 = a58[0];
-                host_read_local(&group0, 1, 2, la34, a60, 0, 0, 0);
+                host_read_local(&group0, 3, 3, la34, a60, 0, 0, 0);
                 v61 = a60[0];
                 if (v59 + (-v53 + 1024 <= (v61 + 1025 - v59) % 1025 ? -v53 +
                            1024 : (v61 + 1025 - v59) % 1025) <= 1025) {
@@ -338,13 +338,13 @@ int main()
                 a62[0] = (v59 + (-v53 + 1024 <= (v61 + 1025 - v59) %
                                  1025 ? -v53 + 1024 : (v61 + 1025 - v59) %
                                  1025)) % 1025;
-                host_write_local(&group0, 1, 2, la33, a62, 0, 0, 0);
+                host_write_local(&group0, 3, 3, la33, a62, 0, 0, 0);
                 r51 = v53 + (-v53 + 1024 <= (v61 + 1025 - v59) % 1025 ? -v53 +
                              1024 : (v61 + 1025 - v59) % 1025);
             }
-            host_read_local(&group0, 1, 2, la33, a63, 0, 0, 0);
+            host_read_local(&group0, 3, 3, la33, a63, 0, 0, 0);
             v64 = a63[0];
-            host_read_local(&group0, 1, 2, la34, a65, 0, 0, 0);
+            host_read_local(&group0, 3, 3, la34, a65, 0, 0, 0);
             v66 = a65[0];
             if (v64 == v66 && v66 == 1024) {
                 uint32_t _a67[1];
@@ -353,9 +353,9 @@ int main()
                 uint32_t *a68 = _a68;
                 
                 a67[0] = 0;
-                host_write_local(&group0, 1, 2, la33, a67, 0, 0, 0);
+                host_write_local(&group0, 3, 3, la33, a67, 0, 0, 0);
                 a68[0] = 0;
-                host_write_local(&group0, 1, 2, la34, a68, 0, 0, 0);
+                host_write_local(&group0, 3, 3, la34, a68, 0, 0, 0);
             }
             r69 = 1024;
             
