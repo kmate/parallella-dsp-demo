@@ -3,7 +3,8 @@ module Main where
 import qualified Prelude as P
 import System.IO
 
-import Zeldspar.Multicore
+import Zeldspar
+import Zeldspar.Parallel
 
 
 type RealSamples     = Vector (Data Float)
@@ -14,7 +15,7 @@ type Twiddles        = Vector (Data (Complex Float))
 flipFlop :: Storable a
          => (Store a, Store a)
          -> [a -> a]
-         -> CoreZ a a
+         -> Zun a a ()
 flipFlop (a, b) fs = do
   let fs' = P.zip fs (P.cycle [(a, b), (b, a)])
       go _ (f, (src, dst)) = do
@@ -55,15 +56,15 @@ bitRev n = [ riffle k | k <- [1..P.floor (logBase 2 $ P.fromIntegral n) - 1] ]
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> CoreZ ComplexSamples ComplexSamples
-fft = fftBase False
+fft :: Length -> ParZun ComplexSamples ComplexSamples ()
+fft = liftP . fftBase False
 
-ifft :: Length -> CoreZ ComplexSamples ComplexSamples
-ifft = fftBase True
+ifft :: Length -> ParZun ComplexSamples ComplexSamples ()
+ifft = liftP . fftBase True
 
 -- Fusion of a whole FFT is not possible for 'n' = 1024,
 -- so we store the internal result after each stage to the same store.
-fftBase :: Bool ->  Length -> CoreZ ComplexSamples ComplexSamples
+fftBase :: Bool ->  Length -> Zun ComplexSamples ComplexSamples ()
 fftBase inv n = do
   core <- lift $ fftCore inv n
   let rev = bitRev n
@@ -73,7 +74,7 @@ fftBase inv n = do
   flipFlop (a, b) (core P.++ rev)
 
 -- | Generates all 'ilog2 n' FFT/IFFT stages for a sample vector.
-fftCore :: Bool -> Length -> CoreComp [ ComplexSamples -> ComplexSamples ]
+fftCore :: Bool -> Length -> Run [ ComplexSamples -> ComplexSamples ]
 fftCore inv n = do
   twids <- precompute (twids inv n)
   let n' = P.floor (logBase 2 $ P.fromIntegral n) - 1
@@ -111,14 +112,14 @@ hann :: Data Length -> RealSamples
 hann width = Indexed width
            $ \k -> -0.5 * cos(2 * π * (i2n k) / (i2n width)) + 0.5
 
-window :: CoreZ RealSamples RealSamples
+window :: Zun RealSamples RealSamples ()
 window = do
   hann <- lift $ precompute (hann fftSize)
   loop $ do
     input <- receive
     emit $ zipWith (*) input hann
 
-interleave :: CoreZ RealSamples ComplexSamples
+interleave :: Zun RealSamples ComplexSamples ()
 interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
@@ -126,7 +127,7 @@ interleave = loop $ do
 zeroes :: Data Length -> RealSamples
 zeroes l = Indexed l $ const 0
 
-analyze :: CoreZ ComplexSamples ComplexSamples
+analyze :: Zun ComplexSamples ComplexSamples ()
 analyze = do
   lastPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
@@ -154,7 +155,7 @@ mulImag :: (Num a, PrimType a, PrimType (Complex a))
         => Data (Complex a) -> Data a -> Data (Complex a)
 mulImag c n = complex (realPart c) (n * imagPart c)
 
-shiftPitch :: CoreZ ComplexSamples ComplexSamples
+shiftPitch :: Zun ComplexSamples ComplexSamples ()
 shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
@@ -166,7 +167,7 @@ shiftPitch = loop $ do
     unsafeFreezeVec numPosBins buffer
   emit output
 
-synthetize :: CoreZ ComplexSamples ComplexSamples
+synthetize :: Zun ComplexSamples ComplexSamples ()
 synthetize = do
   sumPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
@@ -192,12 +193,12 @@ synthetize = do
     emit output  -- emit before store!
     lift $ writeStore sumPhaseS sumPhase'
 
-zeroNegBins :: CoreZ ComplexSamples ComplexSamples
+zeroNegBins :: Zun ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
   input <- receive
   emit $ Indexed fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
-accumulate :: CoreZ ComplexSamples RealSamples
+accumulate :: Zun ComplexSamples RealSamples ()
 accumulate = loop $ do
   input <- receive
   emit $ map ((/ i2n (fftSize * overlap)) . realPart) input
@@ -212,8 +213,8 @@ pitchShift :: Data Float
 pitchShift = 2
 
 -- Needed to be in sync with C the code!
-fftSize' :: Length
-fftSize' = 1024
+fftSize :: Data Length
+fftSize = 1024
 
 overlap :: Data Length
 overlap = 4
@@ -225,14 +226,8 @@ sampleRate = 44100
 stepSize :: Data Length
 stepSize = fftSize `div` overlap
 
-fftSize :: Data Length
-fftSize = value fftSize'
-
-numPosBins' :: Length
-numPosBins' = fftSize' `P.div` 2 + 1
-
 numPosBins :: Data Length
-numPosBins = value numPosBins'
+numPosBins = fftSize `div` 2 + 1
 
 freqPerBin :: Data Float
 freqPerBin = sampleRate / i2n fftSize
@@ -241,32 +236,31 @@ expectedDiff :: Data Float
 expectedDiff = 2 * π * i2n stepSize / i2n fftSize
 
 
-mainProgram :: Multicore ()
+mainProgram :: Run ()
 mainProgram = do
-  let chanSize = 1 `ofLength` fftSize'
-      halfChanSize = 1 `ofLength` numPosBins'
-  onHost $ liftHost $ do
-    addInclude "\"processor.h\""
-    callProc "setup_queues" []
-  translatePar ((window >>> interleave)      `on` 0 |>>chanSize>>|
-                (fft 1024)                   `on` 1 |>>chanSize>>|
-                analyze                      `on` 2 |>>halfChanSize>>|
-                shiftPitch                   `on` 3 |>>halfChanSize>>|
-                (synthetize >>> zeroNegBins) `on` 4 |>>chanSize>>|
-                (ifft 1024)                  `on` 5 |>>chanSize>>|
-                (accumulate >>> window)      `on` 6)
+  addInclude "\"processor.h\""
+  callProc "setup_queues" []
+  let chanSize = 10 `ofLength` fftSize
+      halfChanSize = 10 `ofLength` numPosBins
+  translatePar ((window >>> interleave)      |>>chanSize>>|
+                (fft 1024)                   |>>chanSize>>|
+                analyze                      |>>halfChanSize>>|
+                shiftPitch                   |>>halfChanSize>>|
+                (synthetize >>> zeroNegBins) |>>chanSize>>|
+                (ifft 1024)                  |>>chanSize>>|
+                (accumulate >>> window))
     (do buffer :: Arr Float <- newArr fftSize
-        hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
+        hasMore :: Data Bool <- callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec fftSize buffer
         return (input, hasMore))
     chanSize
     (\output -> do
         Manifest bufferSize buffer' <- fromPull output
         buffer <- unsafeThawArr buffer'
-        needsMore :: Data Bool <- liftHost $ callFun "emit_samples" [ arrArg buffer ]
+        needsMore :: Data Bool <- callFun "emit_samples" [ arrArg buffer ]
         return needsMore)
     chanSize
-  onHost $ liftHost $ callProc "teardown_queues" []
+  callProc "teardown_queues" []
 
 
 main = do
