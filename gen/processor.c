@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <tgmath.h>
 #include <unistd.h>
-#define SLEEP_USECS 1000
 void *thread_t26(void *unused);
 void *thread_t80(void *unused);
 void *thread_t158(void *unused);
@@ -121,11 +120,12 @@ void *thread_t26(void *unused)
             while (1) {
                 uint32_t v34;
                 uint32_t v35;
-                usleep(SLEEP_USECS);
+                
                 v34 = a0[0];
                 v35 = a1[0];
                 if (!(v34 == v35))
                     break;
+                usleep(100);
             }
             v36 = a0[0];
             v37 = a1[0];
@@ -197,11 +197,12 @@ void *thread_t26(void *unused)
             while (1) {
                 uint32_t v53;
                 uint32_t v54;
-                usleep(SLEEP_USECS);
+                
                 v53 = a10[0];
                 v54 = a11[0];
                 if (!((v54 + 1) % 1025 == v53))
                     break;
+                usleep(100);
             }
             v55 = a10[0];
             v56 = a11[0];
@@ -319,11 +320,12 @@ void *thread_t80(void *unused)
             while (1) {
                 uint32_t v92;
                 uint32_t v93;
-                usleep(SLEEP_USECS);
+                
                 v92 = a9[0];
                 v93 = a12[0];
                 if (!(v92 == v93))
                     break;
+                usleep(100);
             }
             v94 = a9[0];
             v95 = a12[0];
@@ -497,11 +499,12 @@ void *thread_t80(void *unused)
             while (1) {
                 uint32_t v131;
                 uint32_t v132;
-                usleep(SLEEP_USECS);
+                
                 v131 = a64[0];
                 v132 = a65[0];
                 if (!((v132 + 1) % 1025 == v131))
                     break;
+                usleep(100);
             }
             v133 = a64[0];
             v134 = a65[0];
@@ -596,11 +599,12 @@ void *thread_t158(void *unused)
             while (1) {
                 uint32_t v166;
                 uint32_t v167;
-                usleep(SLEEP_USECS);
+                
                 v166 = a63[0];
                 v167 = a66[0];
                 if (!(v166 == v167))
                     break;
+                usleep(100);
             }
             v168 = a63[0];
             v169 = a66[0];
@@ -682,11 +686,12 @@ void *thread_t158(void *unused)
             while (1) {
                 uint32_t v185;
                 uint32_t v186;
-                usleep(SLEEP_USECS);
+                
                 v185 = a142[0];
                 v186 = a143[0];
                 if (!((v186 + 1) % 514 == v185))
                     break;
+                usleep(100);
             }
             v187 = a142[0];
             v188 = a143[0];
@@ -776,11 +781,12 @@ void *thread_t213(void *unused)
             while (1) {
                 uint32_t v218;
                 uint32_t v219;
-                usleep(SLEEP_USECS);
+                
                 v218 = a141[0];
                 v219 = a144[0];
                 if (!(v218 == v219))
                     break;
+                usleep(100);
             }
             v220 = a141[0];
             v221 = a144[0];
@@ -860,11 +866,12 @@ void *thread_t213(void *unused)
             while (1) {
                 uint32_t v239;
                 uint32_t v240;
-                usleep(SLEEP_USECS);
+                
                 v239 = a197[0];
                 v240 = a198[0];
                 if (!((v240 + 1) % 514 == v239))
                     break;
+                usleep(100);
             }
             v241 = a197[0];
             v242 = a198[0];
@@ -958,11 +965,12 @@ void *thread_t266(void *unused)
             while (1) {
                 uint32_t v274;
                 uint32_t v275;
-                usleep(SLEEP_USECS);
+                
                 v274 = a196[0];
                 v275 = a199[0];
                 if (!(v274 == v275))
                     break;
+                usleep(100);
             }
             v276 = a196[0];
             v277 = a199[0];
@@ -1053,11 +1061,12 @@ void *thread_t266(void *unused)
             while (1) {
                 uint32_t v294;
                 uint32_t v295;
-                usleep(SLEEP_USECS);
+                
                 v294 = a250[0];
                 v295 = a251[0];
                 if (!((v295 + 1) % 1025 == v294))
                     break;
+                usleep(100);
             }
             v296 = a250[0];
             v297 = a251[0];
@@ -1177,11 +1186,12 @@ void *thread_t321(void *unused)
             while (1) {
                 uint32_t v333;
                 uint32_t v334;
-                usleep(SLEEP_USECS);
+                
                 v333 = a249[0];
                 v334 = a252[0];
                 if (!(v333 == v334))
                     break;
+                usleep(100);
             }
             v335 = a249[0];
             v336 = a252[0];
@@ -1351,11 +1361,12 @@ void *thread_t321(void *unused)
             while (1) {
                 uint32_t v372;
                 uint32_t v373;
-                usleep(SLEEP_USECS);
+                
                 v372 = a305[0];
                 v373 = a306[0];
                 if (!((v373 + 1) % 1025 == v372))
                     break;
+                usleep(100);
             }
             v374 = a305[0];
             v375 = a306[0];
@@ -1447,11 +1458,12 @@ void *thread_t391(void *unused)
             while (1) {
                 uint32_t v399;
                 uint32_t v400;
-                usleep(SLEEP_USECS);
+                
                 v399 = a304[0];
                 v400 = a307[0];
                 if (!(v399 == v400))
                     break;
+                usleep(100);
             }
             v401 = a304[0];
             v402 = a307[0];
@@ -1531,11 +1543,12 @@ void *thread_t391(void *unused)
             while (1) {
                 uint32_t v418;
                 uint32_t v419;
-                usleep(SLEEP_USECS);
+                
                 v418 = a382[0];
                 v419 = a383[0];
                 if (!((v419 + 1) % 1025 == v418))
                     break;
+                usleep(100);
             }
             v420 = a382[0];
             v421 = a383[0];
@@ -1953,6 +1966,7 @@ int main()
                 v445 = a442[0];
                 if (!((v445 + 1) % 1025 == v441))
                     break;
+                usleep(100);
             }
             for (v447 = 0; v447 <= 0; v447++) {
                 uint32_t v448;
@@ -2082,6 +2096,7 @@ int main()
                     v474 = a471[0];
                     if (!(v470 == v474))
                         break;
+                    usleep(100);
                 }
                 for (v476 = 0; v476 <= 0; v476++) {
                     uint32_t v477;

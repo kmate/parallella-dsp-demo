@@ -3,7 +3,7 @@ rm -rf gen/*
 cabal build
 dist/build/parallella-dsp-demo/parallella-dsp-demo
 gcc -std=c99 -Iinclude csrc/mongoose.c csrc/server.c -o dsp-server
-gcc -std=c99 -Iinclude -I../imperative-edsl/include ../imperative-edsl/csrc/chan.c gen/processor.c -lpthread -lm -o dsp-processor
+gcc -std=c99 -D_BSD_SOURCE -Iinclude -I../imperative-edsl/include ../imperative-edsl/csrc/chan.c gen/processor.c -lpthread -lm -o dsp-processor
 ./dsp-processor &
 # valgrind --tool=callgrind ./dsp-processor &
 # valgrind --tool=drd --show-stack-usage=yes ./dsp-processor 2>stack_usage.txt &
