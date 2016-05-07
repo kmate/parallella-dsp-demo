@@ -1,5 +1,5 @@
-var chunkSize = 1024;
-var bufferSize = 2 * 42 * chunkSize; // ~ 2 seconds at 44100Hz
+var chunkSize = 256;
+var bufferSize = 2 * 42 * 4 * chunkSize; // ~ 2 seconds at 44100Hz
 
 var input;
 var socket;
