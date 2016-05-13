@@ -4,15 +4,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <tgmath.h>
-volatile uint32_t *const la38 = (uint32_t *) 8192;
-volatile uint32_t *const la39 = (uint32_t *) 2292197392;
-volatile uint32_t *const la40 = (uint32_t *) 2292197396;
-volatile uint32_t *const la41 = (uint32_t *) 8196;
-volatile float _Complex *const la42 = (float _Complex *) 8200;
-volatile uint32_t *const la44 = (uint32_t *) 10256;
-volatile uint32_t *const la45 = (uint32_t *) 10260;
-volatile uint32_t *const la46 = (uint32_t *) 2360352772;
-volatile float _Complex *const la47 = (float _Complex *) 2360352776;
+volatile uint32_t *const la53 = (uint32_t *) 8192;
+volatile uint32_t *const la54 = (uint32_t *) 2292197392;
+volatile uint32_t *const la55 = (uint32_t *) 2292197396;
+volatile uint32_t *const la56 = (uint32_t *) 8196;
+volatile float _Complex *const la57 = (float _Complex *) 8200;
+volatile uint32_t *const la59 = (uint32_t *) 10256;
+volatile uint32_t *const la60 = (uint32_t *) 10260;
+volatile uint32_t *const la61 = (uint32_t *) 2360352772;
+volatile float _Complex *const la62 = (float _Complex *) 2360352776;
 int main()
 {
     while (1) {
@@ -138,42 +138,42 @@ int main()
                 uint32_t v4;
                 uint32_t v5;
                 
-                v4 = la38[0];
-                v5 = la41[0];
+                v4 = la53[0];
+                v5 = la56[0];
                 if (!(v4 == v5))
                     break;
             }
-            v6 = la38[0];
-            v7 = la41[0];
+            v6 = la53[0];
+            v7 = la56[0];
             r8 = 257;
             let9 = r8 + v7 - v6;
             r10 = let9 < r8 ? let9 : let9 - r8;
             let11 = -v3 + 256;
             r12 = let11 <= r10 ? let11 : r10;
             if (v6 + r12 <= r8) {
-                core_read_local(la42, a0, v6, v3, v3 + r12 - 1);
+                core_read_local(la57, a0, v6, v3, v3 + r12 - 1);
             } else {
                 uint32_t r13;
                 uint32_t r14;
                 
                 r13 = r8 - v6;
-                core_read_local(la42, a0, v6, v3, v3 + r13 - 1);
+                core_read_local(la57, a0, v6, v3, v3 + r13 - 1);
                 r14 = v3 + r13;
-                core_read_local(la42, a0, 0, r14, r14 + r12 - r13 - 1);
+                core_read_local(la57, a0, 0, r14, r14 + r12 - r13 - 1);
             }
             let15 = v6 + r12;
             r16 = let15 < r8 ? let15 : let15 - r8;
-            la38[0] = r16;
-            la39[0] = r16;
+            la53[0] = r16;
+            la54[0] = r16;
             r1 = v3 + r12;
         }
-        v17 = la38[0];
-        v18 = la41[0];
+        v17 = la53[0];
+        v18 = la56[0];
         if (v17 == v18 && v18 == 256) {
-            la38[0] = 0;
-            la39[0] = 0;
-            la40[0] = 0;
-            la41[0] = 0;
+            la53[0] = 0;
+            la54[0] = 0;
+            la55[0] = 0;
+            la56[0] = 0;
         }
         r19 = 256;
         r20 = r19;
@@ -259,34 +259,34 @@ int main()
                 uint32_t v47;
                 uint32_t let48;
                 
-                v46 = la44[0];
-                v47 = la45[0];
+                v46 = la59[0];
+                v47 = la60[0];
                 let48 = v47 + 1;
                 if (!((let48 < 257 ? let48 : v47 + 4294967040) == v46))
                     break;
             }
-            v49 = la44[0];
-            v50 = la45[0];
+            v49 = la59[0];
+            v50 = la60[0];
             let51 = v50 + 257 - v49;
             r52 = let51 < 257 ? let51 : let51 - 257;
             r53 = -r52 + 256;
             let54 = -v45 + 256;
             r55 = let54 <= r53 ? let54 : r53;
             if (v50 + r55 <= 257) {
-                core_write_local(la47, a41, v50, v45, v45 + r55 - 1);
+                core_write_local(la62, a41, v50, v45, v45 + r55 - 1);
             } else {
                 uint32_t r56;
                 uint32_t r57;
                 
                 r56 = -v50 + 257;
-                core_write_local(la47, a41, v50, v45, v45 + r56 - 1);
+                core_write_local(la62, a41, v50, v45, v45 + r56 - 1);
                 r57 = v45 + r56;
-                core_write_local(la47, a41, 0, r57, r57 + (r55 - r56) - 1);
+                core_write_local(la62, a41, 0, r57, r57 + (r55 - r56) - 1);
             }
             let58 = v50 + r55;
             r59 = let58 < 257 ? let58 : let58 - 257;
-            la45[0] = r59;
-            la46[0] = r59;
+            la60[0] = r59;
+            la61[0] = r59;
             r43 = v45 + r55;
         }
     }

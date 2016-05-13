@@ -68,19 +68,16 @@ bitRev n = processArr (bitRevArr n)
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> SizeSpec ComplexSamples -> [CoreId]
-    -> MulticoreZ ComplexSamples ComplexSamples
+fft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
 fft = fftBase False
 
-ifft :: Length -> SizeSpec ComplexSamples -> [CoreId]
-     -> MulticoreZ ComplexSamples ComplexSamples
+ifft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
 ifft = fftBase True
 
-fftBase :: Bool -> Length -> SizeSpec ComplexSamples -> [CoreId]
-        -> MulticoreZ ComplexSamples ComplexSamples
-fftBase inv n chanSize cores = P.foldl1 connect fftProgs
-                |>>chanSize>>| bitRev n `on` forRev
+fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
+fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRev)
   where
+    chanSize = 1 `ofLength` n
     forFFT = P.init cores
     forRev = P.last cores
     numStages = P.floor (logBase 2 $ P.fromIntegral n)
@@ -281,15 +278,15 @@ mainProgram = do
     callProc "setup_queues" []
   translatePar
 
-               ((window >>> interleave)          `on` 0  |>>chanSize>>|
-                (fft  fftSize' chanSize     [1,2,3,7,6]) |>>chanSize>>|
---                analyze                          `on` 5  |>>halfChanSize>>|
---                shiftPitch                       `on` 4  |>>halfChanSize>>|
---                (synthetize >>> zeroNegBins)     `on` 8  |>>chanSize>>|
-                (ifft fftSize' chanSize [9,10,11,15,14]) |>>chanSize>>|
---                accumulate                       `on` 13 |>>chanSize>>|
-                split                            `on` 13 |>>chanSize>>|
-                window                           `on` 12 )
+               ((window >>> interleave)      `on` 0  |>>chanSize>>|
+                (fft  fftSize'          [1,2,3,7,6]) |>>chanSize>>|
+                analyze                      `on` 5  |>>halfChanSize>>|
+                shiftPitch                   `on` 4  |>>halfChanSize>>|
+                (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
+                (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
+                accumulate                   `on` 13 |>>chanSize>>|
+--              split                        `on` 13 |>>chanSize>>|
+                window                       `on` 12 )
 
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]

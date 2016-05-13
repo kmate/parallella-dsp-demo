@@ -11,8 +11,8 @@ volatile uint32_t *const la26 = (uint32_t *) 8196;
 volatile float _Complex *const la27 = (float _Complex *) 8200;
 volatile uint32_t *const la29 = (uint32_t *) 10256;
 volatile uint32_t *const la30 = (uint32_t *) 10260;
-volatile uint32_t *const la31 = (uint32_t *) 2291146756;
-volatile float _Complex *const la32 = (float _Complex *) 2291146760;
+volatile uint32_t *const la31 = (uint32_t *) 2224037892;
+volatile float _Complex *const la32 = (float _Complex *) 2224037896;
 int main()
 {
     while (1) {
