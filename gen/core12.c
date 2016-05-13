@@ -3,14 +3,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <tgmath.h>
-volatile uint32_t *const la0 = (uint32_t *) 8192;
-volatile uint32_t *const la1 = (uint32_t *) 8196;
-volatile uint32_t *const la4 = (uint32_t *) 8200;
-volatile uint32_t *const la5 = (uint32_t *) 8204;
-volatile uint32_t *const la6 = (uint32_t *) 2156929028;
-volatile float _Complex *const la7 = (float _Complex *) 2156929032;
-volatile void *const sa2 = (void *) 16777216;
+volatile uint32_t *const la58 = (uint32_t *) 8192;
+volatile uint32_t *const la59 = (uint32_t *) 2358257680;
+volatile uint32_t *const la60 = (uint32_t *) 2358257684;
+volatile uint32_t *const la61 = (uint32_t *) 8196;
+volatile float *const la62 = (float *) 8200;
+volatile uint32_t *const la63 = (uint32_t *) 9228;
+volatile uint32_t *const la64 = (uint32_t *) 9232;
+volatile void *const sa65 = (void *) 16778244;
 int main()
 {
     float _a0[] = {0.0, 1.5059114e-4, 6.0227513e-4, 1.3547838e-3, 2.4076402e-3,
@@ -102,45 +102,48 @@ int main()
                 uint32_t v5;
                 uint32_t v6;
                 
-                v5 = la0[0];
-                v6 = la1[0];
+                v5 = la58[0];
+                v6 = la61[0];
                 if (!(v5 == v6))
                     break;
             }
-            v7 = la0[0];
-            v8 = la1[0];
+            v7 = la58[0];
+            v8 = la61[0];
             r9 = 257;
             let10 = r9 + v8 - v7;
             r11 = let10 < r9 ? let10 : let10 - r9;
             let12 = -v4 + 256;
             r13 = let12 <= r11 ? let12 : r11;
             if (v7 + r13 <= r9) {
-                core_read_shared(sa2, a1, v7, v4, v4 + r13 - 1);
+                core_read_local(la62, a1, v7, v4, v4 + r13 - 1);
             } else {
                 uint32_t r14;
                 uint32_t r15;
                 
                 r14 = r9 - v7;
-                core_read_shared(sa2, a1, v7, v4, v4 + r14 - 1);
+                core_read_local(la62, a1, v7, v4, v4 + r14 - 1);
                 r15 = v4 + r14;
-                core_read_shared(sa2, a1, 0, r15, r15 + r13 - r14 - 1);
+                core_read_local(la62, a1, 0, r15, r15 + r13 - r14 - 1);
             }
             let16 = v7 + r13;
             r17 = let16 < r9 ? let16 : let16 - r9;
-            la0[0] = r17;
+            la58[0] = r17;
+            la59[0] = r17;
             r2 = v4 + r13;
         }
-        v18 = la0[0];
-        v19 = la1[0];
+        v18 = la58[0];
+        v19 = la61[0];
         if (v18 == v19 && v19 == 256) {
-            la0[0] = 0;
-            la1[0] = 0;
+            la58[0] = 0;
+            la59[0] = 0;
+            la60[0] = 0;
+            la61[0] = 0;
         }
         r20 = 256;
         r21 = r20 <= 256 ? r20 : 256;
         
-        float _Complex _a22[r20 <= 256 ? r20 : 256];
-        float _Complex *a22 = _a22;
+        float _a22[r20 <= 256 ? r20 : 256];
+        float *a22 = _a22;
         
         for (v23 = 0; v23 < (r20 <= 256 ? r20 : 256); v23++) {
             a22[v23] = a1[v23] * a0[v23];
@@ -168,34 +171,33 @@ int main()
                 uint32_t v28;
                 uint32_t let29;
                 
-                v27 = la4[0];
-                v28 = la5[0];
+                v27 = la63[0];
+                v28 = la64[0];
                 let29 = v28 + 1;
                 if (!((let29 < 257 ? let29 : v28 + 4294967040) == v27))
                     break;
             }
-            v30 = la4[0];
-            v31 = la5[0];
+            v30 = la63[0];
+            v31 = la64[0];
             let32 = v31 + 257 - v30;
             r33 = let32 < 257 ? let32 : let32 - 257;
             r34 = -r33 + 256;
             let35 = -v26 + 256;
             r36 = let35 <= r34 ? let35 : r34;
             if (v31 + r36 <= 257) {
-                core_write_local(la7, a22, v31, v26, v26 + r36 - 1);
+                core_write_shared(sa65, a22, v31, v26, v26 + r36 - 1);
             } else {
                 uint32_t r37;
                 uint32_t r38;
                 
                 r37 = -v31 + 257;
-                core_write_local(la7, a22, v31, v26, v26 + r37 - 1);
+                core_write_shared(sa65, a22, v31, v26, v26 + r37 - 1);
                 r38 = v26 + r37;
-                core_write_local(la7, a22, 0, r38, r38 + (r36 - r37) - 1);
+                core_write_shared(sa65, a22, 0, r38, r38 + (r36 - r37) - 1);
             }
             let39 = v31 + r36;
             r40 = let39 < 257 ? let39 : let39 - 257;
-            la5[0] = r40;
-            la6[0] = r40;
+            la64[0] = r40;
             r24 = v26 + r36;
         }
     }
