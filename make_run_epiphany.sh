@@ -10,7 +10,7 @@ gcc -std=c99 -Iinclude csrc/mongoose.c csrc/server.c -o dsp-server
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host/lib
 EINCS=${ESDK}/tools/host/include
-ELDF=../fast.ldf
+ELDF=${ESDK}/bsps/current/fast.ldf
 
 SCRIPT=$(readlink -f "$0")
 EXEPATH=$(dirname "$SCRIPT")
