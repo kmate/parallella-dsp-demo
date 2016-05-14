@@ -316,9 +316,7 @@ mainProgram = do
   onHost $ liftHost $ do
     addInclude "\"processor.h\""
     callProc "setup_queues" []
-  translatePar
-
-               ((window >>> interleave)      `on` 0  |>>chanSize>>|
+  translatePar ((window >>> interleave)      `on` 0  |>>chanSize>>|
                 (fft  fftSize'          [1,2,3,7,6]) |>>chanSize>>|
                 analyze                      `on` 5  |>>halfChanSize>>|
                 shiftPitch                   `on` 4  |>>halfChanSize>>|
