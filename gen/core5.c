@@ -36,8 +36,8 @@ int main()
         float _Complex _a24[129];
         float _Complex *a24 = _a24;
         uint32_t v25;
-        uint32_t r28;
-        uint32_t v45;
+        uint32_t r34;
+        uint32_t v51;
         
         r4 = 0;
         while (1) {
@@ -101,72 +101,100 @@ int main()
         r22 = 256;
         r23 = 129;
         for (v25 = 0; v25 < 129; v25++) {
-            float _Complex let26;
+            float let26;
             float let27;
+            float let28;
+            float _Complex let29;
+            float let30;
+            float let31;
+            float let32;
+            float let33;
             
-            let26 = a3[v25];
-            let27 = (float) v25;
-            a24[v25] = 2.0 * cabs(let26) + I * ((let27 + 4.0 * (carg(let26) -
-                                                                a1[v25] -
-                                                                let27 *
-                                                                1.5707964) /
-                                                 (2.0 * FELD_PI)) * 172.26563);
+            let26 = fabs(creal(a3[v25]));
+            let27 = fabs(cimag(a3[v25]));
+            let28 = (float) v25;
+            let29 = a3[v25];
+            let30 = creal(let29);
+            let31 = let27 + 1.0e-10;
+            let32 = let30 + let31;
+            let33 = let30 >= 0.0 ? 0.7853982 - 0.7853982 * ((let30 - let31) /
+                                                            let32) : 2.3561945 -
+                0.7853982 * (let32 / (let31 - let30));
+            a24[v25] = 2.0 * (0.9375 * (let26 >= let27 ? let26 : let27) +
+                              0.46875 * (let26 <= let27 ? let26 : let27)) + I *
+                ((let28 + 4.0 * ((cimag(let29) < 0.0 ? -let33 : let33) -
+                                 a1[v25] - let28 * 1.5707964) / (2.0 *
+                                                                 FELD_PI)) *
+                 172.26563);
         }
-        r28 = 0;
+        r34 = 0;
         while (1) {
-            uint32_t v29;
-            uint32_t v30;
-            uint32_t v34;
             uint32_t v35;
-            uint32_t let36;
-            uint32_t r37;
-            uint32_t r38;
-            uint32_t let39;
-            uint32_t r40;
-            uint32_t let43;
+            uint32_t v36;
+            uint32_t v40;
+            uint32_t v41;
+            uint32_t let42;
+            uint32_t r43;
             uint32_t r44;
+            uint32_t let45;
+            uint32_t r46;
+            uint32_t let49;
+            uint32_t r50;
             
-            v29 = r28;
-            if (!(v29 < 129))
+            v35 = r34;
+            if (!(v35 < 129))
                 break;
-            v30 = r28;
+            v36 = r34;
             while (1) {
-                uint32_t v31;
-                uint32_t v32;
-                uint32_t let33;
+                uint32_t v37;
+                uint32_t v38;
+                uint32_t let39;
                 
-                v31 = la34[0];
-                v32 = la35[0];
-                let33 = v32 + 1;
-                if (!((let33 < 130 ? let33 : v32 + 4294967167) == v31))
+                v37 = la34[0];
+                v38 = la35[0];
+                let39 = v38 + 1;
+                if (!((let39 < 130 ? let39 : v38 + 4294967167) == v37))
                     break;
             }
-            v34 = la34[0];
-            v35 = la35[0];
-            let36 = v35 + 130 - v34;
-            r37 = let36 < 130 ? let36 : let36 - 130;
-            r38 = -r37 + 129;
-            let39 = -v30 + 129;
-            r40 = let39 <= r38 ? let39 : r38;
-            if (v35 + r40 <= 130) {
-                core_write_local(la37, a24, v35, v30, v30 + r40 - 1);
+            v40 = la34[0];
+            v41 = la35[0];
+            let42 = v41 + 130 - v40;
+            r43 = let42 < 130 ? let42 : let42 - 130;
+            r44 = -r43 + 129;
+            let45 = -v36 + 129;
+            r46 = let45 <= r44 ? let45 : r44;
+            if (v41 + r46 <= 130) {
+                core_write_local(la37, a24, v41, v36, v36 + r46 - 1);
             } else {
-                uint32_t r41;
-                uint32_t r42;
+                uint32_t r47;
+                uint32_t r48;
                 
-                r41 = -v35 + 130;
-                core_write_local(la37, a24, v35, v30, v30 + r41 - 1);
-                r42 = v30 + r41;
-                core_write_local(la37, a24, 0, r42, r42 + (r40 - r41) - 1);
+                r47 = -v41 + 130;
+                core_write_local(la37, a24, v41, v36, v36 + r47 - 1);
+                r48 = v36 + r47;
+                core_write_local(la37, a24, 0, r48, r48 + (r46 - r47) - 1);
             }
-            let43 = v35 + r40;
-            r44 = let43 < 130 ? let43 : let43 - 130;
-            la35[0] = r44;
-            la36[0] = r44;
-            r28 = v30 + r40;
+            let49 = v41 + r46;
+            r50 = let49 < 130 ? let49 : let49 - 130;
+            la35[0] = r50;
+            la36[0] = r50;
+            r34 = v36 + r46;
         }
-        for (v45 = 0; v45 < 129; v45++) {
-            a1[v45] = carg(a3[v45]);
+        for (v51 = 0; v51 < 129; v51++) {
+            float let52;
+            float let53;
+            float let54;
+            float let55;
+            float let56;
+            
+            let52 = cimag(a3[v51]);
+            let53 = creal(a3[v51]);
+            let54 = fabs(let52) + 1.0e-10;
+            let55 = let53 + let54;
+            let56 = let53 >= 0.0 ? 0.7853982 - 0.7853982 * ((let53 - let54) /
+                                                            let55) : 2.3561945 -
+                0.7853982 * (let55 / (let54 - let53));
+            a1[v51] = let52 < 0.0 ? -let56 : let56;
         }
     }
     return 0;
