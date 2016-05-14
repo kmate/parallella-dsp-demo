@@ -37,6 +37,61 @@ processArr f = loop $ do
     unsafeFreezeVec (length input) arr
   emit output
 
+mulImag :: (Num a, PrimType a, PrimType (Complex a))
+        => Data (Complex a) -> Data a -> Data (Complex a)
+mulImag c n = complex (realPart c) (n * imagPart c)
+
+
+--------------------------------------------------------------------------------
+-- Size-optimized approximations of complex math library
+--------------------------------------------------------------------------------
+
+magnitude' :: (RealFloat a, PrimType a, PrimType (Complex a))
+           => Data (Complex a) -> Data a
+magnitude' c = a * (max re im) + b * (min re im)
+  where
+    re = abs $ realPart c
+    im = abs $ imagPart c
+    a = 15 / 16
+    b = 15 / 32
+
+phase' :: (RealFloat a, PrimType a, PrimType (Complex a))
+       => Data (Complex a) -> Data a
+phase' c = (y < 0) ? (-angle) $ angle
+  where
+    x = realPart c
+    y = imagPart c
+    c1 = pi / 4
+    c2 = 3 * c1
+    ay = abs y + 1e-10
+    angle = (x >= 0)
+      ? (c1 - c1 * ((x - ay) / (x + ay)))
+      $ (c2 - c1 * ((x + ay) / (ay - x)))
+
+polar' :: (RealFloat a, PrimType a, PrimType (Complex a))
+       => Data a -> Data a -> Data (Complex a)
+polar' m p = complex re im
+  where
+    re = m * cos' p
+    im = m * sin' p
+    sin' x = cos' (pi / 2 - x)
+    cos' x = c12 * x12 + c10 * x10 + c8 * x8 + c6 * x6 + c4 * x4 + c2 * x2 + c0
+      where
+        x'  = x - 2 * pi * round (x / (2 * pi) + 0.5)
+        x2  = x' * x'
+        x4  = x2 * x2
+        x6  = x4 * x2
+        x8  = x4 * x4
+        x10 = x8 * x2
+        x12 = x6 * x6
+        c12 =  1.73691489450821293670e-09
+        c10 = -2.71133771940801138503e-07
+        c8  =  2.47734245730930250260e-05
+        c6  = -1.38879704270452054154e-03
+        c4  =  4.16665243677686230461e-02
+        c2  = -4.99999917728614591900e-01
+        c0  =  9.99999992290827491711e-01
+
 
 --------------------------------------------------------------------------------
 -- Bit reversal
@@ -157,8 +212,8 @@ analyze = do
         ixf k = (complex magn freq, phs)
           where
             -- compute magnitude and phase
-            magn  = 2 * magnitude (input ! k)
-            phs   = phase (input ! k)
+            magn  = 2 * magnitude' (input ! k)
+            phs   = phase' (input ! k)
             -- compute phase difference
             diff  = phs - lastPhase ! k
             -- subtract expected phase difference
@@ -170,10 +225,6 @@ analyze = do
     let (output, lastPhase') = unzip result
     emit output  -- emit before store!
     lift $ writeStore lastPhaseS lastPhase'
-
-mulImag :: (Num a, PrimType a, PrimType (Complex a))
-        => Data (Complex a) -> Data a -> Data (Complex a)
-mulImag c n = complex (realPart c) (n * imagPart c)
 
 shiftPitch :: CoreZ ComplexSamples ComplexSamples
 shiftPitch = loop $ do
@@ -194,7 +245,7 @@ synthetize = do
     input <- receive
     sumPhase <- lift $ unsafeFreezeStore sumPhaseS
     let result = Indexed numPosBins ixf
-        ixf k = (polar magn phs, phs)
+        ixf k = (polar' magn phs, phs)
           where
             -- get magnitude and true frequency
             magn  = realPart (input ! k)
@@ -262,13 +313,6 @@ expectedDiff :: Data Float
 expectedDiff = 2 * π * i2n stepSize / i2n fftSize
 
 
-split :: CoreZ ComplexSamples RealSamples
-split = loop $ do
-    v <- receive
-    emit $ map ((/i2n fftSize) . realPart) v
-
-
-
 mainProgram :: Multicore ()
 mainProgram = do
   let chanSize = 1 `ofLength` fftSize'
@@ -285,7 +329,6 @@ mainProgram = do
                 (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
                 (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
                 accumulate                   `on` 13 |>>chanSize>>|
---              split                        `on` 13 |>>chanSize>>|
                 window                       `on` 12 )
 
     (do buffer :: Arr Float <- newArr fftSize
