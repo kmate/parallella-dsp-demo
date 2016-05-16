@@ -72,6 +72,9 @@ bool receive_samples(float *input) {
     DEBUG("[Processor] Reader blocks now.\n");
     if (BUFFER_SIZE != fread(inFrame, sizeof(float), BUFFER_SIZE, dsp_in)) {
       printf("[Processor] Terminated (fread).\n");
+
+      sem_post(&can_write);
+      DEBUG("[Processor] Released writer lock.\n");
       return false;
     }
     DEBUG("[Processor] Samples received from pipe.\n");
@@ -84,7 +87,6 @@ bool receive_samples(float *input) {
 
   sem_post(&can_write);
   DEBUG("[Processor] Released writer lock.\n");
-
   return true;
 }
 
@@ -109,6 +111,9 @@ bool emit_samples(float *output) {
     DEBUG("[Processor] Writer blocks now.\n");
     if (BUFFER_SIZE != fwrite(outFrame, sizeof(float), BUFFER_SIZE, dsp_out)) {
       printf("[Processor] Terminated (fwrite).\n");
+
+      sem_post(&can_read);
+      DEBUG("[Processor] Released reader lock.\n");
       return false;
     }
     fflush(dsp_out);
@@ -117,7 +122,6 @@ bool emit_samples(float *output) {
 
   sem_post(&can_read);
   DEBUG("[Processor] Released reader lock.\n");
-
   return true;
 }
 
