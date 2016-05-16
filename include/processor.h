@@ -1,6 +1,7 @@
 #ifndef PROCESSOR_H_
 #define PROCESSOR_H_
 
+#include <semaphore.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,9 +25,18 @@ FILE *dsp_out;
 float in_queue[FFT_SIZE];
 float accumulator[FFT_SIZE + STEP_SIZE];
 
+sem_t can_read;
+sem_t can_write;
+
 void setup_queues() {
   memset(in_queue, 0, FFT_SIZE * sizeof(float));
   memset(accumulator, 0, (FFT_SIZE + STEP_SIZE) * sizeof(float));
+
+  if(sem_init(&can_read, 0, 1) || sem_init(&can_write, 0, 0))
+  {
+    perror("[Processor] sem_init\n");
+    exit(2);
+  }
 
   mkfifo(DSP_FIFO_IN, S_IRUSR | S_IWUSR);
   if (NULL == (dsp_in = fopen(DSP_FIFO_IN, "r"))) {
@@ -52,20 +62,29 @@ bool receive_samples(float *input) {
   static int window_start = BUFFER_SIZE;
   static float inFrame[BUFFER_SIZE];
 
+  DEBUG("[Processor] Waiting reader lock.\n");
+  sem_wait(&can_read);
+
+  DEBUG("[Processor] Receive samples.\n");
   if (BUFFER_SIZE == window_start) {
     window_start = 0;
 
+    DEBUG("[Processor] Reader blocks now.\n");
     if (BUFFER_SIZE != fread(inFrame, sizeof(float), BUFFER_SIZE, dsp_in)) {
       printf("[Processor] Terminated (fread).\n");
       return false;
     }
-    DEBUG("[Processor] Samples received.\n");
+    DEBUG("[Processor] Samples received from pipe.\n");
   }
 
   memcpy(in_queue + IN_LATENCY, inFrame + window_start, STEP_SIZE * sizeof(float));
   memcpy(input, in_queue, FFT_SIZE * sizeof(float));
   memmove(in_queue, in_queue + STEP_SIZE, IN_LATENCY * sizeof(float));
   window_start += STEP_SIZE;
+
+  sem_post(&can_write);
+  DEBUG("[Processor] Released writer lock.\n");
+
   return true;
 }
 
@@ -73,6 +92,10 @@ bool emit_samples(float *output) {
   static int window_start = 0;
   static float outFrame[BUFFER_SIZE];
 
+  DEBUG("[Processor] Waiting writer lock.\n");
+  sem_wait(&can_write);
+
+  DEBUG("[Processor] Emit samples.\n");
   for(int k=0; k < FFT_SIZE; k++) {
     accumulator[k] += output[k];
   }
@@ -83,13 +106,18 @@ bool emit_samples(float *output) {
   if (BUFFER_SIZE <= window_start) {
     window_start = 0;
 
+    DEBUG("[Processor] Writer blocks now.\n");
     if (BUFFER_SIZE != fwrite(outFrame, sizeof(float), BUFFER_SIZE, dsp_out)) {
       printf("[Processor] Terminated (fwrite).\n");
       return false;
     }
     fflush(dsp_out);
-    DEBUG("[Processor] Samples sent.\n");
+    DEBUG("[Processor] Samples emitted to pipe.\n");
   }
+
+  sem_post(&can_read);
+  DEBUG("[Processor] Released reader lock.\n");
+
   return true;
 }
 
