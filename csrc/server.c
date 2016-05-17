@@ -13,7 +13,7 @@ static void signal_handler(int sig_num) {
   s_signal_received = sig_num;
 }
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 1024
 float input[BUFFER_SIZE];
 float output[BUFFER_SIZE];
 

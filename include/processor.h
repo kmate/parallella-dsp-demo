@@ -16,14 +16,16 @@ FILE *dsp_out;
 
 #define DEBUG(...) // printf(__VA_ARGS__)
 
-#define BUFFER_SIZE 512
-#define FFT_SIZE    512
+#define BUFFER_SIZE 1024
+#define FFT_SIZE    1024
 #define OVERLAP     4
 #define STEP_SIZE   ((FFT_SIZE) / (OVERLAP))
 #define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))
 
 float in_queue[FFT_SIZE];
 float accumulator[FFT_SIZE + STEP_SIZE];
+
+bool hasMore = true;
 
 sem_t can_read;
 sem_t can_write;
@@ -75,6 +77,8 @@ bool receive_samples(float *input) {
 
       sem_post(&can_write);
       DEBUG("[Processor] Released writer lock.\n");
+
+      hasMore = false;
       return false;
     }
     DEBUG("[Processor] Samples received from pipe.\n");
@@ -87,7 +91,7 @@ bool receive_samples(float *input) {
 
   sem_post(&can_write);
   DEBUG("[Processor] Released writer lock.\n");
-  return true;
+  return hasMore;
 }
 
 bool emit_samples(float *output) {
@@ -114,6 +118,8 @@ bool emit_samples(float *output) {
 
       sem_post(&can_read);
       DEBUG("[Processor] Released reader lock.\n");
+
+      hasMore = false;
       return false;
     }
     fflush(dsp_out);
@@ -122,7 +128,7 @@ bool emit_samples(float *output) {
 
   sem_post(&can_read);
   DEBUG("[Processor] Released reader lock.\n");
-  return true;
+  return hasMore;
 }
 
 #endif // PROCESSOR_H_

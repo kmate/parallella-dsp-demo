@@ -30,12 +30,9 @@ processArr :: PrimType a
            => (Arr a -> CoreComp ())
            -> CoreZ (Vector (Data a)) (Vector (Data a)) ()
 processArr f = loop $ do
-  input <- receive
-  output <- lift $ do
-    Store (_,arr) <- initStore input
-    f arr
-    unsafeFreezeVec (length input) arr
-  emit output
+  s@(Store (_, arr)) <- receive'
+  lift $ f arr
+  emit' s
 
 mulImag :: (Num a, PrimType a, PrimType (Complex a))
         => Data (Complex a) -> Data a -> Data (Complex a)
@@ -226,12 +223,13 @@ shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
     buffer <- initArr (P.replicate (P.fromIntegral numPosBins') 0)
+    lenRef <- initRef numPosBins
     for (0, 1, Excl numPosBins) $ \k -> do
       index <- force $ round $ i2n k * pitchShift
       let value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
       setArr index value buffer
-    unsafeFreezeVec numPosBins buffer
-  emit output
+    return $ Store (lenRef, buffer)
+  emit' output
 
 synthetize :: CoreZ ComplexSamples ComplexSamples ()
 synthetize = do
@@ -280,7 +278,7 @@ pitchShift = 2
 
 -- Needed to be in sync with C the code!
 fftSize' :: Length
-fftSize' = 512
+fftSize' = 1024
 
 overlap :: Data Length
 overlap = 4

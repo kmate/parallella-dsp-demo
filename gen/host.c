@@ -18,78 +18,78 @@ off_t la5 = 8204;
 off_t la6 = 8196;
 off_t la7 = 8200;
 off_t la8 = 8192;
-off_t la9 = 12304;
-off_t la10 = 12308;
+off_t la9 = 16400;
+off_t la10 = 16404;
 off_t la11 = 8196;
 off_t la12 = 8200;
 off_t la13 = 8192;
-off_t la14 = 12304;
-off_t la15 = 12308;
+off_t la14 = 16400;
+off_t la15 = 16404;
 off_t la16 = 8196;
 off_t la17 = 8200;
 off_t la18 = 8192;
-off_t la19 = 12304;
-off_t la20 = 12308;
+off_t la19 = 16400;
+off_t la20 = 16404;
 off_t la21 = 8196;
 off_t la22 = 8200;
 off_t la23 = 8192;
-off_t la24 = 12304;
-off_t la25 = 12308;
+off_t la24 = 16400;
+off_t la25 = 16404;
 off_t la26 = 8196;
 off_t la27 = 8200;
 off_t la28 = 8192;
-off_t la29 = 12304;
-off_t la30 = 12308;
+off_t la29 = 16400;
+off_t la30 = 16404;
 off_t la31 = 8196;
 off_t la32 = 8200;
 off_t la33 = 8192;
-off_t la34 = 12304;
-off_t la35 = 12308;
+off_t la34 = 16400;
+off_t la35 = 16404;
 off_t la36 = 8196;
 off_t la37 = 8200;
 off_t la38 = 8192;
-off_t la39 = 10264;
-off_t la40 = 10268;
+off_t la39 = 12312;
+off_t la40 = 12316;
 off_t la41 = 8196;
 off_t la42 = 8200;
 off_t la43 = 8192;
-off_t la44 = 10264;
-off_t la45 = 10268;
+off_t la44 = 12312;
+off_t la45 = 12316;
 off_t la46 = 8196;
 off_t la47 = 8200;
 off_t la48 = 8192;
-off_t la49 = 12304;
-off_t la50 = 12308;
+off_t la49 = 16400;
+off_t la50 = 16404;
 off_t la51 = 8196;
 off_t la52 = 8200;
 off_t la53 = 8192;
-off_t la54 = 12304;
-off_t la55 = 12308;
+off_t la54 = 16400;
+off_t la55 = 16404;
 off_t la56 = 8196;
 off_t la57 = 8200;
 off_t la58 = 8192;
-off_t la59 = 12304;
-off_t la60 = 12308;
+off_t la59 = 16400;
+off_t la60 = 16404;
 off_t la61 = 8196;
 off_t la62 = 8200;
 off_t la63 = 8192;
-off_t la64 = 12304;
-off_t la65 = 12308;
+off_t la64 = 16400;
+off_t la65 = 16404;
 off_t la66 = 8196;
 off_t la67 = 8200;
 off_t la68 = 8192;
-off_t la69 = 12304;
-off_t la70 = 12308;
+off_t la69 = 16400;
+off_t la70 = 16404;
 off_t la71 = 8196;
 off_t la72 = 8200;
 off_t la73 = 8192;
-off_t la74 = 12304;
-off_t la75 = 12308;
+off_t la74 = 16400;
+off_t la75 = 16404;
 off_t la76 = 8196;
 off_t la77 = 8200;
-off_t la78 = 10252;
-off_t la79 = 10256;
-off_t sa80 = 16779268;
+off_t la78 = 12300;
+off_t la79 = 12304;
+off_t sa80 = 16781316;
 void *thread_t67(void *unused)
 {
     bool r68;
@@ -97,7 +97,7 @@ void *thread_t67(void *unused)
     r68 = true;
     while (1) {
         bool v69;
-        float _a70[512];
+        float _a70[1024];
         float *a70 = _a70;
         uint32_t r71;
         uint32_t _a91[1];
@@ -132,18 +132,18 @@ void *thread_t67(void *unused)
             uint32_t r84;
             
             v72 = r71;
-            if (!(v72 < 512))
+            if (!(v72 < 1024))
                 break;
             v73 = r71;
             host_read_local(&group0, 3, 0, la78, a74, 0, 0, 0);
             v75 = a74[0];
             host_read_local(&group0, 3, 0, la79, a76, 0, 0, 0);
             v77 = a76[0];
-            r78 = 513;
+            r78 = 1025;
             let79 = r78 + v77 - v75;
             let80 = r78;
             r81 = let79 < let80 ? let79 : let79 - let80;
-            let82 = -v73 + 512;
+            let82 = -v73 + 1024;
             r83 = let82 <= r81 ? let82 : r81;
             if (r83 > 0) {
                 uint32_t let87;
@@ -182,7 +182,7 @@ void *thread_t67(void *unused)
         v92 = a91[0];
         host_read_local(&group0, 3, 0, la79, a93, 0, 0, 0);
         v94 = a93[0];
-        if (v92 == v94 && v94 == 512) {
+        if (v92 == v94 && v94 == 1024) {
             uint32_t _a95[1];
             uint32_t *a95 = _a95;
             uint32_t _a96[1];
@@ -193,7 +193,7 @@ void *thread_t67(void *unused)
             a96[0] = 0;
             host_write_local(&group0, 3, 0, la79, a96, 0, 0, 0);
         }
-        r97 = 512;
+        r97 = 1024;
         
         float _a98[r97];
         float *a98 = _a98;
@@ -345,7 +345,7 @@ int main()
     e_open(&group0, 0, 0, 4, 4);
     e_reset_group(&group0);
     setup_queues();
-    e_alloc(&shm1, sa2, 2052);
+    e_alloc(&shm1, sa2, 4100);
     a2[0] = 0;
     host_write_local(&group0, 0, 0, la0, a2, 0, 0, 0);
     a3[0] = 0;
@@ -485,7 +485,7 @@ int main()
     a63[0] = 0;
     host_write_local(&group0, 3, 0, la76, a63, 0, 0, 0);
     e_load("core13.srec", &group0, 3, 1, 1);
-    e_alloc(&shm64, sa80, 2052);
+    e_alloc(&shm64, sa80, 4100);
     a65[0] = 0;
     host_write_local(&group0, 3, 0, la78, a65, 0, 0, 0);
     a66[0] = 0;
@@ -495,11 +495,11 @@ int main()
     r101 = true;
     while (1) {
         bool v102;
-        float _a103[512];
+        float _a103[1024];
         float *a103 = _a103;
         bool v104;
         uint32_t r105;
-        float _a106[512];
+        float _a106[1024];
         float *a106 = _a106;
         uint32_t v107;
         uint32_t r108;
@@ -508,8 +508,8 @@ int main()
         if (!v102)
             break;
         v104 = receive_samples(a103);
-        r105 = 512;
-        for (v107 = 0; v107 < 512; v107++) {
+        r105 = 1024;
+        for (v107 = 0; v107 < 1024; v107++) {
             a106[v107] = a103[v107];
         }
         r108 = 0;
@@ -532,19 +532,19 @@ int main()
             uint32_t r122;
             
             v109 = r108;
-            if (!(v109 < 512))
+            if (!(v109 < 1024))
                 break;
             v110 = r108;
             host_read_local(&group0, 0, 0, la0, a111, 0, 0, 0);
             v112 = a111[0];
             host_read_local(&group0, 0, 0, la1, a113, 0, 0, 0);
             v114 = a113[0];
-            r115 = 513;
+            r115 = 1025;
             let116 = r115 + v114 - v112;
             let117 = r115;
             r118 = let116 < let117 ? let116 : let116 - let117;
             r119 = r115 - r118 - 1;
-            let120 = -v110 + 512;
+            let120 = -v110 + 1024;
             r121 = let120 <= r119 ? let120 : r119;
             if (r121 > 0) {
                 uint32_t let125;
