@@ -10,7 +10,7 @@ gcc -std=c99 -Iinclude csrc/mongoose.c csrc/server.c -o dsp-server
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host/lib
 EINCS=${ESDK}/tools/host/include
-ELDF=${ESDK}/bsps/current/fast.ldf
+ELDF=${ESDK}/bsps/current/internal.ldf
 
 SCRIPT=$(readlink -f "$0")
 EXEPATH=$(dirname "$SCRIPT")
@@ -29,7 +29,7 @@ case $(uname -p) in
 esac
 
 # Build HOST side application
-${CROSS_PREFIX}gcc -std=gnu99 -D_BSD_SOURCE gen/host.c -o dsp-processor -Iinclude -I ${EINCS} -L ${ELIBS} -le-hal -le-loader -lm
+${CROSS_PREFIX}gcc -std=gnu99 -D_BSD_SOURCE gen/host.c -o dsp-processor -Iinclude -I ${EINCS} -L ${ELIBS} -le-hal -le-loader -lm -lpthread
 
 cd gen
 for f in core*.c
@@ -38,7 +38,7 @@ do
     SREC=../${f%.*}.srec
 
     # Build DEVICE side programs
-    e-gcc -std=c99 -ffast-math -fsingle-precision-constant -I../include -T ${ELDF} $f -o ${ELF} -le-lib -lm -Os
+    e-gcc -std=gnu99 -ffast-math -fsingle-precision-constant -I../include -T ${ELDF} $f -o ${ELF} -le-lib -lm -Os
     # Convert ebinaries to SREC files
     e-objcopy --srec-forceS3 --output-target srec ${ELF} ${SREC}
 done
