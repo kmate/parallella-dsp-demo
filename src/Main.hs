@@ -280,7 +280,7 @@ pitchShift = 2
 
 -- Needed to be in sync with C the code!
 fftSize' :: Length
-fftSize' = 256
+fftSize' = 512
 
 overlap :: Data Length
 overlap = 4

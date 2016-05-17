@@ -16,8 +16,8 @@ FILE *dsp_out;
 
 #define DEBUG(...) // printf(__VA_ARGS__)
 
-#define BUFFER_SIZE 256
-#define FFT_SIZE    256
+#define BUFFER_SIZE 512
+#define FFT_SIZE    512
 #define OVERLAP     4
 #define STEP_SIZE   ((FFT_SIZE) / (OVERLAP))
 #define IN_LATENCY  ((FFT_SIZE) - (STEP_SIZE))

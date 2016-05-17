@@ -5,12 +5,12 @@
 #include <string.h>
 #include <tgmath.h>
 volatile uint32_t *const la38 = (uint32_t *) 8192;
-volatile uint32_t *const la39 = (uint32_t *) 2222990360;
-volatile uint32_t *const la40 = (uint32_t *) 2222990364;
+volatile uint32_t *const la39 = (uint32_t *) 2222991384;
+volatile uint32_t *const la40 = (uint32_t *) 2222991388;
 volatile uint32_t *const la41 = (uint32_t *) 8196;
 volatile float _Complex *const la42 = (float _Complex *) 8200;
-volatile uint32_t *const la44 = (uint32_t *) 9240;
-volatile uint32_t *const la45 = (uint32_t *) 9244;
+volatile uint32_t *const la44 = (uint32_t *) 10264;
+volatile uint32_t *const la45 = (uint32_t *) 10268;
 volatile uint32_t *const la46 = (uint32_t *) 2291146756;
 volatile float _Complex *const la47 = (float _Complex *) 2291146760;
 extern int _CORE_ROW_;
@@ -23,16 +23,16 @@ asm(".set __CORE_COL_,8");
 int main()
 {
     uint32_t r0;
-    float _a1[129];
+    float _a1[257];
     float *a1 = _a1;
     uint32_t v2;
     
-    r0 = 129;
-    for (v2 = 0; v2 < 129; v2++) {
+    r0 = 257;
+    for (v2 = 0; v2 < 257; v2++) {
         a1[v2] = 0.0;
     }
     while (1) {
-        float _Complex _a3[129];
+        float _Complex _a3[257];
         float _Complex *a3 = _a3;
         uint32_t r4;
         uint32_t v21;
@@ -40,7 +40,7 @@ int main()
         uint32_t r23;
         uint32_t v24;
         uint32_t r26;
-        float _Complex _a27[256];
+        float _Complex _a27[512];
         float _Complex *a27 = _a27;
         uint32_t v28;
         uint32_t r37;
@@ -60,16 +60,16 @@ int main()
             uint32_t r15;
             
             v5 = r4;
-            if (!(v5 < 129))
+            if (!(v5 < 257))
                 break;
             v6 = r4;
             v7 = la38[0];
             v8 = la41[0];
-            r9 = 130;
+            r9 = 258;
             let10 = r9 + v8 - v7;
             let11 = r9;
             r12 = let10 < let11 ? let10 : let10 - let11;
-            let13 = -v6 + 129;
+            let13 = -v6 + 257;
             r14 = let13 <= r12 ? let13 : r12;
             if (r14 > 0) {
                 uint32_t let18;
@@ -102,23 +102,23 @@ int main()
         }
         v21 = la38[0];
         v22 = la41[0];
-        if (v21 == v22 && v22 == 129) {
+        if (v21 == v22 && v22 == 257) {
             la38[0] = 0;
             la39[0] = 0;
             la40[0] = 0;
             la41[0] = 0;
         }
-        r23 = 129;
-        for (v24 = 0; v24 < 129; v24++) {
+        r23 = 257;
+        for (v24 = 0; v24 < 257; v24++) {
             float let25;
             
             let25 = (float) v24;
             a1[v24] = a1[v24] + (2.0 * FELD_PI * ((cimag(a3[v24]) - let25 *
-                                                   172.26563) / 172.26563) /
-                                 4.0 + let25 * 1.5707964);
+                                                   86.13281) / 86.13281) / 4.0 +
+                                 let25 * 1.5707964);
         }
-        r26 = 256;
-        for (v28 = 0; v28 < 256; v28++) {
+        r26 = 512;
+        for (v28 = 0; v28 < 512; v28++) {
             float let29;
             float let30;
             float let31;
@@ -129,11 +129,11 @@ int main()
             let29 = creal(a3[v28]);
             let30 = (float) v28;
             let31 = a1[v28] + (2.0 * FELD_PI * ((cimag(a3[v28]) - let30 *
-                                                 172.26563) / 172.26563) / 4.0 +
+                                                 86.13281) / 86.13281) / 4.0 +
                                let30 * 1.5707964);
             let32 = 2.0 * FELD_PI;
             let33 = 1.5707964 - let31;
-            if (v28 <= 129) {
+            if (v28 <= 257) {
                 float let35;
                 float let36;
                 
@@ -207,17 +207,17 @@ int main()
             uint32_t r49;
             
             v38 = r37;
-            if (!(v38 < 256))
+            if (!(v38 < 512))
                 break;
             v39 = r37;
             v40 = la44[0];
             v41 = la45[0];
-            r42 = 257;
+            r42 = 513;
             let43 = r42 + v41 - v40;
             let44 = r42;
             r45 = let43 < let44 ? let43 : let43 - let44;
             r46 = r42 - r45 - 1;
-            let47 = -v39 + 256;
+            let47 = -v39 + 512;
             r48 = let47 <= r46 ? let47 : r46;
             if (r48 > 0) {
                 uint32_t let52;
