@@ -28,7 +28,7 @@ compileTimeVec len ixf = do
 
 processArr :: PrimType a
            => (Arr a -> CoreComp ())
-           -> CoreZ (Vector (Data a)) (Vector (Data a))
+           -> CoreZ (Vector (Data a)) (Vector (Data a)) ()
 processArr f = loop $ do
   input <- receive
   output <- lift $ do
@@ -110,7 +110,7 @@ bitRevArr n arr = do
           setArr b av arr)
       (return ())
 
-bitRev :: PrimType a => Length -> CoreZ (Vector (Data a)) (Vector (Data a))
+bitRev :: PrimType a => Length -> CoreZ (Vector (Data a)) (Vector (Data a)) ()
 bitRev n = processArr (bitRevArr n)
 
 
@@ -118,13 +118,13 @@ bitRev n = processArr (bitRevArr n)
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
+fft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
 fft = fftBase False
 
-ifft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
+ifft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
 ifft = fftBase True
 
-fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples
+fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
 fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRev)
   where
     chanSize = 1 `ofLength` n
@@ -182,14 +182,14 @@ calcTwids inv n = compileTimeVec len ixf
 hann :: Length -> Index -> Float
 hann size k = -0.5 * cos(2 * pi * P.fromIntegral k / P.fromIntegral size) + 0.5
 
-window :: CoreZ RealSamples RealSamples
+window :: CoreZ RealSamples RealSamples ()
 window = do
   hann <- lift $ compileTimeVec fftSize' (hann fftSize')
   loop $ do
     input <- receive
     emit $ zipWith (*) input hann
 
-interleave :: CoreZ RealSamples ComplexSamples
+interleave :: CoreZ RealSamples ComplexSamples ()
 interleave = loop $ do
   input <- receive
   emit $ map (flip complex 0) input
@@ -197,7 +197,7 @@ interleave = loop $ do
 zeroes :: Data Length -> RealSamples
 zeroes l = Indexed l $ const 0
 
-analyze :: CoreZ ComplexSamples ComplexSamples
+analyze :: CoreZ ComplexSamples ComplexSamples ()
 analyze = do
   lastPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
@@ -221,7 +221,7 @@ analyze = do
     emit output  -- emit before store!
     lift $ writeStore lastPhaseS lastPhase'
 
-shiftPitch :: CoreZ ComplexSamples ComplexSamples
+shiftPitch :: CoreZ ComplexSamples ComplexSamples ()
 shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
@@ -233,7 +233,7 @@ shiftPitch = loop $ do
     unsafeFreezeVec numPosBins buffer
   emit output
 
-synthetize :: CoreZ ComplexSamples ComplexSamples
+synthetize :: CoreZ ComplexSamples ComplexSamples ()
 synthetize = do
   sumPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
@@ -259,12 +259,12 @@ synthetize = do
     emit output  -- emit before store!
     lift $ writeStore sumPhaseS sumPhase'
 
-zeroNegBins :: CoreZ ComplexSamples ComplexSamples
+zeroNegBins :: CoreZ ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
   input <- receive
   emit $ Indexed fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
-accumulate :: CoreZ ComplexSamples RealSamples
+accumulate :: CoreZ ComplexSamples RealSamples ()
 accumulate = loop $ do
   input <- receive
   emit $ map ((/ i2n (fftSize * overlap)) . realPart) input
@@ -315,14 +315,14 @@ mainProgram = do
   onHost $ liftHost $ do
     addInclude "\"processor.h\""
     callProc "setup_queues" []
-  translatePar ((window >>> interleave)      `on` 0  |>>chanSize>>|
-                (fft  fftSize'          [1,2,3,7,6]) |>>chanSize>>|
-                analyze                      `on` 5  |>>halfChanSize>>|
-                shiftPitch                   `on` 4  |>>halfChanSize>>|
-                (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
-                (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
-                accumulate                   `on` 13 |>>chanSize>>|
-                window                       `on` 12 )
+  runZ ((window >>> interleave)      `on` 0  |>>chanSize>>|
+        (fft  fftSize'          [1,2,3,7,6]) |>>chanSize>>|
+        analyze                      `on` 5  |>>halfChanSize>>|
+        shiftPitch                   `on` 4  |>>halfChanSize>>|
+        (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
+        (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
+        accumulate                   `on` 13 |>>chanSize>>|
+        window                       `on` 12 )
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec fftSize buffer
