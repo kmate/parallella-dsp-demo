@@ -74,7 +74,6 @@ polar' m p = complex re im
   where
     re = m * cos' p
     im = m * sin' p
-    wrap x = x - 2 * pi * round (x / (2 * pi) + 0.5)
     sin' x = cos' (pi / 2 - x)
     cos' x = share (wrap x) (flip horner [c0,0,c2,0,c4,0,c6,0,c8,0,c10,0,c12])
       where
@@ -226,10 +225,10 @@ shiftPitch :: CoreZ ComplexSamples ComplexSamples
 shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
-    buffer <- newArr numPosBins
+    buffer <- initArr (P.replicate (P.fromIntegral numPosBins') 0)
     for (0, 1, Excl numPosBins) $ \k -> do
-      let index = round $ i2n k * pitchShift
-          value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
+      index <- force $ round $ i2n k * pitchShift
+      let value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
       setArr index value buffer
     unsafeFreezeVec numPosBins buffer
   emit output
@@ -324,7 +323,6 @@ mainProgram = do
                 (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
                 accumulate                   `on` 13 |>>chanSize>>|
                 window                       `on` 12 )
-
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
         input <- unsafeFreezeVec fftSize buffer

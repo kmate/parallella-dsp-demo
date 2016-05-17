@@ -13,6 +13,12 @@ volatile uint32_t *const la44 = (uint32_t *) 9240;
 volatile uint32_t *const la45 = (uint32_t *) 9244;
 volatile uint32_t *const la46 = (uint32_t *) 2291146756;
 volatile float _Complex *const la47 = (float _Complex *) 2291146760;
+extern int _CORE_ROW_;
+asm(".global __CORE_ROW_");
+asm(".set __CORE_ROW_,34");
+extern int _CORE_COL_;
+asm(".global __CORE_COL_");
+asm(".set __CORE_COL_,8");
 #define FELD_PI 3.141592653589793
 int main()
 {
@@ -29,107 +35,111 @@ int main()
         float _Complex _a3[129];
         float _Complex *a3 = _a3;
         uint32_t r4;
-        uint32_t v20;
         uint32_t v21;
-        uint32_t r22;
-        uint32_t v23;
-        uint32_t r25;
-        float _Complex _a26[256];
-        float _Complex *a26 = _a26;
-        uint32_t v27;
-        uint32_t r36;
+        uint32_t v22;
+        uint32_t r23;
+        uint32_t v24;
+        uint32_t r26;
+        float _Complex _a27[256];
+        float _Complex *a27 = _a27;
+        uint32_t v28;
+        uint32_t r37;
         
         r4 = 0;
         while (1) {
             uint32_t v5;
             uint32_t v6;
-            uint32_t v9;
-            uint32_t v10;
-            uint32_t r11;
-            uint32_t let12;
-            uint32_t r13;
-            uint32_t let14;
+            uint32_t v7;
+            uint32_t v8;
+            uint32_t r9;
+            uint32_t let10;
+            uint32_t let11;
+            uint32_t r12;
+            uint32_t let13;
+            uint32_t r14;
             uint32_t r15;
-            uint32_t let18;
-            uint32_t r19;
             
             v5 = r4;
             if (!(v5 < 129))
                 break;
             v6 = r4;
-            while (1) {
-                uint32_t v7;
-                uint32_t v8;
+            v7 = la38[0];
+            v8 = la41[0];
+            r9 = 130;
+            let10 = r9 + v8 - v7;
+            let11 = r9;
+            r12 = let10 < let11 ? let10 : let10 - let11;
+            let13 = -v6 + 129;
+            r14 = let13 <= r12 ? let13 : r12;
+            if (r14 > 0) {
+                uint32_t let18;
+                uint32_t let19;
+                uint32_t r20;
                 
-                v7 = la38[0];
-                v8 = la41[0];
-                if (!(v7 == v8))
-                    break;
-            }
-            v9 = la38[0];
-            v10 = la41[0];
-            r11 = 130;
-            let12 = r11 + v10 - v9;
-            r13 = let12 < r11 ? let12 : let12 - r11;
-            let14 = -v6 + 129;
-            r15 = let14 <= r13 ? let14 : r13;
-            if (v9 + r15 <= r11) {
-                core_read_local(la42, a3, v9, v6, v6 + r15 - 1);
+                if (v7 + r14 <= r9) {
+                    core_read_local(la42, a3, v7, v6, v6 + r14 - 1);
+                } else {
+                    uint32_t r16;
+                    uint32_t r17;
+                    
+                    r16 = r9 - v7;
+                    core_read_local(la42, a3, v7, v6, v6 + r16 - 1);
+                    r17 = v6 + r16;
+                    core_read_local(la42, a3, 0, r17, r17 + r14 - r16 - 1);
+                }
+                let18 = v7 + r14;
+                let19 = r9;
+                r20 = let18 < let19 ? let18 : let18 - let19;
+                la38[0] = r20;
+                la39[0] = r20;
+                r15 = r14;
             } else {
-                uint32_t r16;
-                uint32_t r17;
-                
-                r16 = r11 - v9;
-                core_read_local(la42, a3, v9, v6, v6 + r16 - 1);
-                r17 = v6 + r16;
-                core_read_local(la42, a3, 0, r17, r17 + r15 - r16 - 1);
+                r15 = 0;
             }
-            let18 = v9 + r15;
-            r19 = let18 < r11 ? let18 : let18 - r11;
-            la38[0] = r19;
-            la39[0] = r19;
-            r4 = v6 + r15;
+            if (!(0 == r15)) {
+                r4 = v6 + r15;
+            }
         }
-        v20 = la38[0];
-        v21 = la41[0];
-        if (v20 == v21 && v21 == 129) {
+        v21 = la38[0];
+        v22 = la41[0];
+        if (v21 == v22 && v22 == 129) {
             la38[0] = 0;
             la39[0] = 0;
             la40[0] = 0;
             la41[0] = 0;
         }
-        r22 = 129;
-        for (v23 = 0; v23 < 129; v23++) {
-            float let24;
+        r23 = 129;
+        for (v24 = 0; v24 < 129; v24++) {
+            float let25;
             
-            let24 = (float) v23;
-            a1[v23] = a1[v23] + (2.0 * FELD_PI * ((cimag(a3[v23]) - let24 *
+            let25 = (float) v24;
+            a1[v24] = a1[v24] + (2.0 * FELD_PI * ((cimag(a3[v24]) - let25 *
                                                    172.26563) / 172.26563) /
-                                 4.0 + let24 * 1.5707964);
+                                 4.0 + let25 * 1.5707964);
         }
-        r25 = 256;
-        for (v27 = 0; v27 < 256; v27++) {
-            float let28;
+        r26 = 256;
+        for (v28 = 0; v28 < 256; v28++) {
             float let29;
             float let30;
             float let31;
             float let32;
-            float _Complex v33;
+            float let33;
+            float _Complex v34;
             
-            let28 = creal(a3[v27]);
-            let29 = (float) v27;
-            let30 = a1[v27] + (2.0 * FELD_PI * ((cimag(a3[v27]) - let29 *
+            let29 = creal(a3[v28]);
+            let30 = (float) v28;
+            let31 = a1[v28] + (2.0 * FELD_PI * ((cimag(a3[v28]) - let30 *
                                                  172.26563) / 172.26563) / 4.0 +
-                               let29 * 1.5707964);
-            let31 = 2.0 * FELD_PI;
-            let32 = 1.5707964 - let30;
-            if (v27 <= 129) {
-                float let34;
+                               let30 * 1.5707964);
+            let32 = 2.0 * FELD_PI;
+            let33 = 1.5707964 - let31;
+            if (v28 <= 129) {
                 float let35;
+                float let36;
                 
-                let34 = let30 - let31 * (float) round(let30 / let31 + 0.5);
-                let35 = let32 - let31 * (float) round(let32 / let31 + 0.5);
-                v33 = let28 * (1.0 + (0.0 + (-0.4999999 + (0.0 + (4.1666523e-2 +
+                let35 = let31 - let32 * (float) round(let31 / let32 + 0.5);
+                let36 = let33 - let32 * (float) round(let33 / let32 + 0.5);
+                v34 = let29 * (1.0 + (0.0 + (-0.4999999 + (0.0 + (4.1666523e-2 +
                                                                   (0.0 +
                                                                    (-1.3887971e-3 +
                                                                     (0.0 +
@@ -139,17 +149,17 @@ int main()
                                                                         (0.0 +
                                                                          (1.736915e-9 +
                                                                           0.0 *
-                                                                          let34) *
-                                                                         let34) *
-                                                                        let34) *
-                                                                       let34) *
-                                                                      let34) *
-                                                                     let34) *
-                                                                    let34) *
-                                                                   let34) *
-                                                                  let34) *
-                                                           let34) * let34) *
-                                      let34) * let34) + I * (let28 * (1.0 +
+                                                                          let35) *
+                                                                         let35) *
+                                                                        let35) *
+                                                                       let35) *
+                                                                      let35) *
+                                                                     let35) *
+                                                                    let35) *
+                                                                   let35) *
+                                                                  let35) *
+                                                           let35) * let35) *
+                                      let35) * let35) + I * (let29 * (1.0 +
                                                                       (0.0 +
                                                                        (-0.4999999 +
                                                                         (0.0 +
@@ -163,76 +173,80 @@ int main()
                                                                                 (0.0 +
                                                                                  (1.736915e-9 +
                                                                                   0.0 *
-                                                                                  let35) *
-                                                                                 let35) *
-                                                                                let35) *
-                                                                               let35) *
-                                                                              let35) *
-                                                                             let35) *
-                                                                            let35) *
-                                                                           let35) *
-                                                                          let35) *
-                                                                         let35) *
-                                                                        let35) *
-                                                                       let35) *
-                                                                      let35));
+                                                                                  let36) *
+                                                                                 let36) *
+                                                                                let36) *
+                                                                               let36) *
+                                                                              let36) *
+                                                                             let36) *
+                                                                            let36) *
+                                                                           let36) *
+                                                                          let36) *
+                                                                         let36) *
+                                                                        let36) *
+                                                                       let36) *
+                                                                      let36));
             } else {
-                v33 = 0.0;
+                v34 = 0.0;
             }
-            a26[v27] = v33;
+            a27[v28] = v34;
         }
-        r36 = 0;
+        r37 = 0;
         while (1) {
-            uint32_t v37;
             uint32_t v38;
-            uint32_t v42;
-            uint32_t v43;
+            uint32_t v39;
+            uint32_t v40;
+            uint32_t v41;
+            uint32_t r42;
+            uint32_t let43;
             uint32_t let44;
             uint32_t r45;
             uint32_t r46;
             uint32_t let47;
             uint32_t r48;
-            uint32_t let51;
-            uint32_t r52;
+            uint32_t r49;
             
-            v37 = r36;
-            if (!(v37 < 256))
+            v38 = r37;
+            if (!(v38 < 256))
                 break;
-            v38 = r36;
-            while (1) {
-                uint32_t v39;
-                uint32_t v40;
-                uint32_t let41;
-                
-                v39 = la44[0];
-                v40 = la45[0];
-                let41 = v40 + 1;
-                if (!((let41 < 257 ? let41 : v40 + 4294967040) == v39))
-                    break;
-            }
-            v42 = la44[0];
-            v43 = la45[0];
-            let44 = v43 + 257 - v42;
-            r45 = let44 < 257 ? let44 : let44 - 257;
-            r46 = -r45 + 256;
-            let47 = -v38 + 256;
+            v39 = r37;
+            v40 = la44[0];
+            v41 = la45[0];
+            r42 = 257;
+            let43 = r42 + v41 - v40;
+            let44 = r42;
+            r45 = let43 < let44 ? let43 : let43 - let44;
+            r46 = r42 - r45 - 1;
+            let47 = -v39 + 256;
             r48 = let47 <= r46 ? let47 : r46;
-            if (v43 + r48 <= 257) {
-                core_write_local(la47, a26, v43, v38, v38 + r48 - 1);
-            } else {
-                uint32_t r49;
-                uint32_t r50;
+            if (r48 > 0) {
+                uint32_t let52;
+                uint32_t let53;
+                uint32_t r54;
                 
-                r49 = -v43 + 257;
-                core_write_local(la47, a26, v43, v38, v38 + r49 - 1);
-                r50 = v38 + r49;
-                core_write_local(la47, a26, 0, r50, r50 + (r48 - r49) - 1);
+                if (v41 + r48 <= r42) {
+                    core_write_local(la47, a27, v41, v39, v39 + r48 - 1);
+                } else {
+                    uint32_t r50;
+                    uint32_t r51;
+                    
+                    r50 = r42 - v41;
+                    core_write_local(la47, a27, v41, v39, v39 + r50 - 1);
+                    r51 = v39 + r50;
+                    core_write_local(la47, a27, 0, r51, r51 + (r48 - r50) - 1);
+                }
+                let52 = v41 + r48;
+                let53 = r42;
+                r54 = let52 < let53 ? let52 : let52 - let53;
+                la45[0] = r54;
+                la46[0] = r54;
+                r49 = r48;
+            } else {
+                r49 = 0;
             }
-            let51 = v43 + r48;
-            r52 = let51 < 257 ? let51 : let51 - 257;
-            la45[0] = r52;
-            la46[0] = r52;
-            r36 = v38 + r48;
+            if (!(0 == r49)) {
+                r37 = v39 + r49;
+            }
         }
     }
     return 0;

@@ -2,9 +2,13 @@
 #include <e-feldspar.h>
 #include <e-hal.h>
 #include <e-loader.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <unistd.h>
+void *thread_t67(void *unused);
+e_epiphany_t group0;
+e_mem_t shm64;
 off_t la0 = 8192;
 off_t la1 = 8196;
 off_t sa2 = 16777216;
@@ -86,9 +90,124 @@ off_t la77 = 8200;
 off_t la78 = 9228;
 off_t la79 = 9232;
 off_t sa80 = 16778244;
+void *thread_t67(void *unused)
+{
+    bool r68;
+    
+    r68 = true;
+    while (1) {
+        bool v69;
+        float _a70[256];
+        float *a70 = _a70;
+        uint32_t r71;
+        uint32_t _a91[1];
+        uint32_t *a91 = _a91;
+        uint32_t v92;
+        uint32_t _a93[1];
+        uint32_t *a93 = _a93;
+        uint32_t v94;
+        uint32_t r97;
+        uint32_t v99;
+        bool v100;
+        
+        v69 = r68;
+        if (!v69)
+            break;
+        r71 = 0;
+        while (1) {
+            uint32_t v72;
+            uint32_t v73;
+            uint32_t _a74[1];
+            uint32_t *a74 = _a74;
+            uint32_t v75;
+            uint32_t _a76[1];
+            uint32_t *a76 = _a76;
+            uint32_t v77;
+            uint32_t r78;
+            uint32_t let79;
+            uint32_t let80;
+            uint32_t r81;
+            uint32_t let82;
+            uint32_t r83;
+            uint32_t r84;
+            
+            v72 = r71;
+            if (!(v72 < 256))
+                break;
+            v73 = r71;
+            host_read_local(&group0, 3, 0, la78, a74, 0, 0, 0);
+            v75 = a74[0];
+            host_read_local(&group0, 3, 0, la79, a76, 0, 0, 0);
+            v77 = a76[0];
+            r78 = 257;
+            let79 = r78 + v77 - v75;
+            let80 = r78;
+            r81 = let79 < let80 ? let79 : let79 - let80;
+            let82 = -v73 + 256;
+            r83 = let82 <= r81 ? let82 : r81;
+            if (r83 > 0) {
+                uint32_t let87;
+                uint32_t let88;
+                uint32_t r89;
+                uint32_t _a90[1];
+                uint32_t *a90 = _a90;
+                
+                if (v75 + r83 <= r78) {
+                    host_read_shared(&shm64, a70, v75, v73, v73 + r83 - 1);
+                } else {
+                    uint32_t r85;
+                    uint32_t r86;
+                    
+                    r85 = r78 - v75;
+                    host_read_shared(&shm64, a70, v75, v73, v73 + r85 - 1);
+                    r86 = v73 + r85;
+                    host_read_shared(&shm64, a70, 0, r86, r86 + r83 - r85 - 1);
+                }
+                let87 = v75 + r83;
+                let88 = r78;
+                r89 = let87 < let88 ? let87 : let87 - let88;
+                a90[0] = r89;
+                host_write_local(&group0, 3, 0, la78, a90, 0, 0, 0);
+                r84 = r83;
+            } else {
+                r84 = 0;
+            }
+            if (0 == r84) {
+                usleep(100);
+            } else {
+                r71 = v73 + r84;
+            }
+        }
+        host_read_local(&group0, 3, 0, la78, a91, 0, 0, 0);
+        v92 = a91[0];
+        host_read_local(&group0, 3, 0, la79, a93, 0, 0, 0);
+        v94 = a93[0];
+        if (v92 == v94 && v94 == 256) {
+            uint32_t _a95[1];
+            uint32_t *a95 = _a95;
+            uint32_t _a96[1];
+            uint32_t *a96 = _a96;
+            
+            a95[0] = 0;
+            host_write_local(&group0, 3, 0, la78, a95, 0, 0, 0);
+            a96[0] = 0;
+            host_write_local(&group0, 3, 0, la79, a96, 0, 0, 0);
+        }
+        r97 = 256;
+        
+        float _a98[r97];
+        float *a98 = _a98;
+        
+        for (v99 = 0; v99 < r97; v99++) {
+            a98[v99] = a70[v99];
+        }
+        v100 = emit_samples(a98);
+        r68 = v100;
+    }
+    return NULL;
+}
 int main()
 {
-    e_epiphany_t group0;
     e_mem_t shm1;
     uint32_t _a2[1];
     uint32_t *a2 = _a2;
@@ -214,12 +333,12 @@ int main()
     uint32_t *a62 = _a62;
     uint32_t _a63[1];
     uint32_t *a63 = _a63;
-    e_mem_t shm64;
     uint32_t _a65[1];
     uint32_t *a65 = _a65;
     uint32_t _a66[1];
     uint32_t *a66 = _a66;
-    bool r67;
+    pthread_t t67;
+    bool r101;
     
     e_init(0);
     e_reset_system();
@@ -372,206 +491,98 @@ int main()
     a66[0] = 0;
     host_write_local(&group0, 3, 0, la79, a66, 0, 0, 0);
     e_load("core12.srec", &group0, 3, 0, 1);
-    r67 = true;
+    pthread_create(&t67, NULL, thread_t67, NULL);
+    r101 = true;
     while (1) {
-        bool v68;
-        float _a69[256];
-        float *a69 = _a69;
-        bool v70;
-        uint32_t r71;
-        float _a72[256];
-        float *a72 = _a72;
-        uint32_t v73;
-        uint32_t r74;
+        bool v102;
+        float _a103[256];
+        float *a103 = _a103;
+        bool v104;
+        uint32_t r105;
+        float _a106[256];
+        float *a106 = _a106;
+        uint32_t v107;
+        uint32_t r108;
         
-        v68 = r67;
-        if (!v68)
+        v102 = r101;
+        if (!v102)
             break;
-        v70 = receive_samples(a69);
-        r71 = 256;
-        for (v73 = 0; v73 < 256; v73++) {
-            a72[v73] = a69[v73];
+        v104 = receive_samples(a103);
+        r105 = 256;
+        for (v107 = 0; v107 < 256; v107++) {
+            a106[v107] = a103[v107];
         }
-        r74 = 0;
+        r108 = 0;
         while (1) {
-            uint32_t v75;
-            uint32_t v76;
-            uint32_t _a82[1];
-            uint32_t *a82 = _a82;
-            uint32_t v83;
-            uint32_t _a84[1];
-            uint32_t *a84 = _a84;
-            uint32_t v85;
-            uint32_t let86;
-            uint32_t r87;
-            uint32_t r88;
-            uint32_t let89;
-            uint32_t r90;
-            uint32_t let93;
-            uint32_t r94;
-            uint32_t _a95[1];
-            uint32_t *a95 = _a95;
+            uint32_t v109;
+            uint32_t v110;
+            uint32_t _a111[1];
+            uint32_t *a111 = _a111;
+            uint32_t v112;
+            uint32_t _a113[1];
+            uint32_t *a113 = _a113;
+            uint32_t v114;
+            uint32_t r115;
+            uint32_t let116;
+            uint32_t let117;
+            uint32_t r118;
+            uint32_t r119;
+            uint32_t let120;
+            uint32_t r121;
+            uint32_t r122;
             
-            v75 = r74;
-            if (!(v75 < 256))
+            v109 = r108;
+            if (!(v109 < 256))
                 break;
-            v76 = r74;
-            while (1) {
-                uint32_t _a77[1];
-                uint32_t *a77 = _a77;
-                uint32_t v78;
-                uint32_t _a79[1];
-                uint32_t *a79 = _a79;
-                uint32_t v80;
-                uint32_t let81;
+            v110 = r108;
+            host_read_local(&group0, 0, 0, la0, a111, 0, 0, 0);
+            v112 = a111[0];
+            host_read_local(&group0, 0, 0, la1, a113, 0, 0, 0);
+            v114 = a113[0];
+            r115 = 257;
+            let116 = r115 + v114 - v112;
+            let117 = r115;
+            r118 = let116 < let117 ? let116 : let116 - let117;
+            r119 = r115 - r118 - 1;
+            let120 = -v110 + 256;
+            r121 = let120 <= r119 ? let120 : r119;
+            if (r121 > 0) {
+                uint32_t let125;
+                uint32_t let126;
+                uint32_t r127;
+                uint32_t _a128[1];
+                uint32_t *a128 = _a128;
                 
-                host_read_local(&group0, 0, 0, la0, a77, 0, 0, 0);
-                v78 = a77[0];
-                host_read_local(&group0, 0, 0, la1, a79, 0, 0, 0);
-                v80 = a79[0];
-                let81 = v80 + 1;
-                if (!((let81 < 257 ? let81 : v80 + 4294967040) == v78))
-                    break;
-                usleep(100);
-            }
-            host_read_local(&group0, 0, 0, la0, a82, 0, 0, 0);
-            v83 = a82[0];
-            host_read_local(&group0, 0, 0, la1, a84, 0, 0, 0);
-            v85 = a84[0];
-            let86 = v85 + 257 - v83;
-            r87 = let86 < 257 ? let86 : let86 - 257;
-            r88 = -r87 + 256;
-            let89 = -v76 + 256;
-            r90 = let89 <= r88 ? let89 : r88;
-            if (v85 + r90 <= 257) {
-                host_write_shared(&shm1, a72, v85, v76, v76 + r90 - 1);
-            } else {
-                uint32_t r91;
-                uint32_t r92;
-                
-                r91 = -v85 + 257;
-                host_write_shared(&shm1, a72, v85, v76, v76 + r91 - 1);
-                r92 = v76 + r91;
-                host_write_shared(&shm1, a72, 0, r92, r92 + (r90 - r91) - 1);
-            }
-            let93 = v85 + r90;
-            r94 = let93 < 257 ? let93 : let93 - 257;
-            a95[0] = r94;
-            host_write_local(&group0, 0, 0, la1, a95, 0, 0, 0);
-            r74 = v76 + r90;
-        }
-        if (v70) {
-            float _a96[256];
-            float *a96 = _a96;
-            uint32_t r97;
-            uint32_t _a118[1];
-            uint32_t *a118 = _a118;
-            uint32_t v119;
-            uint32_t _a120[1];
-            uint32_t *a120 = _a120;
-            uint32_t v121;
-            uint32_t r124;
-            uint32_t v126;
-            bool v127;
-            
-            r97 = 0;
-            while (1) {
-                uint32_t v98;
-                uint32_t v99;
-                uint32_t _a104[1];
-                uint32_t *a104 = _a104;
-                uint32_t v105;
-                uint32_t _a106[1];
-                uint32_t *a106 = _a106;
-                uint32_t v107;
-                uint32_t r108;
-                uint32_t let109;
-                uint32_t r110;
-                uint32_t let111;
-                uint32_t r112;
-                uint32_t let115;
-                uint32_t r116;
-                uint32_t _a117[1];
-                uint32_t *a117 = _a117;
-                
-                v98 = r97;
-                if (!(v98 < 256))
-                    break;
-                v99 = r97;
-                while (1) {
-                    uint32_t _a100[1];
-                    uint32_t *a100 = _a100;
-                    uint32_t v101;
-                    uint32_t _a102[1];
-                    uint32_t *a102 = _a102;
-                    uint32_t v103;
-                    
-                    host_read_local(&group0, 3, 0, la78, a100, 0, 0, 0);
-                    v101 = a100[0];
-                    host_read_local(&group0, 3, 0, la79, a102, 0, 0, 0);
-                    v103 = a102[0];
-                    if (!(v101 == v103))
-                        break;
-                    usleep(100);
-                }
-                host_read_local(&group0, 3, 0, la78, a104, 0, 0, 0);
-                v105 = a104[0];
-                host_read_local(&group0, 3, 0, la79, a106, 0, 0, 0);
-                v107 = a106[0];
-                r108 = 257;
-                let109 = r108 + v107 - v105;
-                r110 = let109 < r108 ? let109 : let109 - r108;
-                let111 = -v99 + 256;
-                r112 = let111 <= r110 ? let111 : r110;
-                if (v105 + r112 <= r108) {
-                    host_read_shared(&shm64, a96, v105, v99, v99 + r112 - 1);
+                if (v114 + r121 <= r115) {
+                    host_write_shared(&shm1, a106, v114, v110, v110 + r121 - 1);
                 } else {
-                    uint32_t r113;
-                    uint32_t r114;
+                    uint32_t r123;
+                    uint32_t r124;
                     
-                    r113 = r108 - v105;
-                    host_read_shared(&shm64, a96, v105, v99, v99 + r113 - 1);
-                    r114 = v99 + r113;
-                    host_read_shared(&shm64, a96, 0, r114, r114 + r112 - r113 -
-                                     1);
+                    r123 = r115 - v114;
+                    host_write_shared(&shm1, a106, v114, v110, v110 + r123 - 1);
+                    r124 = v110 + r123;
+                    host_write_shared(&shm1, a106, 0, r124, r124 + (r121 -
+                                                                    r123) - 1);
                 }
-                let115 = v105 + r112;
-                r116 = let115 < r108 ? let115 : let115 - r108;
-                a117[0] = r116;
-                host_write_local(&group0, 3, 0, la78, a117, 0, 0, 0);
-                r97 = v99 + r112;
+                let125 = v114 + r121;
+                let126 = r115;
+                r127 = let125 < let126 ? let125 : let125 - let126;
+                a128[0] = r127;
+                host_write_local(&group0, 0, 0, la1, a128, 0, 0, 0);
+                r122 = r121;
+            } else {
+                r122 = 0;
             }
-            host_read_local(&group0, 3, 0, la78, a118, 0, 0, 0);
-            v119 = a118[0];
-            host_read_local(&group0, 3, 0, la79, a120, 0, 0, 0);
-            v121 = a120[0];
-            if (v119 == v121 && v121 == 256) {
-                uint32_t _a122[1];
-                uint32_t *a122 = _a122;
-                uint32_t _a123[1];
-                uint32_t *a123 = _a123;
-                
-                a122[0] = 0;
-                host_write_local(&group0, 3, 0, la78, a122, 0, 0, 0);
-                a123[0] = 0;
-                host_write_local(&group0, 3, 0, la79, a123, 0, 0, 0);
+            if (0 == r122) {
+                usleep(100);
+            } else {
+                r108 = v110 + r122;
             }
-            r124 = 256;
-            
-            float _a125[r124];
-            float *a125 = _a125;
-            
-            for (v126 = 0; v126 < r124; v126++) {
-                a125[v126] = a96[v126];
-            }
-            v127 = emit_samples(a125);
-            if (!v127) {
-                r67 = false;
-            }
-        } else {
-            r67 = false;
         }
+        r101 = v104;
     }
+    pthread_join(t67, NULL);
     teardown_queues();
     e_free(&shm1);
     e_free(&shm64);

@@ -11,6 +11,12 @@ volatile float *const la77 = (float *) 8200;
 volatile uint32_t *const la78 = (uint32_t *) 9228;
 volatile uint32_t *const la79 = (uint32_t *) 9232;
 volatile void *const sa80 = (void *) 16778244;
+extern int _CORE_ROW_;
+asm(".global __CORE_ROW_");
+asm(".set __CORE_ROW_,35");
+extern int _CORE_COL_;
+asm(".global __CORE_COL_");
+asm(".set __CORE_COL_,8");
 int main()
 {
     float _a0[] = {0.0, 1.5059114e-4, 6.0227513e-4, 1.3547838e-3, 2.4076402e-3,
@@ -73,132 +79,140 @@ int main()
         float _a1[256];
         float *a1 = _a1;
         uint32_t r2;
-        uint32_t v18;
         uint32_t v19;
-        uint32_t r20;
+        uint32_t v20;
         uint32_t r21;
-        uint32_t v23;
-        uint32_t r24;
+        uint32_t r22;
+        uint32_t v24;
+        uint32_t r25;
         
         r2 = 0;
         while (1) {
             uint32_t v3;
             uint32_t v4;
-            uint32_t v7;
-            uint32_t v8;
-            uint32_t r9;
-            uint32_t let10;
-            uint32_t r11;
-            uint32_t let12;
+            uint32_t v5;
+            uint32_t v6;
+            uint32_t r7;
+            uint32_t let8;
+            uint32_t let9;
+            uint32_t r10;
+            uint32_t let11;
+            uint32_t r12;
             uint32_t r13;
-            uint32_t let16;
-            uint32_t r17;
             
             v3 = r2;
             if (!(v3 < 256))
                 break;
             v4 = r2;
-            while (1) {
-                uint32_t v5;
-                uint32_t v6;
+            v5 = la73[0];
+            v6 = la76[0];
+            r7 = 257;
+            let8 = r7 + v6 - v5;
+            let9 = r7;
+            r10 = let8 < let9 ? let8 : let8 - let9;
+            let11 = -v4 + 256;
+            r12 = let11 <= r10 ? let11 : r10;
+            if (r12 > 0) {
+                uint32_t let16;
+                uint32_t let17;
+                uint32_t r18;
                 
-                v5 = la73[0];
-                v6 = la76[0];
-                if (!(v5 == v6))
-                    break;
-            }
-            v7 = la73[0];
-            v8 = la76[0];
-            r9 = 257;
-            let10 = r9 + v8 - v7;
-            r11 = let10 < r9 ? let10 : let10 - r9;
-            let12 = -v4 + 256;
-            r13 = let12 <= r11 ? let12 : r11;
-            if (v7 + r13 <= r9) {
-                core_read_local(la77, a1, v7, v4, v4 + r13 - 1);
+                if (v5 + r12 <= r7) {
+                    core_read_local(la77, a1, v5, v4, v4 + r12 - 1);
+                } else {
+                    uint32_t r14;
+                    uint32_t r15;
+                    
+                    r14 = r7 - v5;
+                    core_read_local(la77, a1, v5, v4, v4 + r14 - 1);
+                    r15 = v4 + r14;
+                    core_read_local(la77, a1, 0, r15, r15 + r12 - r14 - 1);
+                }
+                let16 = v5 + r12;
+                let17 = r7;
+                r18 = let16 < let17 ? let16 : let16 - let17;
+                la73[0] = r18;
+                la74[0] = r18;
+                r13 = r12;
             } else {
-                uint32_t r14;
-                uint32_t r15;
-                
-                r14 = r9 - v7;
-                core_read_local(la77, a1, v7, v4, v4 + r14 - 1);
-                r15 = v4 + r14;
-                core_read_local(la77, a1, 0, r15, r15 + r13 - r14 - 1);
+                r13 = 0;
             }
-            let16 = v7 + r13;
-            r17 = let16 < r9 ? let16 : let16 - r9;
-            la73[0] = r17;
-            la74[0] = r17;
-            r2 = v4 + r13;
+            if (!(0 == r13)) {
+                r2 = v4 + r13;
+            }
         }
-        v18 = la73[0];
-        v19 = la76[0];
-        if (v18 == v19 && v19 == 256) {
+        v19 = la73[0];
+        v20 = la76[0];
+        if (v19 == v20 && v20 == 256) {
             la73[0] = 0;
             la74[0] = 0;
             la75[0] = 0;
             la76[0] = 0;
         }
-        r20 = 256;
-        r21 = r20 <= 256 ? r20 : 256;
+        r21 = 256;
+        r22 = r21 <= 256 ? r21 : 256;
         
-        float _a22[r20 <= 256 ? r20 : 256];
-        float *a22 = _a22;
+        float _a23[r21 <= 256 ? r21 : 256];
+        float *a23 = _a23;
         
-        for (v23 = 0; v23 < (r20 <= 256 ? r20 : 256); v23++) {
-            a22[v23] = a1[v23] * a0[v23];
+        for (v24 = 0; v24 < (r21 <= 256 ? r21 : 256); v24++) {
+            a23[v24] = a1[v24] * a0[v24];
         }
-        r24 = 0;
+        r25 = 0;
         while (1) {
-            uint32_t v25;
             uint32_t v26;
-            uint32_t v30;
-            uint32_t v31;
+            uint32_t v27;
+            uint32_t v28;
+            uint32_t v29;
+            uint32_t r30;
+            uint32_t let31;
             uint32_t let32;
             uint32_t r33;
             uint32_t r34;
             uint32_t let35;
             uint32_t r36;
-            uint32_t let39;
-            uint32_t r40;
+            uint32_t r37;
             
-            v25 = r24;
-            if (!(v25 < 256))
+            v26 = r25;
+            if (!(v26 < 256))
                 break;
-            v26 = r24;
-            while (1) {
-                uint32_t v27;
-                uint32_t v28;
-                uint32_t let29;
-                
-                v27 = la78[0];
-                v28 = la79[0];
-                let29 = v28 + 1;
-                if (!((let29 < 257 ? let29 : v28 + 4294967040) == v27))
-                    break;
-            }
-            v30 = la78[0];
-            v31 = la79[0];
-            let32 = v31 + 257 - v30;
-            r33 = let32 < 257 ? let32 : let32 - 257;
-            r34 = -r33 + 256;
-            let35 = -v26 + 256;
+            v27 = r25;
+            v28 = la78[0];
+            v29 = la79[0];
+            r30 = 257;
+            let31 = r30 + v29 - v28;
+            let32 = r30;
+            r33 = let31 < let32 ? let31 : let31 - let32;
+            r34 = r30 - r33 - 1;
+            let35 = -v27 + 256;
             r36 = let35 <= r34 ? let35 : r34;
-            if (v31 + r36 <= 257) {
-                core_write_shared(sa80, a22, v31, v26, v26 + r36 - 1);
-            } else {
-                uint32_t r37;
-                uint32_t r38;
+            if (r36 > 0) {
+                uint32_t let40;
+                uint32_t let41;
+                uint32_t r42;
                 
-                r37 = -v31 + 257;
-                core_write_shared(sa80, a22, v31, v26, v26 + r37 - 1);
-                r38 = v26 + r37;
-                core_write_shared(sa80, a22, 0, r38, r38 + (r36 - r37) - 1);
+                if (v29 + r36 <= r30) {
+                    core_write_shared(sa80, a23, v29, v27, v27 + r36 - 1);
+                } else {
+                    uint32_t r38;
+                    uint32_t r39;
+                    
+                    r38 = r30 - v29;
+                    core_write_shared(sa80, a23, v29, v27, v27 + r38 - 1);
+                    r39 = v27 + r38;
+                    core_write_shared(sa80, a23, 0, r39, r39 + (r36 - r38) - 1);
+                }
+                let40 = v29 + r36;
+                let41 = r30;
+                r42 = let40 < let41 ? let40 : let40 - let41;
+                la79[0] = r42;
+                r37 = r36;
+            } else {
+                r37 = 0;
             }
-            let39 = v31 + r36;
-            r40 = let39 < 257 ? let39 : let39 - 257;
-            la79[0] = r40;
-            r24 = v26 + r36;
+            if (!(0 == r37)) {
+                r25 = v27 + r37;
+            }
         }
     }
     return 0;
