@@ -28,11 +28,11 @@ compileTimeVec len ixf = do
 
 processArr :: PrimType a
            => (Arr a -> CoreComp ())
-           -> CoreZ (Vector (Data a)) (Vector (Data a)) ()
+           -> CoreZ (Store (Vector (Data a))) (Store (Vector (Data a))) ()
 processArr f = loop $ do
-  s@(Store (_, arr)) <- receive'
+  s@(Store (_, arr)) <- receive
   lift $ f arr
-  emit' s
+  emit s
 
 mulImag :: (Num a, PrimType a, PrimType (Complex a))
         => Data (Complex a) -> Data a -> Data (Complex a)
@@ -107,7 +107,7 @@ bitRevArr n arr = do
           setArr b av arr)
       (return ())
 
-bitRev :: PrimType a => Length -> CoreZ (Vector (Data a)) (Vector (Data a)) ()
+bitRev :: Length -> CoreZ (Store ComplexSamples) (Store (ComplexSamples)) ()
 bitRev n = processArr (bitRevArr n)
 
 
@@ -115,13 +115,13 @@ bitRev n = processArr (bitRevArr n)
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
+fft :: Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
 fft = fftBase False
 
-ifft :: Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
+ifft :: Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
 ifft = fftBase True
 
-fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSamples ComplexSamples ()
+fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
 fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRev)
   where
     chanSize = 1 `ofLength` n
@@ -133,6 +133,7 @@ fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRe
     fftTask stages = processArr $ \arr -> do
       twids <- calcTwids inv n
       forM_ stages $ \k -> fftStageArr twids n k arr
+    fftTasks :: [CoreZ (Store ComplexSamples) (Store ComplexSamples) ()]
     fftTasks = P.map fftTask groups
     fftProgs = P.zipWith on fftTasks forFFT
     connect a b = a |>>chanSize>>| b
@@ -218,7 +219,7 @@ analyze = do
     emit output  -- emit before store!
     lift $ writeStore lastPhaseS lastPhase'
 
-shiftPitch :: CoreZ ComplexSamples ComplexSamples ()
+shiftPitch :: CoreZ ComplexSamples (Store ComplexSamples) ()
 shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
@@ -229,7 +230,7 @@ shiftPitch = loop $ do
       let value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
       setArr index value buffer
     return $ Store (lenRef, buffer)
-  emit' output
+  emit output
 
 synthetize :: CoreZ ComplexSamples ComplexSamples ()
 synthetize = do
@@ -278,7 +279,7 @@ pitchShift = 2
 
 -- Needed to be in sync with C the code!
 fftSize' :: Length
-fftSize' = 1024
+fftSize' = 512
 
 overlap :: Data Length
 overlap = 4
@@ -323,14 +324,14 @@ mainProgram = do
         window                       `on` 12 )
     (do buffer :: Arr Float <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
-        input <- unsafeFreezeVec fftSize buffer
+        input :: RealSamples <- unsafeFreezeVec fftSize buffer
         return (input, hasMore))
     chanSize
-    (\output -> do
+    ((\output -> do
         Manifest bufferSize buffer' <- fromPull output
-        buffer <- unsafeThawArr buffer'
+        buffer :: Arr Float <- unsafeThawArr buffer'
         needsMore :: Data Bool <- liftHost $ callFun "emit_samples" [ arrArg buffer ]
-        return needsMore)
+        return needsMore) :: RealSamples -> Host (Data Bool))
     chanSize
   onHost $ liftHost $ callProc "teardown_queues" []
 

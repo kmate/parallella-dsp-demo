@@ -5,12 +5,12 @@
 #include <string.h>
 #include <tgmath.h>
 volatile uint32_t *const la28 = (uint32_t *) 8192;
-volatile uint32_t *const la29 = (uint32_t *) 2225094672;
-volatile uint32_t *const la30 = (uint32_t *) 2225094676;
+volatile uint32_t *const la29 = (uint32_t *) 2225090576;
+volatile uint32_t *const la30 = (uint32_t *) 2225090580;
 volatile uint32_t *const la31 = (uint32_t *) 8196;
 volatile float _Complex *const la32 = (float _Complex *) 8200;
-volatile uint32_t *const la34 = (uint32_t *) 16400;
-volatile uint32_t *const la35 = (uint32_t *) 16404;
+volatile uint32_t *const la34 = (uint32_t *) 12304;
+volatile uint32_t *const la35 = (uint32_t *) 12308;
 volatile uint32_t *const la36 = (uint32_t *) 2222989316;
 volatile float _Complex *const la37 = (float _Complex *) 2222989320;
 extern int _CORE_ROW_;
@@ -23,23 +23,23 @@ asm(".set __CORE_COL_,9");
 int main()
 {
     uint32_t r0;
-    float _a1[513];
+    float _a1[257];
     float *a1 = _a1;
     uint32_t v2;
     
-    r0 = 513;
-    for (v2 = 0; v2 < 513; v2++) {
+    r0 = 257;
+    for (v2 = 0; v2 < 257; v2++) {
         a1[v2] = 0.0;
     }
     while (1) {
-        float _Complex _a3[1024];
+        float _Complex _a3[512];
         float _Complex *a3 = _a3;
         uint32_t r4;
         uint32_t v21;
         uint32_t v22;
         uint32_t r23;
         uint32_t r24;
-        float _Complex _a25[513];
+        float _Complex _a25[257];
         float _Complex *a25 = _a25;
         uint32_t v26;
         uint32_t r35;
@@ -60,16 +60,16 @@ int main()
             uint32_t r15;
             
             v5 = r4;
-            if (!(v5 < 1024))
+            if (!(v5 < 512))
                 break;
             v6 = r4;
             v7 = la28[0];
             v8 = la31[0];
-            r9 = 1025;
+            r9 = 513;
             let10 = r9 + v8 - v7;
             let11 = r9;
             r12 = let10 < let11 ? let10 : let10 - let11;
-            let13 = -v6 + 1024;
+            let13 = -v6 + 512;
             r14 = let13 <= r12 ? let13 : r12;
             if (r14 > 0) {
                 uint32_t let18;
@@ -102,15 +102,15 @@ int main()
         }
         v21 = la28[0];
         v22 = la31[0];
-        if (v21 == v22 && v22 == 1024) {
+        if (v21 == v22 && v22 == 512) {
             la28[0] = 0;
             la29[0] = 0;
             la30[0] = 0;
             la31[0] = 0;
         }
-        r23 = 1024;
-        r24 = 513;
-        for (v26 = 0; v26 < 513; v26++) {
+        r23 = 512;
+        r24 = 257;
+        for (v26 = 0; v26 < 257; v26++) {
             float let27;
             float let28;
             float let29;
@@ -135,7 +135,7 @@ int main()
                 ((let29 + 4.0 * ((cimag(let30) < 0.0 ? -let34 : let34) -
                                  a1[v26] - let29 * 1.5707964) / (2.0 *
                                                                  FELD_PI)) *
-                 43.066406);
+                 86.13281);
         }
         r35 = 0;
         while (1) {
@@ -153,17 +153,17 @@ int main()
             uint32_t r47;
             
             v36 = r35;
-            if (!(v36 < 513))
+            if (!(v36 < 257))
                 break;
             v37 = r35;
             v38 = la34[0];
             v39 = la35[0];
-            r40 = 514;
+            r40 = 258;
             let41 = r40 + v39 - v38;
             let42 = r40;
             r43 = let41 < let42 ? let41 : let41 - let42;
             r44 = r40 - r43 - 1;
-            let45 = -v37 + 513;
+            let45 = -v37 + 257;
             r46 = let45 <= r44 ? let45 : r44;
             if (r46 > 0) {
                 uint32_t let50;
@@ -194,7 +194,7 @@ int main()
                 r35 = v37 + r47;
             }
         }
-        for (v53 = 0; v53 < 513; v53++) {
+        for (v53 = 0; v53 < 257; v53++) {
             float let54;
             float let55;
             float let56;
