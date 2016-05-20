@@ -8,10 +8,11 @@ import System.IO
 import Zeldspar.Multicore
 
 
-type RealSamples      = Vector (Data Float)
-type ComplexSampleArr = Arr (Complex Float)
-type ComplexSamples   = Vector (Data (Complex Float))
-type Twiddles         = Vector (Data (Complex Float))
+type RealSamples        = DPull Float
+type ComplexSampleArr   = Arr (Complex Float)
+type ComplexSamples     = DPull (Complex Float)
+type ComplexSampleStore = Store ComplexSamples
+type Twiddles           = DPull (Complex Float)
 
 
 --------------------------------------------------------------------------------
@@ -21,16 +22,16 @@ type Twiddles         = Vector (Data (Complex Float))
 compileTimeVec :: (PrimType a, MonadComp m)
                => Length
                -> (Index -> a)
-               -> m (Vector (Data a))
+               -> m (DPull a)
 compileTimeVec len ixf = do
   arr <- initArr [ ixf i | i <- [0..len-1] ]
   unsafeFreezeVec (value len) arr
 
 processArr :: PrimType a
            => (Arr a -> CoreComp ())
-           -> CoreZ (Store (Vector (Data a))) (Store (Vector (Data a))) ()
+           -> CoreZ (Store (DPull a)) (Store (DPull a)) ()
 processArr f = loop $ do
-  s@(Store (_, arr)) <- receive
+  s@(Store (_,arr)) <- receive
   lift $ f arr
   emit s
 
@@ -107,7 +108,7 @@ bitRevArr n arr = do
           setArr b av arr)
       (return ())
 
-bitRev :: Length -> CoreZ (Store ComplexSamples) (Store (ComplexSamples)) ()
+bitRev :: PrimType a => Length -> CoreZ (Store (DPull a)) (Store (DPull a)) ()
 bitRev n = processArr (bitRevArr n)
 
 
@@ -115,13 +116,13 @@ bitRev n = processArr (bitRevArr n)
 -- "Pull-style" parallel FFT
 --------------------------------------------------------------------------------
 
-fft :: Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
+fft :: Length -> [CoreId] -> MulticoreZ ComplexSampleStore ComplexSampleStore ()
 fft = fftBase False
 
-ifft :: Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
+ifft :: Length -> [CoreId] -> MulticoreZ ComplexSampleStore ComplexSampleStore ()
 ifft = fftBase True
 
-fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ (Store ComplexSamples) (Store ComplexSamples) ()
+fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSampleStore ComplexSampleStore ()
 fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRev)
   where
     chanSize = 1 `ofLength` n
@@ -133,7 +134,6 @@ fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRe
     fftTask stages = processArr $ \arr -> do
       twids <- calcTwids inv n
       forM_ stages $ \k -> fftStageArr twids n k arr
-    fftTasks :: [CoreZ (Store ComplexSamples) (Store ComplexSamples) ()]
     fftTasks = P.map fftTask groups
     fftProgs = P.zipWith on fftTasks forFFT
     connect a b = a |>>chanSize>>| b
@@ -190,10 +190,10 @@ window = do
 interleave :: CoreZ RealSamples ComplexSamples ()
 interleave = loop $ do
   input <- receive
-  emit $ map (flip complex 0) input
+  emit $ fmap (flip complex 0) input
 
 zeroes :: Data Length -> RealSamples
-zeroes l = Indexed l $ const 0
+zeroes l = Pull l $ const 0
 
 analyze :: CoreZ ComplexSamples ComplexSamples ()
 analyze = do
@@ -201,7 +201,7 @@ analyze = do
   loop $ do
     input <- receive
     lastPhase <- lift $ unsafeFreezeStore lastPhaseS
-    let result = Indexed numPosBins ixf
+    let result = Pull numPosBins ixf
         ixf k = (complex magn freq, phs)
           where
             -- compute magnitude and phase
@@ -219,7 +219,7 @@ analyze = do
     emit output  -- emit before store!
     lift $ writeStore lastPhaseS lastPhase'
 
-shiftPitch :: CoreZ ComplexSamples (Store ComplexSamples) ()
+shiftPitch :: CoreZ ComplexSamples ComplexSampleStore ()
 shiftPitch = loop $ do
   input <- receive
   output <- lift $ do
@@ -238,7 +238,7 @@ synthetize = do
   loop $ do
     input <- receive
     sumPhase <- lift $ unsafeFreezeStore sumPhaseS
-    let result = Indexed numPosBins ixf
+    let result = Pull numPosBins ixf
         ixf k = (polar' magn phs, phs)
           where
             -- get magnitude and true frequency
@@ -261,12 +261,12 @@ synthetize = do
 zeroNegBins :: CoreZ ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
   input <- receive
-  emit $ Indexed fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
+  emit $ Pull fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
 accumulate :: CoreZ ComplexSamples RealSamples ()
 accumulate = loop $ do
   input <- receive
-  emit $ map ((/ i2n (fftSize * overlap)) . realPart) input
+  emit $ fmap ((/ i2n (fftSize * overlap)) . realPart) input
 
 
 --------------------------------------------------------------------------------
@@ -322,16 +322,15 @@ mainProgram = do
         (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
         accumulate                   `on` 13 |>>chanSize>>|
         window                       `on` 12 )
-    (do buffer :: Arr Float <- newArr fftSize
+    (do buffer <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
         input :: RealSamples <- unsafeFreezeVec fftSize buffer
         return (input, hasMore))
     chanSize
-    ((\output -> do
-        Manifest bufferSize buffer' <- fromPull output
-        buffer :: Arr Float <- unsafeThawArr buffer'
+    (\output -> do
+        let Store (_, buffer) = output :: Store RealSamples
         needsMore :: Data Bool <- liftHost $ callFun "emit_samples" [ arrArg buffer ]
-        return needsMore) :: RealSamples -> Host (Data Bool))
+        return needsMore)
     chanSize
   onHost $ liftHost $ callProc "teardown_queues" []
 
