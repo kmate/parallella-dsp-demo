@@ -13,7 +13,7 @@ static void signal_handler(int sig_num) {
   s_signal_received = sig_num;
 }
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 512
 float input[BUFFER_SIZE];
 float output[BUFFER_SIZE];
 
@@ -38,12 +38,14 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
       memcpy(input, wm->data, wm->size);
       if (BUFFER_SIZE != fwrite(input, sizeof(float), BUFFER_SIZE, dsp_in)) {
         DEBUG("[Server] Terminated (fread).\n");
+        s_signal_received = 9;
         break;
       }
       fflush(dsp_in);
       DEBUG("[Server] Samples sent.\n");
       if (BUFFER_SIZE != fread(output, sizeof(float), BUFFER_SIZE, dsp_out)) {
         printf("Server Terminated (fwrite).\n");
+        s_signal_received = 9;
         break;
       }
       DEBUG("[Server] Samples received.\n");
