@@ -5343,8 +5343,7 @@ void *thread_t1317(void *unused)
         uint32_t v1358;
         uint32_t v1360;
         uint32_t r1367;
-        uint32_t v1369;
-        bool v1370;
+        bool v1368;
         
         v1319 = r1318;
         if (!v1319)
@@ -5490,15 +5489,8 @@ void *thread_t1317(void *unused)
             }
         }
         r1367 = 512;
-        
-        float _a1368[r1367];
-        float *a1368 = _a1368;
-        
-        for (v1369 = 0; v1369 < r1367; v1369++) {
-            a1368[v1369] = a1320[v1369];
-        }
-        v1370 = emit_samples(a1368);
-        r1318 = v1370;
+        v1368 = emit_samples(a1320);
+        r1318 = v1368;
     }
     return NULL;
 }
@@ -5713,7 +5705,7 @@ int main()
     uint32_t v1259;
     pthread_t t1261;
     pthread_t t1317;
-    bool r1371;
+    bool r1369;
     
     setup_queues();
     a3[0] = 0;
@@ -6181,132 +6173,132 @@ int main()
     }
     pthread_create(&t1261, NULL, thread_t1261, NULL);
     pthread_create(&t1317, NULL, thread_t1317, NULL);
-    r1371 = true;
+    r1369 = true;
     while (1) {
+        bool v1370;
+        float _a1371[512];
+        float *a1371 = _a1371;
         bool v1372;
-        float _a1373[512];
-        float *a1373 = _a1373;
-        bool v1374;
-        uint32_t r1375;
-        float _a1376[512];
-        float *a1376 = _a1376;
-        uint32_t v1377;
-        uint32_t r1378;
+        uint32_t r1373;
+        float _a1374[512];
+        float *a1374 = _a1374;
+        uint32_t v1375;
+        uint32_t r1376;
         
-        v1372 = r1371;
-        if (!v1372)
+        v1370 = r1369;
+        if (!v1370)
             break;
-        v1374 = receive_samples(a1373);
-        r1375 = 512;
-        for (v1377 = 0; v1377 < 512; v1377++) {
-            a1376[v1377] = a1373[v1377];
+        v1372 = receive_samples(a1371);
+        r1373 = 512;
+        for (v1375 = 0; v1375 < 512; v1375++) {
+            a1374[v1375] = a1371[v1375];
         }
-        r1378 = 0;
+        r1376 = 0;
         while (1) {
-            uint32_t v1379;
+            uint32_t v1377;
+            uint32_t v1378;
+            uint32_t _a1379[1];
+            uint32_t *a1379 = _a1379;
             uint32_t v1380;
-            uint32_t _a1381[1];
-            uint32_t *a1381 = _a1381;
             uint32_t v1382;
+            uint32_t _a1383[1];
+            uint32_t *a1383 = _a1383;
             uint32_t v1384;
-            uint32_t _a1385[1];
-            uint32_t *a1385 = _a1385;
             uint32_t v1386;
-            uint32_t v1388;
-            uint32_t r1389;
-            uint32_t let1390;
-            uint32_t let1391;
-            uint32_t r1392;
+            uint32_t r1387;
+            uint32_t let1388;
+            uint32_t let1389;
+            uint32_t r1390;
+            uint32_t r1391;
+            uint32_t let1392;
             uint32_t r1393;
-            uint32_t let1394;
-            uint32_t r1395;
-            uint32_t r1396;
+            uint32_t r1394;
             
-            v1379 = r1378;
-            if (!(v1379 < 512))
+            v1377 = r1376;
+            if (!(v1377 < 512))
                 break;
-            v1380 = r1378;
-            for (v1382 = 0; v1382 <= 0; v1382++) {
-                uint32_t v1383;
+            v1378 = r1376;
+            for (v1380 = 0; v1380 <= 0; v1380++) {
+                uint32_t v1381;
                 
-                v1383 = a0[v1382];
-                a1381[v1382] = v1383;
+                v1381 = a0[v1380];
+                a1379[v1380] = v1381;
             }
-            v1384 = a1381[0];
-            for (v1386 = 0; v1386 <= 0; v1386++) {
-                uint32_t v1387;
+            v1382 = a1379[0];
+            for (v1384 = 0; v1384 <= 0; v1384++) {
+                uint32_t v1385;
                 
-                v1387 = a1[v1386];
-                a1385[v1386] = v1387;
+                v1385 = a1[v1384];
+                a1383[v1384] = v1385;
             }
-            v1388 = a1385[0];
-            r1389 = 513;
-            let1390 = r1389 + v1388 - v1384;
-            let1391 = r1389;
-            r1392 = let1390 < let1391 ? let1390 : let1390 - let1391;
-            r1393 = r1389 - r1392 - 1;
-            let1394 = -v1380 + 512;
-            r1395 = let1394 <= r1393 ? let1394 : r1393;
-            if (r1395 > 0) {
-                uint32_t let1405;
-                uint32_t let1406;
-                uint32_t r1407;
-                uint32_t _a1408[1];
-                uint32_t *a1408 = _a1408;
-                uint32_t v1409;
+            v1386 = a1383[0];
+            r1387 = 513;
+            let1388 = r1387 + v1386 - v1382;
+            let1389 = r1387;
+            r1390 = let1388 < let1389 ? let1388 : let1388 - let1389;
+            r1391 = r1387 - r1390 - 1;
+            let1392 = -v1378 + 512;
+            r1393 = let1392 <= r1391 ? let1392 : r1391;
+            if (r1393 > 0) {
+                uint32_t let1403;
+                uint32_t let1404;
+                uint32_t r1405;
+                uint32_t _a1406[1];
+                uint32_t *a1406 = _a1406;
+                uint32_t v1407;
                 
-                if (v1388 + r1395 <= r1389) {
-                    uint32_t v1397;
+                if (v1386 + r1393 <= r1387) {
+                    uint32_t v1395;
                     
-                    for (v1397 = v1380; v1397 <= v1380 + r1395 - 1; v1397++) {
-                        float v1398;
+                    for (v1395 = v1378; v1395 <= v1378 + r1393 - 1; v1395++) {
+                        float v1396;
                         
-                        v1398 = a1376[v1397];
-                        a2[v1397 - v1380 + v1388] = v1398;
+                        v1396 = a1374[v1395];
+                        a2[v1395 - v1378 + v1386] = v1396;
                     }
                 } else {
-                    uint32_t r1399;
-                    uint32_t v1400;
-                    uint32_t r1402;
-                    uint32_t v1403;
+                    uint32_t r1397;
+                    uint32_t v1398;
+                    uint32_t r1400;
+                    uint32_t v1401;
                     
-                    r1399 = r1389 - v1388;
-                    for (v1400 = v1380; v1400 <= v1380 + r1399 - 1; v1400++) {
-                        float v1401;
+                    r1397 = r1387 - v1386;
+                    for (v1398 = v1378; v1398 <= v1378 + r1397 - 1; v1398++) {
+                        float v1399;
                         
-                        v1401 = a1376[v1400];
-                        a2[v1400 - v1380 + v1388] = v1401;
+                        v1399 = a1374[v1398];
+                        a2[v1398 - v1378 + v1386] = v1399;
                     }
-                    r1402 = v1380 + r1399;
-                    for (v1403 = r1402; v1403 <= r1402 + (r1395 - r1399) - 1;
-                         v1403++) {
-                        float v1404;
+                    r1400 = v1378 + r1397;
+                    for (v1401 = r1400; v1401 <= r1400 + (r1393 - r1397) - 1;
+                         v1401++) {
+                        float v1402;
                         
-                        v1404 = a1376[v1403];
-                        a2[v1403 - r1402] = v1404;
+                        v1402 = a1374[v1401];
+                        a2[v1401 - r1400] = v1402;
                     }
                 }
-                let1405 = v1388 + r1395;
-                let1406 = r1389;
-                r1407 = let1405 < let1406 ? let1405 : let1405 - let1406;
-                a1408[0] = r1407;
-                for (v1409 = 0; v1409 <= 0; v1409++) {
-                    uint32_t v1410;
+                let1403 = v1386 + r1393;
+                let1404 = r1387;
+                r1405 = let1403 < let1404 ? let1403 : let1403 - let1404;
+                a1406[0] = r1405;
+                for (v1407 = 0; v1407 <= 0; v1407++) {
+                    uint32_t v1408;
                     
-                    v1410 = a1408[v1409];
-                    a1[v1409] = v1410;
+                    v1408 = a1406[v1407];
+                    a1[v1407] = v1408;
                 }
-                r1396 = r1395;
+                r1394 = r1393;
             } else {
-                r1396 = 0;
+                r1394 = 0;
             }
-            if (0 == r1396) {
+            if (0 == r1394) {
                 usleep(100);
             } else {
-                r1378 = v1380 + r1396;
+                r1376 = v1378 + r1394;
             }
         }
-        r1371 = v1374;
+        r1369 = v1372;
     }
     pthread_join(t1317, NULL);
     teardown_queues();

@@ -10,86 +10,86 @@ void *thread_t67(void *unused);
 e_epiphany_t group0;
 e_mem_t shm64;
 off_t la0 = 8192;
-off_t la1 = 8196;
+off_t la1 = 8208;
 off_t sa2 = 16777216;
 off_t la3 = 8192;
-off_t la4 = 8200;
-off_t la5 = 8204;
-off_t la6 = 8196;
-off_t la7 = 8200;
+off_t la4 = 8224;
+off_t la5 = 8240;
+off_t la6 = 8208;
+off_t la7 = 8224;
 off_t la8 = 8192;
-off_t la9 = 12304;
-off_t la10 = 12308;
-off_t la11 = 8196;
-off_t la12 = 8200;
+off_t la9 = 12336;
+off_t la10 = 12352;
+off_t la11 = 8208;
+off_t la12 = 8224;
 off_t la13 = 8192;
-off_t la14 = 12304;
-off_t la15 = 12308;
-off_t la16 = 8196;
-off_t la17 = 8200;
+off_t la14 = 12336;
+off_t la15 = 12352;
+off_t la16 = 8208;
+off_t la17 = 8224;
 off_t la18 = 8192;
-off_t la19 = 12304;
-off_t la20 = 12308;
-off_t la21 = 8196;
-off_t la22 = 8200;
+off_t la19 = 12336;
+off_t la20 = 12352;
+off_t la21 = 8208;
+off_t la22 = 8224;
 off_t la23 = 8192;
-off_t la24 = 12304;
-off_t la25 = 12308;
-off_t la26 = 8196;
-off_t la27 = 8200;
+off_t la24 = 12336;
+off_t la25 = 12352;
+off_t la26 = 8208;
+off_t la27 = 8224;
 off_t la28 = 8192;
-off_t la29 = 12304;
-off_t la30 = 12308;
-off_t la31 = 8196;
-off_t la32 = 8200;
+off_t la29 = 12336;
+off_t la30 = 12352;
+off_t la31 = 8208;
+off_t la32 = 8224;
 off_t la33 = 8192;
-off_t la34 = 12304;
-off_t la35 = 12308;
-off_t la36 = 8196;
-off_t la37 = 8200;
+off_t la34 = 12336;
+off_t la35 = 12352;
+off_t la36 = 8208;
+off_t la37 = 8224;
 off_t la38 = 8192;
-off_t la39 = 10264;
-off_t la40 = 10268;
-off_t la41 = 8196;
-off_t la42 = 8200;
+off_t la39 = 10288;
+off_t la40 = 10304;
+off_t la41 = 8208;
+off_t la42 = 8224;
 off_t la43 = 8192;
-off_t la44 = 10264;
-off_t la45 = 10268;
-off_t la46 = 8196;
-off_t la47 = 8200;
+off_t la44 = 10288;
+off_t la45 = 10304;
+off_t la46 = 8208;
+off_t la47 = 8224;
 off_t la48 = 8192;
-off_t la49 = 12304;
-off_t la50 = 12308;
-off_t la51 = 8196;
-off_t la52 = 8200;
+off_t la49 = 12336;
+off_t la50 = 12352;
+off_t la51 = 8208;
+off_t la52 = 8224;
 off_t la53 = 8192;
-off_t la54 = 12304;
-off_t la55 = 12308;
-off_t la56 = 8196;
-off_t la57 = 8200;
+off_t la54 = 12336;
+off_t la55 = 12352;
+off_t la56 = 8208;
+off_t la57 = 8224;
 off_t la58 = 8192;
-off_t la59 = 12304;
-off_t la60 = 12308;
-off_t la61 = 8196;
-off_t la62 = 8200;
+off_t la59 = 12336;
+off_t la60 = 12352;
+off_t la61 = 8208;
+off_t la62 = 8224;
 off_t la63 = 8192;
-off_t la64 = 12304;
-off_t la65 = 12308;
-off_t la66 = 8196;
-off_t la67 = 8200;
+off_t la64 = 12336;
+off_t la65 = 12352;
+off_t la66 = 8208;
+off_t la67 = 8224;
 off_t la68 = 8192;
-off_t la69 = 12304;
-off_t la70 = 12308;
-off_t la71 = 8196;
-off_t la72 = 8200;
+off_t la69 = 12336;
+off_t la70 = 12352;
+off_t la71 = 8208;
+off_t la72 = 8224;
 off_t la73 = 8192;
-off_t la74 = 12304;
-off_t la75 = 12308;
-off_t la76 = 8196;
-off_t la77 = 8200;
-off_t la78 = 10252;
-off_t la79 = 10256;
-off_t sa80 = 16779268;
+off_t la74 = 12336;
+off_t la75 = 12352;
+off_t la76 = 8208;
+off_t la77 = 8224;
+off_t la78 = 10288;
+off_t la79 = 10304;
+off_t sa80 = 16779280;
 void *thread_t67(void *unused)
 {
     bool r68;
@@ -107,8 +107,7 @@ void *thread_t67(void *unused)
         uint32_t *a93 = _a93;
         uint32_t v94;
         uint32_t r97;
-        uint32_t v99;
-        bool v100;
+        bool v98;
         
         v69 = r68;
         if (!v69)
@@ -194,15 +193,8 @@ void *thread_t67(void *unused)
             host_write_local(&group0, 3, 0, la79, a96, 0, 0, 0);
         }
         r97 = 512;
-        
-        float _a98[r97];
-        float *a98 = _a98;
-        
-        for (v99 = 0; v99 < r97; v99++) {
-            a98[v99] = a70[v99];
-        }
-        v100 = emit_samples(a98);
-        r68 = v100;
+        v98 = emit_samples(a70);
+        r68 = v98;
     }
     return NULL;
 }
@@ -338,7 +330,7 @@ int main()
     uint32_t _a66[1];
     uint32_t *a66 = _a66;
     pthread_t t67;
-    bool r101;
+    bool r99;
     
     e_init(0);
     e_reset_system();
@@ -492,95 +484,95 @@ int main()
     host_write_local(&group0, 3, 0, la79, a66, 0, 0, 0);
     e_load("core12.srec", &group0, 3, 0, 1);
     pthread_create(&t67, NULL, thread_t67, NULL);
-    r101 = true;
+    r99 = true;
     while (1) {
+        bool v100;
+        float _a101[512];
+        float *a101 = _a101;
         bool v102;
-        float _a103[512];
-        float *a103 = _a103;
-        bool v104;
-        uint32_t r105;
-        float _a106[512];
-        float *a106 = _a106;
-        uint32_t v107;
-        uint32_t r108;
+        uint32_t r103;
+        float _a104[512];
+        float *a104 = _a104;
+        uint32_t v105;
+        uint32_t r106;
         
-        v102 = r101;
-        if (!v102)
+        v100 = r99;
+        if (!v100)
             break;
-        v104 = receive_samples(a103);
-        r105 = 512;
-        for (v107 = 0; v107 < 512; v107++) {
-            a106[v107] = a103[v107];
+        v102 = receive_samples(a101);
+        r103 = 512;
+        for (v105 = 0; v105 < 512; v105++) {
+            a104[v105] = a101[v105];
         }
-        r108 = 0;
+        r106 = 0;
         while (1) {
-            uint32_t v109;
+            uint32_t v107;
+            uint32_t v108;
+            uint32_t _a109[1];
+            uint32_t *a109 = _a109;
             uint32_t v110;
             uint32_t _a111[1];
             uint32_t *a111 = _a111;
             uint32_t v112;
-            uint32_t _a113[1];
-            uint32_t *a113 = _a113;
-            uint32_t v114;
-            uint32_t r115;
-            uint32_t let116;
-            uint32_t let117;
-            uint32_t r118;
+            uint32_t r113;
+            uint32_t let114;
+            uint32_t let115;
+            uint32_t r116;
+            uint32_t r117;
+            uint32_t let118;
             uint32_t r119;
-            uint32_t let120;
-            uint32_t r121;
-            uint32_t r122;
+            uint32_t r120;
             
-            v109 = r108;
-            if (!(v109 < 512))
+            v107 = r106;
+            if (!(v107 < 512))
                 break;
-            v110 = r108;
-            host_read_local(&group0, 0, 0, la0, a111, 0, 0, 0);
+            v108 = r106;
+            host_read_local(&group0, 0, 0, la0, a109, 0, 0, 0);
+            v110 = a109[0];
+            host_read_local(&group0, 0, 0, la1, a111, 0, 0, 0);
             v112 = a111[0];
-            host_read_local(&group0, 0, 0, la1, a113, 0, 0, 0);
-            v114 = a113[0];
-            r115 = 513;
-            let116 = r115 + v114 - v112;
-            let117 = r115;
-            r118 = let116 < let117 ? let116 : let116 - let117;
-            r119 = r115 - r118 - 1;
-            let120 = -v110 + 512;
-            r121 = let120 <= r119 ? let120 : r119;
-            if (r121 > 0) {
-                uint32_t let125;
-                uint32_t let126;
-                uint32_t r127;
-                uint32_t _a128[1];
-                uint32_t *a128 = _a128;
+            r113 = 513;
+            let114 = r113 + v112 - v110;
+            let115 = r113;
+            r116 = let114 < let115 ? let114 : let114 - let115;
+            r117 = r113 - r116 - 1;
+            let118 = -v108 + 512;
+            r119 = let118 <= r117 ? let118 : r117;
+            if (r119 > 0) {
+                uint32_t let123;
+                uint32_t let124;
+                uint32_t r125;
+                uint32_t _a126[1];
+                uint32_t *a126 = _a126;
                 
-                if (v114 + r121 <= r115) {
-                    host_write_shared(&shm1, a106, v114, v110, v110 + r121 - 1);
+                if (v112 + r119 <= r113) {
+                    host_write_shared(&shm1, a104, v112, v108, v108 + r119 - 1);
                 } else {
-                    uint32_t r123;
-                    uint32_t r124;
+                    uint32_t r121;
+                    uint32_t r122;
                     
-                    r123 = r115 - v114;
-                    host_write_shared(&shm1, a106, v114, v110, v110 + r123 - 1);
-                    r124 = v110 + r123;
-                    host_write_shared(&shm1, a106, 0, r124, r124 + (r121 -
-                                                                    r123) - 1);
+                    r121 = r113 - v112;
+                    host_write_shared(&shm1, a104, v112, v108, v108 + r121 - 1);
+                    r122 = v108 + r121;
+                    host_write_shared(&shm1, a104, 0, r122, r122 + (r119 -
+                                                                    r121) - 1);
                 }
-                let125 = v114 + r121;
-                let126 = r115;
-                r127 = let125 < let126 ? let125 : let125 - let126;
-                a128[0] = r127;
-                host_write_local(&group0, 0, 0, la1, a128, 0, 0, 0);
-                r122 = r121;
+                let123 = v112 + r119;
+                let124 = r113;
+                r125 = let123 < let124 ? let123 : let123 - let124;
+                a126[0] = r125;
+                host_write_local(&group0, 0, 0, la1, a126, 0, 0, 0);
+                r120 = r119;
             } else {
-                r122 = 0;
+                r120 = 0;
             }
-            if (0 == r122) {
+            if (0 == r120) {
                 usleep(100);
             } else {
-                r108 = v110 + r122;
+                r106 = v108 + r120;
             }
         }
-        r101 = v104;
+        r99 = v102;
     }
     pthread_join(t67, NULL);
     teardown_queues();

@@ -5,14 +5,14 @@
 #include <string.h>
 #include <tgmath.h>
 volatile uint32_t *const la68 = (uint32_t *) 8192;
-volatile uint32_t *const la69 = (uint32_t *) 2359308304;
-volatile uint32_t *const la70 = (uint32_t *) 2359308308;
-volatile uint32_t *const la71 = (uint32_t *) 8196;
-volatile float _Complex *const la72 = (float _Complex *) 8200;
-volatile uint32_t *const la74 = (uint32_t *) 12304;
-volatile uint32_t *const la75 = (uint32_t *) 12308;
-volatile uint32_t *const la76 = (uint32_t *) 2357207044;
-volatile float *const la77 = (float *) 2357207048;
+volatile uint32_t *const la69 = (uint32_t *) 2359308336;
+volatile uint32_t *const la70 = (uint32_t *) 2359308352;
+volatile uint32_t *const la71 = (uint32_t *) 8208;
+volatile float _Complex *const la72 = (float _Complex *) 8224;
+volatile uint32_t *const la74 = (uint32_t *) 12336;
+volatile uint32_t *const la75 = (uint32_t *) 12352;
+volatile uint32_t *const la76 = (uint32_t *) 2357207056;
+volatile float *const la77 = (float *) 2357207072;
 extern int _CORE_ROW_;
 asm(".global __CORE_ROW_");
 asm(".set __CORE_ROW_,35");
@@ -22,7 +22,7 @@ asm(".set __CORE_COL_,9");
 int main()
 {
     while (1) {
-        float _Complex _a0[512];
+        float _Complex _a0[512] __attribute__((aligned(16)));
         float _Complex *a0 = _a0;
         uint32_t r1;
         uint32_t v18;
@@ -98,7 +98,7 @@ int main()
         r20 = 512;
         r21 = r20;
         
-        float _a22[r20];
+        float _a22[r20] __attribute__((aligned(16)));
         float *a22 = _a22;
         
         for (v23 = 0; v23 < r20; v23++) {
