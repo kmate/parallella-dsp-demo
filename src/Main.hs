@@ -146,7 +146,7 @@ distribute' stages ncores = P.reverse $ P.snd $ P.foldl chop (stages, []) sizes
     (quot, rem) = ntasks `P.quotRem` ncores
     ntasks = P.length stages
 
-fftStageArr :: Twiddles -> Length -> Index -> Arr (Complex Float) -> CoreComp ()
+fftStageArr :: Twiddles -> Length -> Index -> ComplexSampleArr -> CoreComp ()
 fftStageArr twids n k arr = do
   let numStages = P.floor (logBase 2 $ P.fromIntegral n)
       rounds    = value $ 1 `P.shiftL` P.fromIntegral k
@@ -155,7 +155,7 @@ fftStageArr twids n k arr = do
       twidStep  = rounds
   for (0, 1, Excl rounds) $ \r -> do
     tIxr <- initRef (0 :: Data Word32)
-    for (0, 1, Excl $ bflies) $ \b -> do
+    for (0, 1, Excl bflies) $ \b -> do
       aIx <- force $ i2n r * 2 * bflies + b
       bIx <- force $ aIx + itemStep
       tIx <- getRef tIxr
@@ -315,11 +315,11 @@ mainProgram = do
     addInclude "\"processor.h\""
     callProc "setup_queues" []
   runZ ((window >>> interleave)      `on` 0  |>>chanSize>>|
-        (fft  fftSize'          [1,2,3,7,6]) |>>chanSize>>|
+        fft  fftSize'            [1,2,3,7,6] |>>chanSize>>|
         analyze                      `on` 5  |>>halfChanSize>>|
         shiftPitch                   `on` 4  |>>halfChanSize>>|
         (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
-        (ifft fftSize'      [9,10,11,15,14]) |>>chanSize>>|
+        ifft fftSize'        [9,10,11,15,14] |>>chanSize>>|
         accumulate                   `on` 13 |>>chanSize>>|
         window                       `on` 12 )
     (do buffer <- newArr fftSize
@@ -340,7 +340,7 @@ main = do
     h <- openFile outFile WriteMode
     hPutStrLn h $ compile mainProgram
     hClose h
-    putStrLn $ "x86 source generated: " P.++ show outFile
+    putStrLn $ "PThread source generated: " P.++ show outFile
 
     let modules = compileAll `onParallella` mainProgram
     outFiles <- forM modules $ \(name, contents) -> do
