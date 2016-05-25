@@ -4,15 +4,18 @@
 #include <stdint.h>
 #include <string.h>
 #include <tgmath.h>
-volatile uint32_t *const la10 = (uint32_t *) 12352;
-volatile uint32_t *const la11 = (uint32_t *) 2157977616;
-volatile float _Complex *const la12 = (float _Complex *) 2157977632;
-volatile uint32_t *const la3 = (uint32_t *) 8192;
-volatile uint32_t *const la4 = (uint32_t *) 2155880480;
-volatile uint32_t *const la5 = (uint32_t *) 2155880496;
-volatile uint32_t *const la6 = (uint32_t *) 8208;
-volatile float _Complex *const la7 = (float _Complex *) 8224;
-volatile uint32_t *const la9 = (uint32_t *) 12336;
+volatile uint32_t *const la10 = (uint32_t *) 8208;
+volatile float _Complex *const la11 = (float _Complex *) 8224;
+volatile bool *const la12 = (bool *) 12336;
+volatile uint32_t *const la15 = (uint32_t *) 12368;
+volatile uint32_t *const la16 = (uint32_t *) 12384;
+volatile uint32_t *const la17 = (uint32_t *) 2157977616;
+volatile float _Complex *const la18 = (float _Complex *) 2157977632;
+volatile bool *const la5 = (bool *) 2155880512;
+volatile bool *const la6 = (bool *) 2155880528;
+volatile uint32_t *const la7 = (uint32_t *) 8192;
+volatile uint32_t *const la8 = (uint32_t *) 2155880544;
+volatile uint32_t *const la9 = (uint32_t *) 2155880560;
 extern int _CORE_ROW_;
 asm(".global __CORE_ROW_");
 asm(".set __CORE_ROW_,32");
@@ -22,13 +25,11 @@ asm(".set __CORE_COL_,9");
 int main()
 {
     while (1) {
-        float _Complex _a0[512] __attribute__((aligned(16)));
-        float _Complex *a0 = _a0;
-        uint32_t r1;
-        uint32_t v18;
-        uint32_t v19;
-        uint32_t r20;
-        float _Complex _a21[] __attribute__((aligned(16))) = {1.0, 0.9999247 +
+        uint32_t r0;
+        float _Complex _a1[512] __attribute__((aligned(16)));
+        float _Complex *a1 = _a1;
+        bool v2;
+        float _Complex _a23[] __attribute__((aligned(16))) = {1.0, 0.9999247 +
                                                               -1.2271538e-2 * I,
                                                               0.9996988 +
                                                               -2.4541229e-2 * I,
@@ -539,198 +540,228 @@ int main()
                                                               -0.9999247 +
                                                               -1.2271485e-2 *
                                                               I};
-        float _Complex *a21 = _a21;
-        uint32_t v22;
-        uint32_t v30;
-        uint32_t v38;
-        uint32_t r46;
+        float _Complex *a23 = _a23;
+        uint32_t v24;
+        uint32_t v32;
+        uint32_t v40;
+        bool v48;
+        bool r49;
         
-        r1 = 0;
-        while (1) {
-            uint32_t v2;
-            uint32_t v3;
-            uint32_t v4;
-            uint32_t v5;
-            uint32_t r6;
-            uint32_t let7;
-            uint32_t let8;
-            uint32_t r9;
-            uint32_t let10;
-            uint32_t r11;
-            uint32_t r12;
+        r0 = 512;
+        v2 = la5[0];
+        la6[0] = v2;
+        if (v2) {
+            uint32_t r3;
+            uint32_t v21;
+            uint32_t v22;
             
-            v2 = r1;
-            if (!(v2 < 512))
-                break;
-            v3 = r1;
-            v4 = la3[0];
-            v5 = la6[0];
-            r6 = 513;
-            let7 = r6 + v5 - v4;
-            let8 = r6;
-            r9 = let7 < let8 ? let7 : let7 - let8;
-            let10 = -v3 + 512;
-            r11 = let10 <= r9 ? let10 : r9;
-            if (r11 > 0) {
-                uint32_t let15;
-                uint32_t let16;
-                uint32_t r17;
+            r3 = 0;
+            while (1) {
+                bool v4;
+                uint32_t v5;
+                uint32_t v6;
+                uint32_t v7;
+                uint32_t v8;
+                uint32_t r9;
+                uint32_t let10;
+                uint32_t let11;
+                uint32_t r12;
+                uint32_t let13;
+                uint32_t r14;
+                uint32_t r15;
                 
-                if (v4 + r11 <= r6) {
-                    core_read_local(la7, a0, v4, v3, v3 + r11 - 1);
-                } else {
-                    uint32_t r13;
-                    uint32_t r14;
+                v4 = la5[0];
+                v5 = r3;
+                if (!(v4 && v5 < r0))
+                    break;
+                v6 = r3;
+                v7 = la7[0];
+                v8 = la10[0];
+                r9 = 513;
+                let10 = r9 + v8 - v7;
+                let11 = r9;
+                r12 = let10 < let11 ? let10 : let10 - let11;
+                let13 = r0 - 1 - v6 + 1;
+                r14 = let13 <= r12 ? let13 : r12;
+                if (r14 > 0) {
+                    uint32_t let18;
+                    uint32_t let19;
+                    uint32_t r20;
                     
-                    r13 = r6 - v4;
-                    core_read_local(la7, a0, v4, v3, v3 + r13 - 1);
-                    r14 = v3 + r13;
-                    core_read_local(la7, a0, 0, r14, r14 + r11 - r13 - 1);
+                    if (v7 + r14 <= r9) {
+                        core_read_local(la11, a1, v7, v6, v6 + r14 - 1);
+                    } else {
+                        uint32_t r16;
+                        uint32_t r17;
+                        
+                        r16 = r9 - v7;
+                        core_read_local(la11, a1, v7, v6, v6 + r16 - 1);
+                        r17 = v6 + r16;
+                        core_read_local(la11, a1, 0, r17, r17 + r14 - r16 - 1);
+                    }
+                    let18 = v7 + r14;
+                    let19 = r9;
+                    r20 = let18 < let19 ? let18 : let18 - let19;
+                    la7[0] = r20;
+                    la8[0] = r20;
+                    r15 = r14;
+                } else {
+                    r15 = 0;
                 }
-                let15 = v4 + r11;
-                let16 = r6;
-                r17 = let15 < let16 ? let15 : let15 - let16;
-                la3[0] = r17;
-                la4[0] = r17;
-                r12 = r11;
-            } else {
-                r12 = 0;
+                if (!(0 == r15)) {
+                    r3 = v6 + r15;
+                }
             }
-            if (!(0 == r12)) {
-                r1 = v3 + r12;
+            v21 = la7[0];
+            v22 = la10[0];
+            if (v21 == v22 && v22 == 512) {
+                la7[0] = 0;
+                la8[0] = 0;
+                la9[0] = 0;
+                la10[0] = 0;
             }
         }
-        v18 = la3[0];
-        v19 = la6[0];
-        if (v18 == v19 && v19 == 512) {
-            la3[0] = 0;
-            la4[0] = 0;
-            la5[0] = 0;
-            la6[0] = 0;
+        if (!v2) {
+            la12[0] = false;
+            core_halt();
         }
-        r20 = 512;
-        for (v22 = 0; v22 < 1; v22++) {
-            uint32_t r23;
-            uint32_t v24;
+        for (v24 = 0; v24 < 1; v24++) {
+            uint32_t r25;
+            uint32_t v26;
             
-            r23 = 0;
-            for (v24 = 0; v24 < 256; v24++) {
-                uint32_t r25;
-                uint32_t r26;
-                uint32_t v27;
-                float _Complex v28;
-                float _Complex v29;
+            r25 = 0;
+            for (v26 = 0; v26 < 256; v26++) {
+                uint32_t r27;
+                uint32_t r28;
+                uint32_t v29;
+                float _Complex v30;
+                float _Complex v31;
                 
-                r25 = (uint32_t) v22 * 512 + v24;
-                r26 = r25 + 256;
-                v27 = r23;
-                r23 = r23 + 1;
-                v28 = a0[r25];
-                v29 = a0[r26];
-                a0[r25] = v28 + v29;
-                a0[r26] = (v28 - v29) * a21[v27];
+                r27 = (uint32_t) v24 * 512 + v26;
+                r28 = r27 + 256;
+                v29 = r25;
+                r25 = r25 + 1;
+                v30 = a1[r27];
+                v31 = a1[r28];
+                a1[r27] = v30 + v31;
+                a1[r28] = (v30 - v31) * a23[v29];
             }
         }
-        for (v30 = 0; v30 < 2; v30++) {
-            uint32_t r31;
-            uint32_t v32;
+        for (v32 = 0; v32 < 2; v32++) {
+            uint32_t r33;
+            uint32_t v34;
             
-            r31 = 0;
-            for (v32 = 0; v32 < 128; v32++) {
-                uint32_t r33;
-                uint32_t r34;
-                uint32_t v35;
-                float _Complex v36;
-                float _Complex v37;
+            r33 = 0;
+            for (v34 = 0; v34 < 128; v34++) {
+                uint32_t r35;
+                uint32_t r36;
+                uint32_t v37;
+                float _Complex v38;
+                float _Complex v39;
                 
-                r33 = (uint32_t) v30 * 256 + v32;
-                r34 = r33 + 128;
-                v35 = r31;
-                r31 = r31 + 2;
-                v36 = a0[r33];
-                v37 = a0[r34];
-                a0[r33] = v36 + v37;
-                a0[r34] = (v36 - v37) * a21[v35];
+                r35 = (uint32_t) v32 * 256 + v34;
+                r36 = r35 + 128;
+                v37 = r33;
+                r33 = r33 + 2;
+                v38 = a1[r35];
+                v39 = a1[r36];
+                a1[r35] = v38 + v39;
+                a1[r36] = (v38 - v39) * a23[v37];
             }
         }
-        for (v38 = 0; v38 < 4; v38++) {
-            uint32_t r39;
-            uint32_t v40;
+        for (v40 = 0; v40 < 4; v40++) {
+            uint32_t r41;
+            uint32_t v42;
             
-            r39 = 0;
-            for (v40 = 0; v40 < 64; v40++) {
-                uint32_t r41;
-                uint32_t r42;
-                uint32_t v43;
-                float _Complex v44;
-                float _Complex v45;
+            r41 = 0;
+            for (v42 = 0; v42 < 64; v42++) {
+                uint32_t r43;
+                uint32_t r44;
+                uint32_t v45;
+                float _Complex v46;
+                float _Complex v47;
                 
-                r41 = (uint32_t) v38 * 128 + v40;
-                r42 = r41 + 64;
-                v43 = r39;
-                r39 = r39 + 4;
-                v44 = a0[r41];
-                v45 = a0[r42];
-                a0[r41] = v44 + v45;
-                a0[r42] = (v44 - v45) * a21[v43];
+                r43 = (uint32_t) v40 * 128 + v42;
+                r44 = r43 + 64;
+                v45 = r41;
+                r41 = r41 + 4;
+                v46 = a1[r43];
+                v47 = a1[r44];
+                a1[r43] = v46 + v47;
+                a1[r44] = (v46 - v47) * a23[v45];
             }
         }
-        r46 = 0;
-        while (1) {
-            uint32_t v47;
-            uint32_t v48;
-            uint32_t v49;
-            uint32_t v50;
-            uint32_t r51;
-            uint32_t let52;
-            uint32_t let53;
-            uint32_t r54;
-            uint32_t r55;
-            uint32_t let56;
-            uint32_t r57;
-            uint32_t r58;
+        v48 = la12[0];
+        if (v48) {
+            uint32_t r50;
             
-            v47 = r46;
-            if (!(v47 < 512))
-                break;
-            v48 = r46;
-            v49 = la9[0];
-            v50 = la10[0];
-            r51 = 513;
-            let52 = r51 + v50 - v49;
-            let53 = r51;
-            r54 = let52 < let53 ? let52 : let52 - let53;
-            r55 = r51 - r54 - 1;
-            let56 = -v48 + 512;
-            r57 = let56 <= r55 ? let56 : r55;
-            if (r57 > 0) {
+            r50 = 0;
+            while (1) {
+                bool v51;
+                uint32_t v52;
+                uint32_t v53;
+                uint32_t v54;
+                uint32_t v55;
+                uint32_t r56;
+                uint32_t let57;
+                uint32_t let58;
+                uint32_t r59;
+                uint32_t r60;
                 uint32_t let61;
-                uint32_t let62;
+                uint32_t r62;
                 uint32_t r63;
                 
-                if (v50 + r57 <= r51) {
-                    core_write_local(la12, a0, v50, v48, v48 + r57 - 1);
-                } else {
-                    uint32_t r59;
-                    uint32_t r60;
+                v51 = la12[0];
+                v52 = r50;
+                if (!(v51 && v52 < r0))
+                    break;
+                v53 = r50;
+                v54 = la15[0];
+                v55 = la16[0];
+                r56 = 513;
+                let57 = r56 + v55 - v54;
+                let58 = r56;
+                r59 = let57 < let58 ? let57 : let57 - let58;
+                r60 = r56 - r59 - 1;
+                let61 = r0 - 1 - v53 + 1;
+                r62 = let61 <= r60 ? let61 : r60;
+                if (r62 > 0) {
+                    uint32_t let66;
+                    uint32_t let67;
+                    uint32_t r68;
                     
-                    r59 = r51 - v50;
-                    core_write_local(la12, a0, v50, v48, v48 + r59 - 1);
-                    r60 = v48 + r59;
-                    core_write_local(la12, a0, 0, r60, r60 + (r57 - r59) - 1);
+                    if (v55 + r62 <= r56) {
+                        core_write_local(la18, a1, v55, v53, v53 + r62 - 1);
+                    } else {
+                        uint32_t r64;
+                        uint32_t r65;
+                        
+                        r64 = r56 - v55;
+                        core_write_local(la18, a1, v55, v53, v53 + r64 - 1);
+                        r65 = v53 + r64;
+                        core_write_local(la18, a1, 0, r65, r65 + (r62 - r64) -
+                                         1);
+                    }
+                    let66 = v55 + r62;
+                    let67 = r56;
+                    r68 = let66 < let67 ? let66 : let66 - let67;
+                    la16[0] = r68;
+                    la17[0] = r68;
+                    r63 = r62;
+                } else {
+                    r63 = 0;
                 }
-                let61 = v50 + r57;
-                let62 = r51;
-                r63 = let61 < let62 ? let61 : let61 - let62;
-                la10[0] = r63;
-                la11[0] = r63;
-                r58 = r57;
-            } else {
-                r58 = 0;
+                if (!(0 == r63)) {
+                    r50 = v53 + r63;
+                }
             }
-            if (!(0 == r58)) {
-                r46 = v48 + r58;
-            }
+            r49 = true;
+        } else {
+            r49 = false;
+        }
+        if (!r49) {
+            la5[0] = false;
+            core_halt();
         }
     }
     return 0;
