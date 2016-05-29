@@ -125,7 +125,7 @@ ifft = fftBase True
 fftBase :: Bool -> Length -> [CoreId] -> MulticoreZ ComplexSampleStore ComplexSampleStore ()
 fftBase inv n cores = (P.foldl1 connect fftProgs) `connect` (bitRev n `on` forRev)
   where
-    chanSize = 1 `ofLength` n
+    chanSize = n
     forFFT = P.init cores
     forRev = P.last cores
     numStages = P.floor (logBase 2 $ P.fromIntegral n)
@@ -309,8 +309,8 @@ expectedDiff = 2 * π * i2n stepSize / i2n fftSize
 
 mainProgram :: Multicore ()
 mainProgram = do
-  let chanSize = 1 `ofLength` fftSize'
-      halfChanSize = 1 `ofLength` numPosBins'
+  let chanSize = fftSize'
+      halfChanSize = numPosBins'
   onHost $ liftHost $ do
     addInclude "\"processor.h\""
     callProc "setup_queues" []

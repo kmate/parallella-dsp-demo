@@ -1,19 +1,12 @@
-#include <e-feldspar.h>
-#include <e-lib.h>
+#include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
-volatile bool *const la103 = (bool *) 2358259760;
-volatile bool *const la104 = (bool *) 2358259776;
-volatile uint32_t *const la105 = (uint32_t *) 8192;
-volatile uint32_t *const la106 = (uint32_t *) 2358259792;
-volatile uint32_t *const la107 = (uint32_t *) 2358259808;
-volatile uint32_t *const la108 = (uint32_t *) 8208;
-volatile float *const la109 = (float *) 8224;
-volatile bool *const la110 = (bool *) 10288;
-volatile uint32_t *const la112 = (uint32_t *) 10320;
-volatile uint32_t *const la113 = (uint32_t *) 10336;
-volatile void *const sa114 = (void *) 16779280;
+volatile bool *const la45 = (bool *) 8192;
+volatile bool *const la46 = (bool *) 8208;
+volatile float *const la47 = (float *) 8224;
+volatile bool *const la48 = (bool *) 10272;
+volatile bool *const la49 = (bool *) 10288;
+volatile void *const sa50 = (void *) 16779264;
 extern int _CORE_ROW_;
 asm(".global __CORE_ROW_");
 asm(".set __CORE_ROW_,35");
@@ -269,166 +262,27 @@ int main()
         float _a2[512] __attribute__((aligned(16)));
         float *a2 = _a2;
         bool v3;
-        uint32_t r24;
-        uint32_t v26;
-        bool v27;
-        bool r28;
+        uint32_t r4;
+        uint32_t v6;
+        bool v7;
         
         r1 = 512;
-        v3 = la103[0];
-        la104[0] = v3;
-        if (v3) {
-            uint32_t r4;
-            uint32_t v22;
-            uint32_t v23;
-            
-            r4 = 0;
-            while (1) {
-                bool v5;
-                uint32_t v6;
-                uint32_t v7;
-                uint32_t v8;
-                uint32_t v9;
-                uint32_t r10;
-                uint32_t let11;
-                uint32_t let12;
-                uint32_t r13;
-                uint32_t let14;
-                uint32_t r15;
-                uint32_t r16;
-                
-                v5 = la103[0];
-                v6 = r4;
-                if (!(v5 && v6 < r1))
-                    break;
-                v7 = r4;
-                v8 = la105[0];
-                v9 = la108[0];
-                r10 = 513;
-                let11 = r10 + v9 - v8;
-                let12 = r10;
-                r13 = let11 < let12 ? let11 : let11 - let12;
-                let14 = r1 - 1 - v7 + 1;
-                r15 = let14 <= r13 ? let14 : r13;
-                if (r15 > 0) {
-                    uint32_t let19;
-                    uint32_t let20;
-                    uint32_t r21;
-                    
-                    if (v8 + r15 <= r10) {
-                        core_read_local(la109, a2, v8, v7, v7 + r15 - 1);
-                    } else {
-                        uint32_t r17;
-                        uint32_t r18;
-                        
-                        r17 = r10 - v8;
-                        core_read_local(la109, a2, v8, v7, v7 + r17 - 1);
-                        r18 = v7 + r17;
-                        core_read_local(la109, a2, 0, r18, r18 + r15 - r17 - 1);
-                    }
-                    let19 = v8 + r15;
-                    let20 = r10;
-                    r21 = let19 < let20 ? let19 : let19 - let20;
-                    la105[0] = r21;
-                    la106[0] = r21;
-                    r16 = r15;
-                } else {
-                    r16 = 0;
-                }
-                if (!(0 == r16)) {
-                    r4 = v7 + r16;
-                }
-            }
-            v22 = la105[0];
-            v23 = la108[0];
-            if (v22 == v23 && v23 == 512) {
-                la105[0] = 0;
-                la106[0] = 0;
-                la107[0] = 0;
-                la108[0] = 0;
-            }
-        }
+        v3 = core_read_c2c(la47, la45, la46, a2, 0, r1);
         if (!v3) {
-            la110[0] = false;
+            core_close_chan(sa50, la48, la49);
             core_halt();
         }
-        r24 = r1 <= 512 ? r1 : 512;
+        r4 = r1 <= 512 ? r1 : 512;
         
-        float _a25[r1 <= 512 ? r1 : 512] __attribute__((aligned(16)));
-        float *a25 = _a25;
+        float _a5[r1 <= 512 ? r1 : 512] __attribute__((aligned(16)));
+        float *a5 = _a5;
         
-        for (v26 = 0; v26 < (r1 <= 512 ? r1 : 512); v26++) {
-            a25[v26] = a2[v26] * a0[v26];
+        for (v6 = 0; v6 < (r1 <= 512 ? r1 : 512); v6++) {
+            a5[v6] = a2[v6] * a0[v6];
         }
-        v27 = la110[0];
-        if (v27) {
-            uint32_t r29;
-            
-            r29 = 0;
-            while (1) {
-                bool v30;
-                uint32_t v31;
-                uint32_t v32;
-                uint32_t v33;
-                uint32_t v34;
-                uint32_t r35;
-                uint32_t let36;
-                uint32_t let37;
-                uint32_t r38;
-                uint32_t r39;
-                uint32_t let40;
-                uint32_t r41;
-                uint32_t r42;
-                
-                v30 = la110[0];
-                v31 = r29;
-                if (!(v30 && v31 < r24))
-                    break;
-                v32 = r29;
-                v33 = la112[0];
-                v34 = la113[0];
-                r35 = 513;
-                let36 = r35 + v34 - v33;
-                let37 = r35;
-                r38 = let36 < let37 ? let36 : let36 - let37;
-                r39 = r35 - r38 - 1;
-                let40 = r24 - 1 - v32 + 1;
-                r41 = let40 <= r39 ? let40 : r39;
-                if (r41 > 0) {
-                    uint32_t let45;
-                    uint32_t let46;
-                    uint32_t r47;
-                    
-                    if (v34 + r41 <= r35) {
-                        core_write_shared(sa114, a25, v34, v32, v32 + r41 - 1);
-                    } else {
-                        uint32_t r43;
-                        uint32_t r44;
-                        
-                        r43 = r35 - v34;
-                        core_write_shared(sa114, a25, v34, v32, v32 + r43 - 1);
-                        r44 = v32 + r43;
-                        core_write_shared(sa114, a25, 0, r44, r44 + (r41 -
-                                                                     r43) - 1);
-                    }
-                    let45 = v34 + r41;
-                    let46 = r35;
-                    r47 = let45 < let46 ? let45 : let45 - let46;
-                    la113[0] = r47;
-                    r42 = r41;
-                } else {
-                    r42 = 0;
-                }
-                if (!(0 == r42)) {
-                    r29 = v32 + r42;
-                }
-            }
-            r28 = true;
-        } else {
-            r28 = false;
-        }
-        if (!r28) {
-            la103[0] = false;
+        v7 = core_write_c2h(sa50, la48, la49, a5, 0, r4);
+        if (!v7) {
+            core_close_chan(la47, la45, la46);
             core_halt();
         }
     }
