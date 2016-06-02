@@ -38,7 +38,7 @@ do
     SREC=../${f%.*}.srec
 
     # Build DEVICE side programs
-    e-gcc -std=gnu99 -ffast-math -fsingle-precision-constant -I../include -T ${ELDF} ../csrc/feldspar-parallella.c $f -o ${ELF} -le-lib -lm -O2
+    e-gcc -std=gnu99 -ffast-math -fsingle-precision-constant -I../include -T ${ELDF} ../csrc/feldspar-parallella.c $f -o ${ELF} -le-lib -lm -Os
     # Convert ebinaries to SREC files
     e-objcopy --srec-forceS3 --output-target srec ${ELF} ${SREC}
 done
