@@ -31,7 +31,7 @@ processArr :: PrimType a
            => (Arr a -> CoreComp ())
            -> CoreZ (Store (DPull a)) (Store (DPull a)) ()
 processArr f = loop $ do
-  s@(Store (_,arr)) <- receive
+  s@(Store (_,arr)) <- take
   lift $ f arr
   emit s
 
@@ -184,12 +184,12 @@ window :: CoreZ RealSamples RealSamples ()
 window = do
   hann <- lift $ compileTimeVec fftSize' (hann fftSize')
   loop $ do
-    input <- receive
+    input <- take
     emit $ zipWith (*) input hann
 
 interleave :: CoreZ RealSamples ComplexSamples ()
 interleave = loop $ do
-  input <- receive
+  input <- take
   emit $ fmap (flip complex 0) input
 
 zeroes :: Data Length -> RealSamples
@@ -199,7 +199,7 @@ analyze :: CoreZ ComplexSamples ComplexSamples ()
 analyze = do
   lastPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
-    input <- receive
+    input <- take
     lastPhase <- lift $ unsafeFreezeStore lastPhaseS
     let result = Pull numPosBins ixf
         ixf k = (complex magn freq, phs)
@@ -221,7 +221,7 @@ analyze = do
 
 shiftPitch :: CoreZ ComplexSamples ComplexSampleStore ()
 shiftPitch = loop $ do
-  input <- receive
+  input <- take
   output <- lift $ do
     buffer <- initArr (P.replicate (P.fromIntegral numPosBins') 0)
     lenRef <- initRef numPosBins
@@ -236,7 +236,7 @@ synthetize :: CoreZ ComplexSamples ComplexSamples ()
 synthetize = do
   sumPhaseS <- lift $ initStore (zeroes numPosBins)
   loop $ do
-    input <- receive
+    input <- take
     sumPhase <- lift $ unsafeFreezeStore sumPhaseS
     let result = Pull numPosBins ixf
         ixf k = (polar' magn phs, phs)
@@ -260,12 +260,12 @@ synthetize = do
 
 zeroNegBins :: CoreZ ComplexSamples ComplexSamples ()
 zeroNegBins = loop $ do
-  input <- receive
+  input <- take
   emit $ Pull fftSize $ \i -> (i <= numPosBins) ? (input ! i) $ 0
 
 accumulate :: CoreZ ComplexSamples RealSamples ()
 accumulate = loop $ do
-  input <- receive
+  input <- take
   emit $ fmap ((/ i2n (fftSize * overlap)) . realPart) input
 
 
@@ -314,14 +314,14 @@ mainProgram = do
   onHost $ liftHost $ do
     addInclude "\"processor.h\""
     callProc "setup_queues" []
-  runZ ((window >>> interleave)      `on` 0  |>>chanSize>>|
-        fft  fftSize'            [1,2,3,7,6] |>>chanSize>>|
-        analyze                      `on` 5  |>>halfChanSize>>|
-        shiftPitch                   `on` 4  |>>halfChanSize>>|
-        (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
-        ifft fftSize'        [9,10,11,15,14] |>>chanSize>>|
-        accumulate                   `on` 13 |>>chanSize>>|
-        window                       `on` 12 )
+  runParZ ((window >>> interleave)      `on` 0  |>>chanSize>>|
+           fft  fftSize'            [1,2,3,7,6] |>>chanSize>>|
+           analyze                      `on` 5  |>>halfChanSize>>|
+           shiftPitch                   `on` 4  |>>halfChanSize>>|
+           (synthetize >>> zeroNegBins) `on` 8  |>>chanSize>>|
+           ifft fftSize'        [9,10,11,15,14] |>>chanSize>>|
+           accumulate                   `on` 13 |>>chanSize>>|
+           window                       `on` 12 )
     (do buffer <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
         input :: RealSamples <- unsafeFreezeVec fftSize buffer
