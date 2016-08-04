@@ -19,13 +19,23 @@ type Twiddles           = DPull (Complex Float)
 -- Utilities
 --------------------------------------------------------------------------------
 
+unzip :: Pully vec (a,b) => vec -> (Pull a, Pull b)
+unzip ab = (Pull len (fst . (ab!)), Pull len (snd . (ab!)))
+  where
+    len = length ab
+
+unsafeFreezeVec :: (PrimType a, MonadComp m) => Arr a -> m (DPull a)
+unsafeFreezeVec arr = do
+  iarr <- unsafeFreezeArr arr
+  return $ toPull $ Manifest iarr
+
 compileTimeVec :: (PrimType a, MonadComp m)
                => Length
                -> (Index -> a)
                -> m (DPull a)
 compileTimeVec len ixf = do
   arr <- initArr [ ixf i | i <- [0..len-1] ]
-  unsafeFreezeVec (value len) arr
+  unsafeFreezeVec arr
 
 processArr :: PrimType a
            => (Arr a -> CoreComp ())
@@ -324,7 +334,7 @@ mainProgram = do
            window                       `on` 12 )
     (do buffer <- newArr fftSize
         hasMore :: Data Bool <- liftHost $ callFun "receive_samples" [ arrArg buffer ]
-        input :: RealSamples <- unsafeFreezeVec fftSize buffer
+        input :: RealSamples <- unsafeFreezeVec buffer
         return (input, hasMore))
     chanSize
     (\output -> do
