@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -89,7 +90,7 @@ int main()
         float _Complex *a3 = _a3;
         uint32_t r4;
         uint32_t v5;
-        bool v8;
+        bool v9;
         
         r0 = 257;
         v2 = core_read_c2c(la23, la21, la22, a1, 0, r0);
@@ -100,14 +101,21 @@ int main()
         r4 = 257;
         for (v5 = 0; v5 < 257; v5++) {
             uint32_t r6;
-            float _Complex let7;
+            uint32_t let7;
+            float _Complex let8;
             
             r6 = (uint32_t) lround((float) v5 * 2.0);
-            let7 = a1[v5];
-            a3[r6] = r6 < 257 ? creal(let7) + I * (2.0 * cimag(let7)) : 0.0;
+            assert(r6 < 257 && "setArr: index out of bounds");
+            assert(r0 <= 257 && "invalid IArr slice");
+            assert(v5 < r0 && "indexing outside of Pull vector");
+            let7 = v5;
+            assert(r0 <= 257 && "invalid IArr slice");
+            assert(let7 < r0 && "arrIx: index out of bounds");
+            let8 = a1[let7];
+            a3[r6] = r6 < 257 ? creal(let8) + I * (2.0 * cimag(let8)) : 0.0;
         }
-        v8 = core_write_c2c(la26, la24, la25, a3, 0, r4);
-        if (!v8) {
+        v9 = core_write_c2c(la26, la24, la25, a3, 0, r4);
+        if (!v9) {
             core_close_chan(la23, la21, la22);
             core_halt();
         }

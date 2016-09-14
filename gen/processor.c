@@ -172,6 +172,7 @@ void *thread_t2(void *unused)
         float _Complex _a8[r4 <= 512 ? r4 : 512];
         float _Complex *a8 = _a8;
         
+        r7 = r4 <= 512 ? r4 : 512;
         for (v9 = 0; v9 < (r4 <= 512 ? r4 : 512); v9++) {
             a8[v9] = a5[v9] * a3[v9];
         }
@@ -1244,6 +1245,7 @@ void *thread_t122(void *unused)
     uint32_t v125;
     
     r123 = 257;
+    r123 = 257;
     for (v125 = 0; v125 < 257; v125++) {
         a124[v125] = 0.0;
     }
@@ -1267,6 +1269,7 @@ void *thread_t122(void *unused)
             pthread_cancel(t122);
             pthread_join(t122, NULL);
         }
+        r129 = 257;
         r129 = 257;
         for (v131 = 0; v131 < 257; v131++) {
             float let132;
@@ -1303,6 +1306,7 @@ void *thread_t122(void *unused)
             pthread_cancel(t122);
             pthread_join(t122, NULL);
         }
+        r123 = 257;
         for (v141 = 0; v141 < 257; v141++) {
             float let142;
             float let143;
@@ -1401,6 +1405,7 @@ void *thread_t159(void *unused)
     uint32_t v162;
     
     r160 = 257;
+    r160 = 257;
     for (v162 = 0; v162 < 257; v162++) {
         a161[v162] = 0.0;
     }
@@ -1424,6 +1429,7 @@ void *thread_t159(void *unused)
             pthread_cancel(t159);
             pthread_join(t159, NULL);
         }
+        r160 = 257;
         for (v166 = 0; v166 < 257; v166++) {
             float let167;
             
@@ -1433,6 +1439,7 @@ void *thread_t159(void *unused)
                                                         86.13281) / 4.0 +
                                        let167 * 1.5707964);
         }
+        r168 = 512;
         r168 = 512;
         for (v170 = 0; v170 < 512; v170++) {
             float let171;
@@ -2593,6 +2600,7 @@ void *thread_t291(void *unused)
         float _a296[r292];
         float *a296 = _a296;
         
+        r295 = r292;
         for (v297 = 0; v297 < r292; v297++) {
             a296[v297] = creal(a293[v297]) / 2048.0;
         }
@@ -2740,6 +2748,7 @@ void *thread_t300(void *unused)
         float _a306[r302 <= 512 ? r302 : 512];
         float *a306 = _a306;
         
+        r305 = r302 <= 512 ? r302 : 512;
         for (v307 = 0; v307 < (r302 <= 512 ? r302 : 512); v307++) {
             a306[v307] = a303[v307] * a301[v307];
         }
@@ -2842,6 +2851,7 @@ int main()
             uint32_t v322;
             bool v323;
             
+            r320 = 512;
             r320 = 512;
             for (v322 = 0; v322 < 512; v322++) {
                 a321[v322] = a318[v322];

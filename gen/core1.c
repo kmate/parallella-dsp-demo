@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -533,9 +534,9 @@ int main()
                                                              -1.2271485e-2 * I};
         float _Complex *a3 = _a3;
         uint32_t v4;
-        uint32_t v12;
-        uint32_t v20;
-        bool v28;
+        uint32_t v13;
+        uint32_t v22;
+        bool v31;
         
         r0 = 512;
         v2 = core_read_c2c(la5, la3, la4, a1, 0, r0);
@@ -554,63 +555,87 @@ int main()
                 uint32_t v9;
                 float _Complex v10;
                 float _Complex v11;
+                uint32_t let12;
                 
                 r7 = (uint32_t) v4 * 512 + v6;
                 r8 = r7 + 256;
                 v9 = r5;
                 r5 = r5 + 1;
+                assert(r7 < 512 && "getArr: index out of bounds");
                 v10 = a1[r7];
+                assert(r8 < 512 && "getArr: index out of bounds");
                 v11 = a1[r8];
+                assert(r7 < 512 && "setArr: index out of bounds");
                 a1[r7] = v10 + v11;
-                a1[r8] = (v10 - v11) * a3[v9];
+                assert(r8 < 512 && "setArr: index out of bounds");
+                assert(v9 < 256 && "indexing outside of Pull vector");
+                let12 = v9;
+                assert(let12 < 256 && "arrIx: index out of bounds");
+                a1[r8] = (v10 - v11) * a3[let12];
             }
         }
-        for (v12 = 0; v12 < 2; v12++) {
-            uint32_t r13;
-            uint32_t v14;
+        for (v13 = 0; v13 < 2; v13++) {
+            uint32_t r14;
+            uint32_t v15;
             
-            r13 = 0;
-            for (v14 = 0; v14 < 128; v14++) {
-                uint32_t r15;
+            r14 = 0;
+            for (v15 = 0; v15 < 128; v15++) {
                 uint32_t r16;
-                uint32_t v17;
-                float _Complex v18;
+                uint32_t r17;
+                uint32_t v18;
                 float _Complex v19;
+                float _Complex v20;
+                uint32_t let21;
                 
-                r15 = (uint32_t) v12 * 256 + v14;
-                r16 = r15 + 128;
-                v17 = r13;
-                r13 = r13 + 2;
-                v18 = a1[r15];
+                r16 = (uint32_t) v13 * 256 + v15;
+                r17 = r16 + 128;
+                v18 = r14;
+                r14 = r14 + 2;
+                assert(r16 < 512 && "getArr: index out of bounds");
                 v19 = a1[r16];
-                a1[r15] = v18 + v19;
-                a1[r16] = (v18 - v19) * a3[v17];
+                assert(r17 < 512 && "getArr: index out of bounds");
+                v20 = a1[r17];
+                assert(r16 < 512 && "setArr: index out of bounds");
+                a1[r16] = v19 + v20;
+                assert(r17 < 512 && "setArr: index out of bounds");
+                assert(v18 < 256 && "indexing outside of Pull vector");
+                let21 = v18;
+                assert(let21 < 256 && "arrIx: index out of bounds");
+                a1[r17] = (v19 - v20) * a3[let21];
             }
         }
-        for (v20 = 0; v20 < 4; v20++) {
-            uint32_t r21;
-            uint32_t v22;
+        for (v22 = 0; v22 < 4; v22++) {
+            uint32_t r23;
+            uint32_t v24;
             
-            r21 = 0;
-            for (v22 = 0; v22 < 64; v22++) {
-                uint32_t r23;
-                uint32_t r24;
-                uint32_t v25;
-                float _Complex v26;
-                float _Complex v27;
+            r23 = 0;
+            for (v24 = 0; v24 < 64; v24++) {
+                uint32_t r25;
+                uint32_t r26;
+                uint32_t v27;
+                float _Complex v28;
+                float _Complex v29;
+                uint32_t let30;
                 
-                r23 = (uint32_t) v20 * 128 + v22;
-                r24 = r23 + 64;
-                v25 = r21;
-                r21 = r21 + 4;
-                v26 = a1[r23];
-                v27 = a1[r24];
-                a1[r23] = v26 + v27;
-                a1[r24] = (v26 - v27) * a3[v25];
+                r25 = (uint32_t) v22 * 128 + v24;
+                r26 = r25 + 64;
+                v27 = r23;
+                r23 = r23 + 4;
+                assert(r25 < 512 && "getArr: index out of bounds");
+                v28 = a1[r25];
+                assert(r26 < 512 && "getArr: index out of bounds");
+                v29 = a1[r26];
+                assert(r25 < 512 && "setArr: index out of bounds");
+                a1[r25] = v28 + v29;
+                assert(r26 < 512 && "setArr: index out of bounds");
+                assert(v27 < 256 && "indexing outside of Pull vector");
+                let30 = v27;
+                assert(let30 < 256 && "arrIx: index out of bounds");
+                a1[r26] = (v28 - v29) * a3[let30];
             }
         }
-        v28 = core_write_c2c(la8, la6, la7, a1, 0, r0);
-        if (!v28) {
+        v31 = core_write_c2c(la8, la6, la7, a1, 0, r0);
+        if (!v31) {
             core_close_chan(la5, la3, la4);
             core_halt();
         }

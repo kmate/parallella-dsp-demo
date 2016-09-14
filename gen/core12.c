@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -262,9 +263,13 @@ int main()
         float _a2[512] __attribute__((aligned(16)));
         float *a2 = _a2;
         bool v3;
-        uint32_t r4;
-        uint32_t v6;
-        bool v7;
+        uint32_t let4;
+        uint32_t r5;
+        uint32_t let6;
+        uint32_t let8;
+        uint32_t let9;
+        uint32_t v10;
+        bool v18;
         
         r1 = 512;
         v3 = core_read_c2c(la47, la45, la46, a2, 0, r1);
@@ -272,16 +277,54 @@ int main()
             core_close_chan(sa50, la48, la49);
             core_halt();
         }
-        r4 = r1 <= 512 ? r1 : 512;
+        assert(r1 <= 512 && "invalid IArr slice");
+        let4 = r1;
+        r5 = let4 <= 512 ? let4 : 512;
+        assert(r1 <= 512 && "invalid IArr slice");
+        let6 = r1;
         
-        float _a5[r1 <= 512 ? r1 : 512] __attribute__((aligned(16)));
-        float *a5 = _a5;
+        float _a7[let6 <= 512 ? let6 : 512] __attribute__((aligned(16)));
+        float *a7 = _a7;
         
-        for (v6 = 0; v6 < (r1 <= 512 ? r1 : 512); v6++) {
-            a5[v6] = a2[v6] * a0[v6];
+        assert(r1 <= 512 && "invalid IArr slice");
+        let8 = r1;
+        r5 = let8 <= 512 ? let8 : 512;
+        assert(r1 <= 512 && "invalid IArr slice");
+        let9 = r1;
+        for (v10 = 0; v10 < (let9 <= 512 ? let9 : 512); v10++) {
+            uint32_t let11;
+            uint32_t let12;
+            uint32_t let13;
+            uint32_t let14;
+            uint32_t let15;
+            uint32_t let16;
+            uint32_t let17;
+            
+            assert(r1 <= 512 && "invalid IArr slice");
+            let11 = r1;
+            assert(v10 < (let11 <= 512 ? let11 : 512) &&
+                "setArr: index out of bounds");
+            assert(r1 <= 512 && "invalid IArr slice");
+            let12 = r1;
+            assert(v10 < (let12 <= 512 ? let12 : 512) &&
+                "indexing outside of Pull vector");
+            let13 = v10;
+            assert(r1 <= 512 && "invalid IArr slice");
+            assert(let13 < r1 && "indexing outside of Pull vector");
+            let14 = let13;
+            assert(r1 <= 512 && "invalid IArr slice");
+            let15 = r1;
+            assert(v10 < (let15 <= 512 ? let15 : 512) &&
+                "indexing outside of Pull vector");
+            let16 = v10;
+            assert(let16 < 512 && "indexing outside of Pull vector");
+            let17 = let16;
+            assert(let14 < let15 && "arrIx: index out of bounds");
+            assert(let17 < 512 && "arrIx: index out of bounds");
+            a7[v10] = a2[let14] * a0[let17];
         }
-        v7 = core_write_c2h(sa50, la48, la49, a5, 0, r4);
-        if (!v7) {
+        v18 = core_write_c2h(sa50, la48, la49, a7, 0, r5);
+        if (!v18) {
             core_close_chan(la47, la45, la46);
             core_halt();
         }

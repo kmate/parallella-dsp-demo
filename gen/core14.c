@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -43,9 +44,13 @@ int main()
                 float _Complex v5;
                 float _Complex v6;
                 
+                assert(v3 < 512 && "getArr: index out of bounds");
                 v5 = a1[v3];
+                assert(r4 < 512 && "getArr: index out of bounds");
                 v6 = a1[r4];
+                assert(v3 < 512 && "setArr: index out of bounds");
                 a1[v3] = v6;
+                assert(r4 < 512 && "setArr: index out of bounds");
                 a1[r4] = v5;
             }
         }

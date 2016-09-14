@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <feldspar-parallella.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -23,7 +24,7 @@ int main()
         bool v2;
         uint32_t r3;
         uint32_t v5;
-        bool v6;
+        bool v7;
         
         r0 = 512;
         v2 = core_read_c2c(la44, la42, la43, a1, 0, r0);
@@ -31,16 +32,30 @@ int main()
             core_close_chan(la47, la45, la46);
             core_halt();
         }
+        assert(r0 <= 512 && "invalid IArr slice");
         r3 = r0;
+        assert(r0 <= 512 && "invalid IArr slice");
         
         float _a4[r0] __attribute__((aligned(16)));
         float *a4 = _a4;
         
+        assert(r0 <= 512 && "invalid IArr slice");
+        r3 = r0;
+        assert(r0 <= 512 && "invalid IArr slice");
         for (v5 = 0; v5 < r0; v5++) {
-            a4[v5] = creal(a1[v5]) / 2048.0;
+            uint32_t let6;
+            
+            assert(r0 <= 512 && "invalid IArr slice");
+            assert(v5 < r0 && "setArr: index out of bounds");
+            assert(r0 <= 512 && "invalid IArr slice");
+            assert(v5 < r0 && "indexing outside of Pull vector");
+            let6 = v5;
+            assert(r0 <= 512 && "invalid IArr slice");
+            assert(let6 < r0 && "arrIx: index out of bounds");
+            a4[v5] = creal(a1[let6]) / 2048.0;
         }
-        v6 = core_write_c2c(la47, la45, la46, a4, 0, r3);
-        if (!v6) {
+        v7 = core_write_c2c(la47, la45, la46, a4, 0, r3);
+        if (!v7) {
             core_close_chan(la44, la42, la43);
             core_halt();
         }

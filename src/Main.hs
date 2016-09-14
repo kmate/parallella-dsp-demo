@@ -9,7 +9,7 @@ import Zeldspar.Multicore
 
 
 type RealSamples        = DPull Float
-type ComplexSampleArr   = Arr (Complex Float)
+type ComplexSampleArr   = DArr (Complex Float)
 type ComplexSamples     = DPull (Complex Float)
 type ComplexSampleStore = Store ComplexSamples
 type Twiddles           = DPull (Complex Float)
@@ -24,21 +24,21 @@ unzip ab = (Pull len (fst . (ab!)), Pull len (snd . (ab!)))
   where
     len = length ab
 
-unsafeFreezeVec :: (PrimType a, MonadComp m) => Arr a -> m (DPull a)
+unsafeFreezeVec :: (PrimType a, MonadComp m) => DArr a -> m (DPull a)
 unsafeFreezeVec arr = do
   iarr <- unsafeFreezeArr arr
-  return $ toPull $ Manifest iarr
+  return $ toPull $ iarr
 
 compileTimeVec :: (PrimType a, MonadComp m)
                => Length
                -> (Index -> a)
                -> m (DPull a)
 compileTimeVec len ixf = do
-  arr <- initArr [ ixf i | i <- [0..len-1] ]
+  arr <- constArr [ ixf i | i <- [0..len-1] ]
   unsafeFreezeVec arr
 
 processArr :: PrimType a
-           => (Arr a -> CoreComp ())
+           => (DArr a -> CoreComp ())
            -> CoreZ (Store (DPull a)) (Store (DPull a)) ()
 processArr f = loop $ do
   s@(Store (_,arr)) <- take
@@ -100,7 +100,7 @@ polar' m p = complex re im
 -- Bit reversal
 --------------------------------------------------------------------------------
 
-bitRevArr :: (MonadComp m, PrimType a) => Length -> Arr a -> m ()
+bitRevArr :: (MonadComp m, PrimType a) => Length -> DArr a -> m ()
 bitRevArr n arr = do
   let m = value $ P.floor (logBase 2 $ P.fromIntegral n)
   for (0, 1, Excl $ value n) $ \a -> do
@@ -112,10 +112,10 @@ bitRevArr n arr = do
     modifyRef br (\b -> ((b .>>. 16) .|. (b .<<. 16)) .>>. (32 - m))
     b <- unsafeFreezeRef br
     iff (b > a)
-      (do av :: Data a <- getArr a arr
-          bv :: Data a <- getArr b arr
-          setArr a bv arr
-          setArr b av arr)
+      (do av <- getArr arr a
+          bv <- getArr arr b
+          setArr arr a bv
+          setArr arr b av)
       (return ())
 
 bitRev :: PrimType a => Length -> CoreZ (Store (DPull a)) (Store (DPull a)) ()
@@ -170,10 +170,10 @@ fftStageArr twids n k arr = do
       bIx <- force $ aIx + itemStep
       tIx <- getRef tIxr
       modifyRef tIxr (+(twidStep :: Data Word32))
-      a <- getArr aIx arr
-      b <- getArr bIx arr
-      setArr aIx (a + b) arr
-      setArr bIx ((a - b) * twids ! tIx) arr
+      a <- getArr arr aIx
+      b <- getArr arr bIx
+      setArr arr aIx (a + b)
+      setArr arr bIx ((a - b) * twids ! tIx)
 
 calcTwids :: MonadComp m => Bool -> Length -> m Twiddles
 calcTwids inv n = compileTimeVec len ixf
@@ -233,12 +233,12 @@ shiftPitch :: CoreZ ComplexSamples ComplexSampleStore ()
 shiftPitch = loop $ do
   input <- take
   output <- lift $ do
-    buffer <- initArr (P.replicate (P.fromIntegral numPosBins') 0)
+    buffer <- constArr (P.replicate (P.fromIntegral numPosBins') 0)
     lenRef <- initRef numPosBins
     for (0, 1, Excl numPosBins) $ \k -> do
       index <- force $ round $ i2n k * pitchShift
       let value = (index < numPosBins) ? ((input ! k) `mulImag` pitchShift) $ 0
-      setArr index value buffer
+      setArr buffer index value
     return $ Store (lenRef, buffer)
   emit output
 
